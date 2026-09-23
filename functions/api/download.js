@@ -1,17 +1,17 @@
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const fileName = url.searchParams.get('file');
+  const filePath = url.searchParams.get('file');
 
-  if (!fileName) {
+  if (!filePath) {
     return new Response('Missing file parameter', { status: 400 });
   }
 
   const owner = 'fontkemdoan';
   const repo = 'fontsdata';
-  const path = `fonts/${fileName}`;
+  const path = `fonts/${filePath}`;
 
-  const githubUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+  const githubUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;
 
   const res = await fetch(githubUrl, {
     headers: {
@@ -26,6 +26,7 @@ export async function onRequestGet(context) {
   }
 
   const fileBuffer = await res.arrayBuffer();
+  const fileName = filePath.split('/').pop();
 
   return new Response(fileBuffer, {
     headers: {
@@ -33,4 +34,4 @@ export async function onRequestGet(context) {
       'Content-Disposition': `attachment; filename="${fileName}"`
     }
   });
-}
+} 
