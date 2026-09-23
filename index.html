@@ -179,7 +179,7 @@
       <input type="text" id="search" placeholder="Nhập tên font...">
       <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
-    <div class="hint">Chỉ cần nhập tên font thôi mấy thằng óc 🤣</div>
+    <div class="hint">Tìm ko ra là do bờm, hoặc ko có font thật 🤣</div>
 
     <div id="results"></div>
     <div id="status"></div>
@@ -222,17 +222,23 @@ function render(list) {
   });
 }
 
-searchInput.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  clearBtn.classList.toggle('show', q.length > 0);
+// Chuẩn hóa chuỗi: bỏ khoảng trắng, gạch ngang, gạch dưới, viết thường hết
+function normalize(str) {
+  return str.toLowerCase().replace(/[\s\-_]+/g, '');
+}
 
-  if (!q) {
+searchInput.addEventListener('input', (e) => {
+  const raw = e.target.value.trim();
+  clearBtn.classList.toggle('show', raw.length > 0);
+
+  if (!raw) {
     document.getElementById('results').innerHTML = '';
     statusEl.textContent = '';
     return;
   }
 
-  const filtered = allFonts.filter(f => f.name.toLowerCase().includes(q));
+  const q = normalize(raw);
+  const filtered = allFonts.filter(f => normalize(f.name).includes(q));
   render(filtered.slice(0, 100));
 });
 
