@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tìm kiếm Font</title>
+<style>
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #f5f5f7;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { text-align: center; font-size: 24px; }
+  #search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  #results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .font-item {
+    background: white;
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .font-name { font-size: 15px; }
+  .download-btn {
+    background: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  #status { text-align: center; color: #888; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <h1>Tìm kiếm Font</h1>
+  <input type="text" id="search" placeholder="Gõ tên font để tìm...">
+  <div id="results"></div>
+  <div id="status">Đang tải danh sách font...</div>
+
+<script>
+let allFonts = [];
+
+fetch('manifest.json')
+  .then(res => res.json())
+  .then(data => {
+    allFonts = data;
+    document.getElementById('status').textContent = `Đã tải ${allFonts.length} font. Gõ để tìm kiếm.`;
+    render(allFonts.slice(0, 50));
+  })
+  .catch(err => {
+    document.getElementById('status').textContent = 'Lỗi tải manifest.json: ' + err;
+  });
+
+function render(list) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+  if (list.length === 0) {
+    container.innerHTML = '<div id="status">Không tìm thấy font nào.</div>';
+    return;
+  }
+  list.forEach(font => {
+    const div = document.createElement('div');
+    div.className = 'font-item';
+    div.innerHTML = `
+      <span class="font-name">${font.name}</span>
+      <a class="download-btn" href="${font.url}" download>Tải xuống</a>
+    `;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) {
+    render(allFonts.slice(0, 50));
+    return;
+  }
+  const filtered = allFonts.filter(f => f.name.toLowerCase().includes(q));
+  render(filtered.slice(0, 100));
+});
+</script>
+</body>
+</html>
