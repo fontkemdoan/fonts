@@ -80,7 +80,7 @@ function render(list) {
     div.className = 'font-item';
     div.innerHTML = `
       <span class="font-name">${font.name}</span>
-      <a class="download-btn" href="${font.url}" download>Tải xuống</a>
+      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download>Tải xuống</a>
     `;
     container.appendChild(div);
   });
@@ -97,4 +97,4 @@ document.getElementById('search').addEventListener('input', (e) => {
 });
 </script>
 </body>
-</html>
+</html> 
