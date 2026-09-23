@@ -5,12 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kem Đoàn</title>
 <link rel="icon" type="image/png" href="kemdoan.jpg">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
+  :root {
+    --bg: #e8ecf0;
+    --surface: #e8ecf0;
+    --accent: #666fff;
+    --accent2: #ff6990;
+    --text: #4a4a4a;
+    --muted: #8690a7;
+    --sl: #ffffff;
+    --sd: #c8cdd6;
+    --green: linear-gradient(90deg, #46eeaa, #2cbfc7);
+    --pink: linear-gradient(90deg, #ff9eb6, #ff6990);
+    --yellow: linear-gradient(90deg, #e6c349, #ff984c);
+    --orange: linear-gradient(90deg, #fab288, #f86d92);
+    --red: linear-gradient(90deg, #fa83ab, #ff4281);
+    --blue: linear-gradient(90deg, #9994ff, #666fff);
+    --grey: linear-gradient(90deg, #7f7f7f, #4d4d4d);
+    --dark: linear-gradient(90deg, #474747, #292929);
+    --violet: linear-gradient(90deg, #ff6cab, #7366ff);
+    --light: linear-gradient(90deg, #ffffff, #f4f4f4);
+    --nr: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
+    --nh: 8px 8px 20px var(--sd), -8px -8px 20px var(--sl);
+    --ni: inset 4px 4px 10px var(--sd), inset -4px -4px 10px var(--sl);
+    --np: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+  }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body {
     font-family: -apple-system, sans-serif;
-    background: #f5f5f7;
+    background: var(--bg);
+    color: var(--text);
     margin: 0;
     padding: 30px 20px;
     display: flex;
@@ -27,8 +53,8 @@
     margin-bottom: 24px;
   }
   .logo-img {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     border: 4px solid #fff;
     box-shadow: 0 4px 14px rgba(0,0,0,0.15);
@@ -51,13 +77,18 @@
     width: 100%;
     padding: 14px 44px 14px 20px;
     font-size: 16px;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 50px;
     outline: none;
-    background: #fff;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--ni);
+  }
+  #search::placeholder {
+    color: var(--muted);
   }
   #search:focus {
-    border-color: #007aff;
+    box-shadow: var(--np);
   }
   #clear-btn {
     position: absolute;
@@ -71,11 +102,14 @@
     color: #fff;
     border-radius: 50%;
     font-size: 14px;
-    line-height: 22px;
     cursor: pointer;
     display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
   }
-  #clear-btn.show { display: block; }
+  #clear-btn.show { display: flex; }
+  #clear-btn i { font-size: 14px; line-height: 1; }
 
   .hint {
     text-align: center;
@@ -102,14 +136,24 @@
   }
   .font-name { font-size: 15px; }
   .download-btn {
-    background: #007aff;
+    background: var(--blue);
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 10px;
     text-decoration: none;
     font-size: 14px;
+    font-weight: 600;
     white-space: nowrap;
+    box-shadow: var(--nr);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .download-btn:hover {
+    box-shadow: var(--nh);
+  }
+  .download-btn:active {
+    box-shadow: var(--np);
+    transform: translateY(1px);
   }
   #status {
     text-align: center;
@@ -135,10 +179,10 @@
     </div>
 
     <div class="search-wrap">
-      <input type="text" id="search" placeholder="Tìm kiếm font...">
-      <button id="clear-btn">✕</button>
+      <input type="text" id="search" placeholder="nhập tên font...">
+      <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
-    <div class="hint">Chỉ cần nhập tên file font</div>
+    <div class="hint">Chỉ cần nhập font thôi Quỳnh bờm 🤣</div>
 
     <div id="results"></div>
     <div id="status"></div>
