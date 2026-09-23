@@ -7,29 +7,31 @@
 <link rel="icon" type="image/png" href="kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
+  * {  -webkit-tap-highlight-color: transparent; }
+
   :root {
-    --bg: #e8ecf0;
-    --surface: #e8ecf0;
-    --accent: #666fff;
-    --accent2: #ff6990;
-    --text: #4a4a4a;
-    --muted: #8690a7;
-    --sl: #ffffff;
-    --sd: #c8cdd6;
-    --green: linear-gradient(90deg, #46eeaa, #2cbfc7);
-    --pink: linear-gradient(90deg, #ff9eb6, #ff6990);
-    --yellow: linear-gradient(90deg, #e6c349, #ff984c);
-    --orange: linear-gradient(90deg, #fab288, #f86d92);
-    --red: linear-gradient(90deg, #fa83ab, #ff4281);
-    --blue: linear-gradient(90deg, #9994ff, #666fff);
-    --grey: linear-gradient(90deg, #7f7f7f, #4d4d4d);
-    --dark: linear-gradient(90deg, #474747, #292929);
-    --violet: linear-gradient(90deg, #ff6cab, #7366ff);
-    --light: linear-gradient(90deg, #ffffff, #f4f4f4);
-    --nr: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
-    --nh: 8px 8px 20px var(--sd), -8px -8px 20px var(--sl);
-    --ni: inset 4px 4px 10px var(--sd), inset -4px -4px 10px var(--sl);
-    --np: inset 3px 3px 8px var(--sd), inset -3px -3px 8px var(--sl);
+    --bg: #efefef;
+    --text: #504d69;
+    --text-muted: #7f88a9;
+    --accent: #584838;
+    --green: #1fabb3;
+    --buy: #747dff;
+    --free: #ff7398;
+    --box-shadow-img:
+       8px 8px 16px #d9dae0;
+    --box-shadow:
+         8px 8px 16px #d9dae0,
+        -8px -8px 16px #fff;
+    --box-shadow-btn:
+        6px 6px 12px #d9dae0,
+        -6px -6px 12px #fff;
+    --active-btn:
+        inset 6px 6px 8px #d9dae0,
+        inset -6px -6px 8px #fff;
+    --bluegradient: linear-gradient(90deg, #9994ff, #666fff);
+    --yellowgradient: linear-gradient(90deg, #ffde68, #ffb179);
+    --greengradient: linear-gradient(90deg, #67ffeb, #4ad8e8);
+    --pinkgradient: linear-gradient(90deg, #ff9eb6, #ff6990);
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -80,15 +82,15 @@
     border: none;
     border-radius: 50px;
     outline: none;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--text);
-    box-shadow: var(--ni);
+    box-shadow: var(--active-btn);
   }
   #search::placeholder {
-    color: var(--muted);
+    color: var(--text-muted);
   }
   #search:focus {
-    box-shadow: var(--np);
+    box-shadow: var(--active-btn);
   }
   #clear-btn {
     position: absolute;
@@ -124,19 +126,19 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    background: transparent;
   }
   .font-item {
-    background: white;
+    background: transparent;
     border-radius: 8px;
     padding: 14px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
   .font-name { font-size: 15px; }
   .download-btn {
-    background: var(--blue);
+    background: var(--bluegradient);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -145,14 +147,11 @@
     font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
-    box-shadow: var(--nr);
+    box-shadow: var(--box-shadow-btn);
     transition: box-shadow 0.15s ease, transform 0.15s ease;
   }
-  .download-btn:hover {
-    box-shadow: var(--nh);
-  }
   .download-btn:active {
-    box-shadow: var(--np);
+    box-shadow: var(--active-btn);
     transform: translateY(1px);
   }
   #status {
@@ -220,7 +219,7 @@ function render(list) {
     div.className = 'font-item';
     div.innerHTML = `
       <span class="font-name">${font.name}</span>
-      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download>Tải xuống</a>
+      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download>Tải</a>
     `;
     container.appendChild(div);
   });
