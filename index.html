@@ -129,12 +129,13 @@
     background: transparent;
   }
   .font-item {
-    background: transparent;
-    border-radius: 8px;
+    background: var(--bg);
+    border-radius: 14px;
     padding: 14px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: var(--box-shadow);
   }
   .font-name { font-size: 15px; }
   .download-btn {
@@ -149,6 +150,9 @@
     white-space: nowrap;
     box-shadow: var(--box-shadow-btn);
     transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .download-btn:hover {
+    box-shadow: var(--active-btn);
   }
   .download-btn:active {
     box-shadow: var(--active-btn);
@@ -249,3 +253,4 @@ clearBtn.addEventListener('click', () => {
 </script>
 </body>
 </html>
+ 
