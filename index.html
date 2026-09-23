@@ -3,25 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tìm kiếm Font</title>
+<title>Kem Đoàn</title>
+<link rel="icon" type="image/png" href="kemdoan.jpg">
 <style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     font-family: -apple-system, sans-serif;
     background: #f5f5f7;
     margin: 0;
-    padding: 20px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
-  h1 { text-align: center; font-size: 24px; }
+
+  .content { flex: 1; }
+
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .logo-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    object-fit: cover;
+    background: #ddd;
+  }
+  .logo-text {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
+  }
+
+  .search-wrap {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+  }
   #search {
     width: 100%;
-    box-sizing: border-box;
-    padding: 12px 16px;
+    padding: 14px 44px 14px 20px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    outline: none;
+    background: #fff;
   }
+  #search:focus {
+    border-color: #007aff;
+  }
+  #clear-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: #ccc;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    display: none;
+  }
+  #clear-btn.show { display: block; }
+
+  .hint {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
   #results {
+    max-width: 480px;
+    margin: 20px auto 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -44,37 +109,68 @@
     border-radius: 6px;
     text-decoration: none;
     font-size: 14px;
+    white-space: nowrap;
   }
-  #status { text-align: center; color: #888; margin-top: 20px; }
+  #status {
+    text-align: center;
+    color: #888;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+    padding: 20px 0 4px;
+  }
 </style>
 </head>
 <body>
-  <h1>Tìm kiếm Font</h1>
-  <input type="text" id="search" placeholder="Gõ tên font để tìm...">
-  <div id="results"></div>
-  <div id="status">Đang tải danh sách font...</div>
+
+  <div class="content">
+    <div class="logo-wrap">
+      <img src="kemdoan.jpg" alt="logo" class="logo-img">
+      <div class="logo-text">Kem Đoàn</div>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Tìm kiếm font...">
+      <button id="clear-btn">✕</button>
+    </div>
+    <div class="hint">Chỉ cần nhập tên file font</div>
+
+    <div id="results"></div>
+    <div id="status"></div>
+  </div>
+
+  <footer>© Kem Đoàn</footer>
 
 <script>
 let allFonts = [];
+const searchInput = document.getElementById('search');
+const clearBtn = document.getElementById('clear-btn');
+const statusEl = document.getElementById('status');
 
 fetch('manifest.json')
   .then(res => res.json())
   .then(data => {
     allFonts = data;
-    document.getElementById('status').textContent = `Đã tải ${allFonts.length} font. Gõ để tìm kiếm.`;
-    render(allFonts.slice(0, 50));
   })
   .catch(err => {
-    document.getElementById('status').textContent = 'Lỗi tải manifest.json: ' + err;
+    statusEl.textContent = 'Lỗi tải manifest.json: ' + err;
   });
 
 function render(list) {
   const container = document.getElementById('results');
   container.innerHTML = '';
+
   if (list.length === 0) {
-    container.innerHTML = '<div id="status">Không tìm thấy font nào.</div>';
+    statusEl.textContent = 'Không tìm thấy font nào.';
     return;
   }
+
+  statusEl.textContent = '';
   list.forEach(font => {
     const div = document.createElement('div');
     div.className = 'font-item';
@@ -86,15 +182,27 @@ function render(list) {
   });
 }
 
-document.getElementById('search').addEventListener('input', (e) => {
+searchInput.addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase().trim();
+  clearBtn.classList.toggle('show', q.length > 0);
+
   if (!q) {
-    render(allFonts.slice(0, 50));
+    document.getElementById('results').innerHTML = '';
+    statusEl.textContent = '';
     return;
   }
+
   const filtered = allFonts.filter(f => f.name.toLowerCase().includes(q));
   render(filtered.slice(0, 100));
 });
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  clearBtn.classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  statusEl.textContent = '';
+  searchInput.focus();
+});
 </script>
 </body>
-</html> 
+</html>
