@@ -150,27 +150,49 @@
   }
 
   .login-panel {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    position: relative;
+    width: 100%;
     max-width: 340px;
-    margin: 60px auto 0;
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    padding: 70px 32px 36px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   .login-icon {
+    position: absolute;
+    top: -55px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    background: var(--surface);
+    background: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    color: var(--text-muted);
+    font-size: 50px;
+    color: var(--bg);
     border: 3px solid #fff;
     box-shadow: var(--shadow-soft);
+    overflow: hidden;
+  }
+  .login-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .login-title {
-    margin-top: 12px;
+    margin-top: 0;
     font-size: 18px;
     font-weight: 600;
     color: #444;
@@ -235,14 +257,16 @@
 <body>
 
   <div class="login-panel" id="login-panel" style="display:none;">
-    <div class="login-icon"><i class="ri-user-3-line"></i></div>
-    <div class="login-title">Thành viên</div>
-    <div class="login-input-wrap">
-      <i class="ri-mail-line login-input-icon"></i>
-      <input type="email" id="login-email" placeholder="Nhập mail của bạn">
+    <div class="login-card">
+      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
+      <div class="login-title">Thành viên</div>
+      <div class="login-input-wrap">
+        <i class="ri-mail-line login-input-icon"></i>
+        <input type="email" id="login-email" placeholder="Nhập mail của bạn">
+      </div>
+      <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+      <div id="login-error"></div>
     </div>
-    <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
-    <div id="login-error"></div>
   </div>
 
   <div class="content" id="content" style="display:none;">
@@ -340,6 +364,41 @@ function doLogin() {
 loginBtn.addEventListener('click', doLogin);
 loginEmail.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') doLogin();
+});
+
+const loginIcon = document.getElementById('login-icon');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let previewTimer = null;
+
+function resetLoginIcon() {
+  loginIcon.innerHTML = '<i class="ri-user-line"></i>';
+}
+
+function previewAvatar(email) {
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok && data.avatar) {
+        loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+      } else {
+        resetLoginIcon();
+      }
+    })
+    .catch(() => resetLoginIcon());
+}
+
+loginEmail.addEventListener('input', () => {
+  clearTimeout(previewTimer);
+  const val = loginEmail.value.trim().toLowerCase();
+  if (!emailRegex.test(val)) {
+    resetLoginIcon();
+    return;
+  }
+  previewTimer = setTimeout(() => previewAvatar(val), 400);
 });
 
 function render(list) {
