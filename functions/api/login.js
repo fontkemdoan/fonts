@@ -43,7 +43,7 @@ export async function onRequestPost(context) {
     return json({ ok: false });
   }
 
-  return json({ ok: true, avatar: match.avatar || null });
+  return json({ ok: true, avatar: match.avatar || null, name: match.name || null });
 }
 
 function json(obj, status = 200) {
