@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kem Đoàn</title>
-<link rel="icon" type="image/png" href="kemdoan.jpg">
+<link rel="icon" type="image" href="kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -12,17 +12,17 @@
   :root {
     --bg: #fff;
     --surface: #f4f4f4;
-    --text: #444;
+    --text: #555;
     --text-muted: #bdbdbd;
-    --green-pastel: #7be0b5;
-    --green-pastel-hover: #4dd29b;
-    --green-icon: #fff;
-    --red-pastel: #f47070;
-    --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.2);
+    --green: linear-gradient(90deg, #7be0b5, #3ed194);
+    --pink: linear-gradient(90deg, #ff998b, #ff728f);
+    --grey: linear-gradient(90deg, #909090, #606060);
+    --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.14);
     --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1);
   }
 
   html, body { height: 100%; }
+  
   body {
     font-family: -apple-system, sans-serif;
     background: var(--bg);
@@ -49,7 +49,7 @@
     height: 100px;
     border-radius: 50%;
     border: 3px solid #fff;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-soft);
     object-fit: cover;
     background: #ddd;
   }
@@ -149,7 +149,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--green-pastel);
+    background: var(--green);
     color: #fff;
     display: flex;
     align-items: center;
@@ -164,7 +164,7 @@
   }
   
   .download-btn:hover {
-    background: var(--green-pastel-hover);
+    background: var(--pink);
   }
   
   .download-btn:active {
@@ -201,17 +201,17 @@
   
   .login-icon {
     position: absolute;
-    top: -55px;
+    top: -50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 110px;
-    height: 110px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: var(--text);
+    background: var(--grey);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 50px;
+    font-size: 40px;
     color: var(--bg);
     border: 3px solid #fff;
     box-shadow: var(--shadow-soft);
@@ -228,7 +228,7 @@
     margin-top: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #444;
+    color: var(--text);
   }
   
   .login-input-wrap {
@@ -277,7 +277,7 @@
     padding: 14px 0;
     border: none;
     border-radius: 50px;
-    background: var(--green-pastel);
+    background: var(--green);
     color: #fff;
     font-size: 15px;
     font-weight: 600;
@@ -287,15 +287,6 @@
     gap: 8px;
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
-  }
-  
-  #login-btn.active {
-    border: none;
-    background: var(--red-pastel);
-  }
-  
-  #login-btn.active:hover {
-    background: var(--green-pastel);
   }
   
   #login-btn:active {
@@ -314,7 +305,7 @@
 
   #login-error {
     margin-top: 14px;
-    color: var(--red-pastel);
+    color: #666;
     font-size: 14px;
     text-align: center;
     min-height: 16px;
@@ -329,7 +320,7 @@
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành viên</div>
       <div class="login-input-wrap">
-        <i class="ri-mail-line login-input-icon"></i>
+        <i class="ri-user-fill login-input-icon"></i>
         <input type="email" id="login-email" placeholder="abcd@gmail.com">
       </div>
       <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
@@ -443,7 +434,6 @@ let previewTimer = null;
 function resetLoginIcon() {
   loginIcon.innerHTML = '<i class="ri-user-line"></i>';
   loginTitle.textContent = DEFAULT_TITLE;
-  loginBtn.classList.remove('active');
 }
 
 function previewAvatar(email) {
@@ -459,7 +449,6 @@ function previewAvatar(email) {
           loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
         }
         loginTitle.textContent = data.name || DEFAULT_TITLE;
-        loginBtn.classList.add('active');
       } else {
         resetLoginIcon();
       }
