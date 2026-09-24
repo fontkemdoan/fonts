@@ -11,7 +11,7 @@
 
   :root {
     --bg: #fff;
-    --surface: #f5f5f5;
+    --surface: #f4f4f4;
     --text: #444;
     --text-muted: #bdbdbd;
     --green-pastel: #89ddba;
@@ -324,7 +324,7 @@ function doLogin() {
         localStorage.setItem('kd_logged_in', '1');
         showApp();
       } else {
-        loginError.textContent = 'Email không có quyền truy cập';
+        loginError.textContent = 'Không phải người nhà. Cútttttt';
       }
     })
     .catch(() => {
@@ -332,7 +332,7 @@ function doLogin() {
     })
     .finally(() => {
       loginBtn.disabled = false;
-      loginBtn.innerHTML = 'Đăng nhập <i class="ri-arrow-right-line"></i>';
+      loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
     });
 }
 
