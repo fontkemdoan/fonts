@@ -265,10 +265,10 @@
     width: 100%;
     margin-top: 14px;
     padding: 14px 0;
-    border: none;
+    border: 1px solid var(--green-pastel-hover);
     border-radius: 50px;
-    background: var(--green-pastel);
-    color: #fff;
+    background: transparent;
+    color: var(--green-pastel-hover);
     font-size: 15px;
     font-weight: 600;
     display: flex;
@@ -280,6 +280,8 @@
   }
   
   #login-btn.active {
+    color: var(--bg);
+    border: none;
     background: var(--green-pastel);
   }
   
@@ -288,7 +290,7 @@
   }
   
   #login-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.94);
   }
   
   #login-btn i {
@@ -406,7 +408,7 @@ function doLogin() {
         localStorage.setItem('kd_logged_in', '1');
         showApp();
       } else {
-        loginError.textContent = 'Không phải người nhà. Cútttttt';
+        loginError.textContent = 'Tài khoản không tồn tại';
       }
     })
     .catch(() => {
