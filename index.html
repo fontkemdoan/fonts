@@ -17,6 +17,7 @@
     --green-pastel: #7be0b5;
     --green-pastel-hover: #4dd29b;
     --green-icon: #fff;
+    --red-pastel: #f47070;
     --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.2);
     --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1);
   }
@@ -262,6 +263,14 @@
     font-style: italic;
   }
 
+  #login-email:-webkit-autofill,
+  #login-email:-webkit-autofill:hover,
+  #login-email:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+    -webkit-text-fill-color: var(--text);
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
   #login-btn {
     width: 100%;
     margin-top: 14px;
@@ -282,7 +291,7 @@
   
   #login-btn.active {
     border: none;
-    background: var(--green-pastel-hover);
+    background: var(--red-pastel);
   }
   
   #login-btn.active:hover {
@@ -305,7 +314,7 @@
 
   #login-error {
     margin-top: 14px;
-    color: #f47070;
+    color: var(--red-pastel);
     font-size: 14px;
     text-align: center;
     min-height: 16px;
