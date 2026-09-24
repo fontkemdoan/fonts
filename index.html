@@ -7,33 +7,19 @@
 <link rel="icon" type="image/png" href="kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
-  * {  -webkit-tap-highlight-color: transparent; }
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
   :root {
-    --bg: #efefef;
-    --text: #504d69;
-    --text-muted: #b8bbc6;
-    --accent: #584838;
-    --green: #1fabb3;
-    --buy: #747dff;
-    --free: #ff7398;
-    --box-shadow-img:
-       8px 8px 16px #d9dae0;
-    --box-shadow:
-         8px 8px 16px #d9dae0,
-        -8px -8px 16px #fff;
-    --box-shadow-btn:
-        6px 6px 12px #d9dae0,
-        -6px -6px 12px #fff;
-    --active-btn:
-        inset 6px 6px 8px #d9dae0,
-        inset -6px -6px 8px #fff;
-    --bluegradient: linear-gradient(90deg, #9994ff, #666fff);
-    --yellowgradient: linear-gradient(90deg, #ffde68, #ffb179);
-    --greengradient: linear-gradient(90deg, #67ffeb, #4ad8e8);
-    --pinkgradient: linear-gradient(90deg, #ff9eb6, #ff6990);
+    --bg: #fff;
+    --surface: #f4f4f5;
+    --text: #3b3b45;
+    --text-muted: #a4a4ae;
+    --green-pastel: #b7ebc6;
+    --green-pastel-hover: #a3e3b6;
+    --green-icon: #2e8f52;
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.06);
   }
-  * { box-sizing: border-box; }
+
   html, body { height: 100%; }
   body {
     font-family: -apple-system, sans-serif;
@@ -75,23 +61,28 @@
     max-width: 480px;
     margin: 0 auto;
   }
+  .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
   #search {
     width: 100%;
-    padding: 14px 44px 14px 20px;
+    padding: 14px 44px 14px 46px;
     font-size: 16px;
     border: none;
     border-radius: 50px;
     outline: none;
-    background: var(--bg);
+    background: var(--surface);
     color: var(--text);
-    box-shadow: var(--active-btn);
   }
-  #search::placeholder {
-    color: var(--text-muted);
-  }
-  #search:focus {
-    box-shadow: var(--active-btn);
-  }
+  #search::placeholder { color: var(--text-muted); }
+
   #clear-btn {
     position: absolute;
     right: 14px;
@@ -100,10 +91,9 @@
     width: 22px;
     height: 22px;
     border: none;
-    background: #ccc;
+    background: #d2d2d8;
     color: #fff;
     border-radius: 50%;
-    font-size: 14px;
     cursor: pointer;
     display: none;
     align-items: center;
@@ -113,58 +103,52 @@
   #clear-btn.show { display: flex; }
   #clear-btn i { font-size: 14px; line-height: 1; }
 
-  .hint {
-    text-align: center;
-    color: #999;
-    font-size: 13px;
-    margin-top: 10px;
-  }
-
   #results {
     max-width: 480px;
     margin: 20px auto 0;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    background: transparent;
+    gap: 14px;
   }
   .font-item {
-    background: var(--bg);
-    border-radius: 14px;
-    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 50px;
+    padding: 8px 8px 8px 22px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--box-shadow);
+    gap: 12px;
+    box-shadow: var(--shadow-soft);
   }
-  .font-name { font-size: 15px; }
+  .font-name {
+    font-size: 15px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
   .download-btn {
-    background: var(--bluegradient);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 50px;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--green-pastel);
+    color: var(--green-icon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    white-space: nowrap;
-    box-shadow: var(--box-shadow-btn);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    font-size: 20px;
+    transition: background 0.15s ease, transform 0.15s ease;
   }
-  .download-btn:hover {
-    box-shadow: var(--active-btn);
-  }
-  .download-btn:active {
-    box-shadow: var(--active-btn);
-    transform: translateY(1px);
-  }
+  .download-btn i { line-height: 1; }
+  .download-btn:hover { background: var(--green-pastel-hover); }
+  .download-btn:active { transform: scale(0.94); }
+
   #status {
     text-align: center;
     color: #888;
     margin-top: 16px;
     font-size: 14px;
   }
-
 </style>
 </head>
 <body>
@@ -176,10 +160,10 @@
     </div>
 
     <div class="search-wrap">
+      <i class="ri-search-line search-icon"></i>
       <input type="text" id="search" placeholder="Nhập tên font...">
       <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
-    <div class="hint">Tìm ko ra là do bờm, hoặc ko có font thật 🤣</div>
 
     <div id="results"></div>
     <div id="status"></div>
@@ -206,7 +190,7 @@ function render(list) {
   container.innerHTML = '';
 
   if (list.length === 0) {
-    statusEl.textContent = 'Không tìm thấy font nào.';
+    statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>( Vui lòng nhập chính xác tên font<br>hoặc font chưa được cập nhật )</i>';
     return;
   }
 
@@ -216,7 +200,7 @@ function render(list) {
     div.className = 'font-item';
     div.innerHTML = `
       <span class="font-name">${font.name}</span>
-      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download>Tải</a>
+      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download aria-label="Tải font"><i class="ri-download-cloud-line"></i></a>
     `;
     container.appendChild(div);
   });
