@@ -17,7 +17,7 @@
     --green-pastel: #7be0b5;
     --green-pastel-hover: #4dd29b;
     --green-icon: #fff;
-    --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.08);
+    --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.1);
   }
 
   html, body { height: 100%; }
@@ -160,8 +160,8 @@
     position: relative;
     width: 100%;
     max-width: 340px;
-    background: var(--surface);
-    border-radius: 20px;
+    background: #f4f4f4;
+    border-radius: 30px;
     box-shadow: var(--shadow-soft);
     padding: 70px 32px 36px;
     display: flex;
@@ -218,7 +218,7 @@
     border: none;
     border-radius: 50px;
     outline: none;
-    background: var(--surface);
+    background: var(--bg);
     color: var(--text);
   }
   #login-email::placeholder { color: var(--text-muted); }
@@ -229,7 +229,7 @@
     padding: 14px 0;
     border: none;
     border-radius: 50px;
-    background: var(--green-pastel);
+    background: #c9c9ce;
     color: #fff;
     font-size: 15px;
     font-weight: 600;
@@ -240,7 +240,8 @@
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
   }
-  #login-btn:hover { background: var(--green-pastel-hover); }
+  #login-btn.active { background: var(--green-pastel); }
+  #login-btn.active:hover { background: var(--green-pastel-hover); }
   #login-btn:active { transform: scale(0.97); }
   #login-btn i { font-size: 18px; line-height: 1; }
   #login-btn:disabled { opacity: 0.6; cursor: default; }
@@ -367,11 +368,15 @@ loginEmail.addEventListener('keydown', (e) => {
 });
 
 const loginIcon = document.getElementById('login-icon');
+const loginTitle = document.querySelector('.login-title');
+const DEFAULT_TITLE = 'Thành viên';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 let previewTimer = null;
 
 function resetLoginIcon() {
   loginIcon.innerHTML = '<i class="ri-user-line"></i>';
+  loginTitle.textContent = DEFAULT_TITLE;
+  loginBtn.classList.remove('active');
 }
 
 function previewAvatar(email) {
@@ -382,8 +387,12 @@ function previewAvatar(email) {
   })
     .then(res => res.json())
     .then(data => {
-      if (data.ok && data.avatar) {
-        loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+      if (data.ok) {
+        if (data.avatar) {
+          loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+        }
+        loginTitle.textContent = data.name || DEFAULT_TITLE;
+        loginBtn.classList.add('active');
       } else {
         resetLoginIcon();
       }
