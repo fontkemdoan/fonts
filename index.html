@@ -31,6 +31,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .content { flex: 1; }
@@ -265,10 +266,10 @@
     width: 100%;
     margin-top: 14px;
     padding: 14px 0;
-    border: 1px solid var(--green-pastel-hover);
+    border: none;
     border-radius: 50px;
-    background: transparent;
-    color: var(--green-pastel-hover);
+    background: var(--green-pastel);
+    color: #fff;
     font-size: 15px;
     font-weight: 600;
     display: flex;
@@ -280,13 +281,12 @@
   }
   
   #login-btn.active {
-    color: var(--bg);
     border: none;
-    background: var(--green-pastel);
+    background: var(--green-pastel-hover);
   }
   
   #login-btn.active:hover {
-    background: var(--green-pastel-hover);
+    background: var(--green-pastel);
   }
   
   #login-btn:active {
