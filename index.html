@@ -148,11 +148,103 @@
     margin-top: 16px;
     font-size: 14px;
   }
+
+  .login-panel {
+    max-width: 340px;
+    margin: 60px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .login-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--text-muted);
+    box-shadow: var(--shadow-soft);
+  }
+  .login-title {
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #444;
+  }
+  .login-input-wrap {
+    position: relative;
+    width: 100%;
+    margin-top: 24px;
+  }
+  .login-input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  #login-email {
+    width: 100%;
+    padding: 14px 18px 14px 46px;
+    font-size: 15px;
+    border: none;
+    border-radius: 50px;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+  }
+  #login-email::placeholder { color: var(--text-muted); }
+
+  #login-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px 0;
+    border: none;
+    border-radius: 50px;
+    background: var(--green-pastel);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  #login-btn:hover { background: var(--green-pastel-hover); }
+  #login-btn:active { transform: scale(0.97); }
+  #login-btn i { font-size: 18px; line-height: 1; }
+  #login-btn:disabled { opacity: 0.6; cursor: default; }
+
+  #login-error {
+    margin-top: 14px;
+    color: #e05252;
+    font-size: 13px;
+    text-align: center;
+    min-height: 16px;
+  }
 </style>
 </head>
 <body>
 
-  <div class="content">
+  <div class="login-panel" id="login-panel" style="display:none;">
+    <div class="login-icon"><i class="ri-user-3-line"></i></div>
+    <div class="login-title">Thành viên</div>
+    <div class="login-input-wrap">
+      <i class="ri-mail-line login-input-icon"></i>
+      <input type="email" id="login-email" placeholder="Nhập mail của bạn">
+    </div>
+    <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+    <div id="login-error"></div>
+  </div>
+
+  <div class="content" id="content" style="display:none;">
     <div class="logo-wrap">
       <img src="kemdoan.jpg" alt="logo" class="logo-img">
       <div class="logo-text">Kem Đoàn</div>
@@ -174,15 +266,80 @@ let allFonts = [];
 const searchInput = document.getElementById('search');
 const clearBtn = document.getElementById('clear-btn');
 const statusEl = document.getElementById('status');
+const loginPanel = document.getElementById('login-panel');
+const contentEl = document.getElementById('content');
+const loginEmail = document.getElementById('login-email');
+const loginBtn = document.getElementById('login-btn');
+const loginError = document.getElementById('login-error');
 
-fetch('manifest.json')
-  .then(res => res.json())
-  .then(data => {
-    allFonts = data;
+function showApp() {
+  loginPanel.style.display = 'none';
+  contentEl.style.display = '';
+  loadManifest();
+}
+
+function showLogin() {
+  contentEl.style.display = 'none';
+  loginPanel.style.display = 'flex';
+}
+
+function loadManifest() {
+  fetch('manifest.json')
+    .then(res => res.json())
+    .then(data => {
+      allFonts = data;
+    })
+    .catch(err => {
+      statusEl.textContent = 'Lỗi tải manifest.json: ' + err;
+    });
+}
+
+// Kiểm tra đã đăng nhập trước đó chưa (lưu vĩnh viễn trên máy)
+if (localStorage.getItem('kd_logged_in') === '1') {
+  showApp();
+} else {
+  showLogin();
+}
+
+function doLogin() {
+  const email = loginEmail.value.trim().toLowerCase();
+  loginError.textContent = '';
+
+  if (!email) {
+    loginError.textContent = 'Vui lòng nhập email';
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Đang kiểm tra...';
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
   })
-  .catch(err => {
-    statusEl.textContent = 'Lỗi tải manifest.json: ' + err;
-  });
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        localStorage.setItem('kd_logged_in', '1');
+        showApp();
+      } else {
+        loginError.textContent = 'Email không có quyền truy cập';
+      }
+    })
+    .catch(() => {
+      loginError.textContent = 'Lỗi kết nối, thử lại sau';
+    })
+    .finally(() => {
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = 'Đăng nhập <i class="ri-arrow-right-line"></i>';
+    });
+}
+
+loginBtn.addEventListener('click', doLogin);
+loginEmail.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doLogin();
+});
 
 function render(list) {
   const container = document.getElementById('results');
