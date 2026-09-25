@@ -308,7 +308,20 @@
     color: #666;
     font-size: 14px;
     text-align: center;
-    min-height: 16px;
+    height: 20px;
+    overflow: hidden;
+  }
+
+  @keyframes kd-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .kd-spinner {
+    display: inline-block;
+    animation: kd-spin 0.8s linear infinite;
+    font-size: 18px;
+    line-height: 1;
   }
   
 </style>
@@ -405,6 +418,9 @@ function showLoginError(msg) {
   }, 2000);
 }
 
+// Thời gian tối thiểu hiện icon xoay khi đăng nhập (ms) - có thể đổi số này sau này
+const MIN_LOGIN_LOADING_MS = 2000;
+
 function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
   loginError.textContent = '';
@@ -415,7 +431,9 @@ function doLogin() {
   }
 
   loginBtn.disabled = true;
-  loginBtn.textContent = 'Đang kiểm tra...';
+  loginBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
+
+  const startTime = Date.now();
 
   fetch('/api/login', {
     method: 'POST',
@@ -424,21 +442,43 @@ function doLogin() {
   })
     .then(res => res.json())
     .then(data => {
-      if (data.ok) {
-        localStorage.setItem('kd_logged_in', '1');
-        showApp();
-      } else if (data.error === 'device_mismatch') {
-        showLoginError('Email này đã đăng nhập trên thiết bị khác');
+      const elapsed = Date.now() - startTime;
+      const remaining = MIN_LOGIN_LOADING_MS - elapsed;
+
+      const finish = () => {
+        if (data.ok) {
+          localStorage.setItem('kd_logged_in', '1');
+          showApp();
+        } else if (data.error === 'device_mismatch') {
+          showLoginError('Email này đã đăng nhập trên thiết bị khác');
+        } else {
+          showLoginError('Tài khoản không tồn tại');
+        }
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+      };
+
+      if (remaining > 0) {
+        setTimeout(finish, remaining);
       } else {
-        showLoginError('Tài khoản không tồn tại');
+        finish();
       }
     })
     .catch(() => {
-      showLoginError('Lỗi kết nối, thử lại sau');
-    })
-    .finally(() => {
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+      const elapsed = Date.now() - startTime;
+      const remaining = MIN_LOGIN_LOADING_MS - elapsed;
+
+      const finish = () => {
+        showLoginError('Lỗi kết nối, thử lại sau');
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+      };
+
+      if (remaining > 0) {
+        setTimeout(finish, remaining);
+      } else {
+        finish();
+      }
     });
 }
 
