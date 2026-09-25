@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kem Đoàn</title>
+<title>Font - Kem Đoàn</title>
 <link rel="icon" type="image" href="kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
@@ -299,7 +299,6 @@
   }
   
   #login-btn:disabled {
-    opacity: 0.6;
     cursor: default;
   }
 
@@ -348,7 +347,7 @@
   <div class="content" id="content" style="display:none;">
     <div class="logo-wrap">
       <img src="kemdoan.jpg" alt="logo" class="logo-img">
-      <div class="logo-text">Kem Đoàn</div>
+      <div class="logo-text">Font - Kem Đoàn</div>
     </div>
 
     <div class="search-wrap">
@@ -454,7 +453,7 @@ function showLoginError(msg) {
 }
 
 // Thời gian tối thiểu hiện icon xoay khi đăng nhập (ms) - có thể đổi số này sau này
-const MIN_LOGIN_LOADING_MS = 2000;
+const MIN_LOGIN_LOADING_MS = 1500;
 
 function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
