@@ -308,7 +308,8 @@
     color: #666;
     font-size: 14px;
     text-align: center;
-    min-height: 16px;
+    height: 20px;
+    overflow: hidden;
   }
   
 </style>
@@ -385,12 +386,32 @@ if (localStorage.getItem('kd_logged_in') === '1') {
   showLogin();
 }
 
+// Sinh (hoặc lấy lại) mã định danh máy, lưu vĩnh viễn trên trình duyệt này
+function getDeviceId() {
+  let id = localStorage.getItem('kd_device_id');
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : 'dev-' + Math.random().toString(36).slice(2) + Date.now());
+    localStorage.setItem('kd_device_id', id);
+  }
+  return id;
+}
+const deviceId = getDeviceId();
+
+let loginErrorTimer = null;
+function showLoginError(msg) {
+  loginError.textContent = msg;
+  clearTimeout(loginErrorTimer);
+  loginErrorTimer = setTimeout(() => {
+    loginError.textContent = '';
+  }, 2000);
+}
+
 function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
   loginError.textContent = '';
 
   if (!email) {
-    loginError.textContent = 'Vui lòng nhập email';
+    showLoginError('Vui lòng nhập email');
     return;
   }
 
@@ -400,19 +421,21 @@ function doLogin() {
   fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email })
+    body: JSON.stringify({ email, deviceId, mode: 'login' })
   })
     .then(res => res.json())
     .then(data => {
       if (data.ok) {
         localStorage.setItem('kd_logged_in', '1');
         showApp();
+      } else if (data.error === 'device_mismatch') {
+        showLoginError('Email này đã đăng nhập trên thiết bị khác');
       } else {
-        loginError.textContent = 'Tài khoản không tồn tại';
+        showLoginError('Tài khoản không tồn tại');
       }
     })
     .catch(() => {
-      loginError.textContent = 'Lỗi kết nối, thử lại sau';
+      showLoginError('Lỗi kết nối, thử lại sau');
     })
     .finally(() => {
       loginBtn.disabled = false;
@@ -440,7 +463,7 @@ function previewAvatar(email) {
   fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email })
+    body: JSON.stringify({ email, mode: 'preview' })
   })
     .then(res => res.json())
     .then(data => {
@@ -517,4 +540,3 @@ clearBtn.addEventListener('click', () => {
 </script>
 </body>
 </html>
- 
