@@ -328,6 +328,10 @@
 </head>
 <body>
 
+  <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text-muted);"></i>
+  </div>
+
   <div class="login-panel" id="login-panel" style="display:none;">
     <div class="login-card">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
@@ -391,13 +395,6 @@ function loadManifest() {
     });
 }
 
-// Kiểm tra đã đăng nhập trước đó chưa (lưu vĩnh viễn trên máy)
-if (localStorage.getItem('kd_logged_in') === '1') {
-  showApp();
-} else {
-  showLogin();
-}
-
 // Sinh (hoặc lấy lại) mã định danh máy, lưu vĩnh viễn trên trình duyệt này
 function getDeviceId() {
   let id = localStorage.getItem('kd_device_id');
@@ -408,6 +405,44 @@ function getDeviceId() {
   return id;
 }
 const deviceId = getDeviceId();
+
+// Mỗi lần vào trang, xác minh lại với server (không chỉ tin localStorage)
+// -> nếu email đã bị xóa khỏi emails.json, người dùng sẽ bị đăng xuất ngay
+function verifyAndBoot() {
+  const loggedIn = localStorage.getItem('kd_logged_in') === '1';
+  const storedEmail = localStorage.getItem('kd_email');
+  const bootLoading = document.getElementById('boot-loading');
+
+  if (!loggedIn || !storedEmail) {
+    bootLoading.style.display = 'none';
+    showLogin();
+    return;
+  }
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: storedEmail, deviceId, mode: 'login' })
+  })
+    .then(res => res.json())
+    .then(data => {
+      bootLoading.style.display = 'none';
+      if (data.ok) {
+        showApp();
+      } else {
+        localStorage.removeItem('kd_logged_in');
+        localStorage.removeItem('kd_email');
+        showLogin();
+      }
+    })
+    .catch(() => {
+      // Lỗi mạng tạm thời: không đăng xuất oan, cứ cho vào bình thường
+      bootLoading.style.display = 'none';
+      showApp();
+    });
+}
+
+verifyAndBoot();
 
 let loginErrorTimer = null;
 function showLoginError(msg) {
@@ -448,6 +483,7 @@ function doLogin() {
       const finish = () => {
         if (data.ok) {
           localStorage.setItem('kd_logged_in', '1');
+          localStorage.setItem('kd_email', email);
           showApp();
         } else if (data.error === 'device_mismatch') {
           showLoginError('Email này đã đăng nhập trên thiết bị khác');
