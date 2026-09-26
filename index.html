@@ -333,6 +333,18 @@
     height: 20px;
     overflow: hidden;
   }
+
+  @keyframes kd-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .kd-spinner {
+    display: inline-block;
+    animation: kd-spin 0.8s linear infinite;
+    font-size: 18px;
+    line-height: 1;
+  }
   
 </style>
 </head>
@@ -348,15 +360,15 @@
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" placeholder="Mật khẩu hiện tại">
+        <input type="password" id="login-password" placeholder="Mật khẩu">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
         <i class="ri-lock-2-line login-input-icon"></i>
         <input type="password" id="new-password" placeholder="Mật khẩu mới">
       </div>
       <div class="login-btn-row">
-        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
         <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
+        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
       </div>
       <div id="login-error"></div>
     </div>
@@ -443,7 +455,7 @@ function doLogin() {
   }
 
   loginBtn.disabled = true;
-  loginBtn.textContent = 'Đang xử lý...';
+  loginBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
 
   fetch('/api/login', {
     method: 'POST',
@@ -519,7 +531,7 @@ changePassBtn.addEventListener('click', () => {
 
   changePassBtn.disabled = true;
   loginBtn.disabled = true;
-  changePassBtn.textContent = 'Đang xử lý...';
+  changePassBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
 
   fetch('/api/change-password', {
     method: 'POST',
