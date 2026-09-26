@@ -234,7 +234,7 @@
   .login-input-wrap {
     position: relative;
     width: 100%;
-    margin-top: 24px;
+    margin-top: 14px;
   }
   
   .login-input-icon {
@@ -302,14 +302,10 @@
     transition: background 0.15s ease, transform 0.15s ease;
   }
 
-  #login-btn {
+  #login-btn,
+  #change-pass-btn {
     background: var(--green);
     color: #fff;
-  }
-
-  #change-pass-btn {
-    background: var(--surface);
-    color: var(--text);
   }
   
   #login-btn:active,
@@ -317,7 +313,8 @@
     transform: scale(0.94);
   }
   
-  #login-btn i {
+  #login-btn i,
+  #change-pass-btn i {
     font-size: 18px;
     line-height: 1;
   }
@@ -351,7 +348,7 @@
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" placeholder="Mật khẩu">
+        <input type="password" id="login-password" placeholder="Mật khẩu hiện tại">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
         <i class="ri-lock-2-line login-input-icon"></i>
@@ -359,7 +356,7 @@
       </div>
       <div class="login-btn-row">
         <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
-        <button id="change-pass-btn">Đổi mật khẩu</button>
+        <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
       </div>
       <div id="login-error"></div>
     </div>
@@ -465,7 +462,7 @@ function doLogin() {
       }
     })
     .catch(() => {
-      showLoginError('Lỗi kết nối, thử lại sau');
+      showLoginError('Lỗi kết nối, hãy thử lại sau');
     })
     .finally(() => {
       loginBtn.disabled = false;
@@ -473,22 +470,41 @@ function doLogin() {
     });
 }
 
-loginBtn.addEventListener('click', doLogin);
+loginBtn.addEventListener('click', () => {
+  if (changePassMode) {
+    exitChangePassMode();
+  } else {
+    doLogin();
+  }
+});
 loginEmail.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') doLogin();
+  if (e.key === 'Enter' && !changePassMode) doLogin();
 });
 loginPassword.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') doLogin();
+  if (e.key === 'Enter' && !changePassMode) doLogin();
 });
 
 // ---- Đổi mật khẩu (không cần đã đăng nhập, chỉ cần email + mật khẩu cũ) ----
 let changePassMode = false;
 
+function enterChangePassMode() {
+  changePassMode = true;
+  changePassExtra.style.display = 'block';
+  changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
+  loginBtn.innerHTML = '<i class="ri-arrow-left-line"></i> Quay lại';
+}
+
+function exitChangePassMode() {
+  changePassMode = false;
+  changePassExtra.style.display = 'none';
+  newPasswordInput.value = '';
+  changePassBtn.innerHTML = '<i class="ri-key-2-line"></i> Đổi Pass';
+  loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+}
+
 changePassBtn.addEventListener('click', () => {
   if (!changePassMode) {
-    changePassMode = true;
-    changePassExtra.style.display = 'block';
-    changePassBtn.textContent = 'Xác nhận';
+    enterChangePassMode();
     return;
   }
 
@@ -497,11 +513,12 @@ changePassBtn.addEventListener('click', () => {
   const newPassword = newPasswordInput.value;
 
   if (!email || !oldPassword || !newPassword) {
-    showLoginError('Vui lòng nhập đủ thông tin');
+    showLoginError('Vui lòng nhập đầy đủ thông tin');
     return;
   }
 
   changePassBtn.disabled = true;
+  loginBtn.disabled = true;
   changePassBtn.textContent = 'Đang xử lý...';
 
   fetch('/api/change-password', {
@@ -513,10 +530,7 @@ changePassBtn.addEventListener('click', () => {
     .then(data => {
       if (data.ok) {
         showLoginError('Đổi mật khẩu thành công');
-        changePassMode = false;
-        changePassExtra.style.display = 'none';
-        newPasswordInput.value = '';
-        changePassBtn.textContent = 'Đổi mật khẩu';
+        exitChangePassMode();
       } else if (data.error === 'wrong_password') {
         showLoginError('Mật khẩu hiện tại không đúng');
       } else if (data.error === 'not_found') {
@@ -528,7 +542,8 @@ changePassBtn.addEventListener('click', () => {
     .catch(() => showLoginError('Lỗi kết nối, thử lại sau'))
     .finally(() => {
       changePassBtn.disabled = false;
-      if (changePassMode) changePassBtn.textContent = 'Xác nhận';
+      loginBtn.disabled = false;
+      if (changePassMode) changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
     });
 });
 
