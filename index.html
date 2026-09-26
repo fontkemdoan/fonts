@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Font - Kem Đoàn</title>
+<title>Kem Đoàn</title>
 <link rel="icon" type="image" href="kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <style>
@@ -247,7 +247,9 @@
     pointer-events: none;
   }
   
-  #login-email {
+  #login-email,
+  #login-password,
+  #new-password {
     width: 100%;
     padding: 14px 18px 14px 46px;
     font-size: 15px;
@@ -258,38 +260,60 @@
     color: var(--text);
   }
   
-  #login-email::placeholder {
+  #login-email::placeholder,
+  #login-password::placeholder,
+  #new-password::placeholder {
     color: var(--text-muted);
     font-style: italic;
   }
 
   #login-email:-webkit-autofill,
   #login-email:-webkit-autofill:hover,
-  #login-email:-webkit-autofill:focus {
+  #login-email:-webkit-autofill:focus,
+  #login-password:-webkit-autofill,
+  #login-password:-webkit-autofill:hover,
+  #login-password:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
     -webkit-text-fill-color: var(--text);
     transition: background-color 9999s ease-in-out 0s;
   }
 
-  #login-btn {
+  .login-btn-row {
+    display: flex;
+    gap: 10px;
     width: 100%;
     margin-top: 14px;
+  }
+
+  #login-btn,
+  #change-pass-btn {
+    flex: 1;
+    margin-top: 0;
     padding: 14px 0;
     border: none;
     border-radius: 50px;
-    background: var(--green);
-    color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
   }
+
+  #login-btn {
+    background: var(--green);
+    color: #fff;
+  }
+
+  #change-pass-btn {
+    background: var(--surface);
+    color: var(--text);
+  }
   
-  #login-btn:active {
+  #login-btn:active,
+  #change-pass-btn:active {
     transform: scale(0.94);
   }
   
@@ -298,7 +322,9 @@
     line-height: 1;
   }
   
-  #login-btn:disabled {
+  #login-btn:disabled,
+  #change-pass-btn:disabled {
+    opacity: 0.6;
     cursor: default;
   }
 
@@ -310,26 +336,10 @@
     height: 20px;
     overflow: hidden;
   }
-
-  @keyframes kd-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .kd-spinner {
-    display: inline-block;
-    animation: kd-spin 0.8s linear infinite;
-    font-size: 18px;
-    line-height: 1;
-  }
   
 </style>
 </head>
 <body>
-
-  <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
-    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text-muted);"></i>
-  </div>
 
   <div class="login-panel" id="login-panel" style="display:none;">
     <div class="login-card">
@@ -339,7 +349,18 @@
         <i class="ri-user-fill login-input-icon"></i>
         <input type="email" id="login-email" placeholder="abcd@gmail.com">
       </div>
-      <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+      <div class="login-input-wrap">
+        <i class="ri-lock-line login-input-icon"></i>
+        <input type="password" id="login-password" placeholder="Mật khẩu">
+      </div>
+      <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
+        <i class="ri-lock-2-line login-input-icon"></i>
+        <input type="password" id="new-password" placeholder="Mật khẩu mới">
+      </div>
+      <div class="login-btn-row">
+        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+        <button id="change-pass-btn">Đổi mật khẩu</button>
+      </div>
       <div id="login-error"></div>
     </div>
   </div>
@@ -347,7 +368,7 @@
   <div class="content" id="content" style="display:none;">
     <div class="logo-wrap">
       <img src="kemdoan.jpg" alt="logo" class="logo-img">
-      <div class="logo-text">Font - Kem Đoàn</div>
+      <div class="logo-text">Kem Đoàn</div>
     </div>
 
     <div class="search-wrap">
@@ -369,8 +390,12 @@ const statusEl = document.getElementById('status');
 const loginPanel = document.getElementById('login-panel');
 const contentEl = document.getElementById('content');
 const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
 const loginBtn = document.getElementById('login-btn');
 const loginError = document.getElementById('login-error');
+const changePassBtn = document.getElementById('change-pass-btn');
+const changePassExtra = document.getElementById('change-pass-extra');
+const newPasswordInput = document.getElementById('new-password');
 
 function showApp() {
   loginPanel.style.display = 'none';
@@ -394,54 +419,12 @@ function loadManifest() {
     });
 }
 
-// Sinh (hoặc lấy lại) mã định danh máy, lưu vĩnh viễn trên trình duyệt này
-function getDeviceId() {
-  let id = localStorage.getItem('kd_device_id');
-  if (!id) {
-    id = (crypto.randomUUID ? crypto.randomUUID() : 'dev-' + Math.random().toString(36).slice(2) + Date.now());
-    localStorage.setItem('kd_device_id', id);
-  }
-  return id;
+// Ghi nhớ đăng nhập vĩnh viễn trên máy này, chỉ mất khi xóa cache trình duyệt
+if (localStorage.getItem('kd_logged_in') === '1') {
+  showApp();
+} else {
+  showLogin();
 }
-const deviceId = getDeviceId();
-
-// Mỗi lần vào trang, xác minh lại với server (không chỉ tin localStorage)
-// -> nếu email đã bị xóa khỏi emails.json, người dùng sẽ bị đăng xuất ngay
-function verifyAndBoot() {
-  const loggedIn = localStorage.getItem('kd_logged_in') === '1';
-  const storedEmail = localStorage.getItem('kd_email');
-  const bootLoading = document.getElementById('boot-loading');
-
-  if (!loggedIn || !storedEmail) {
-    bootLoading.style.display = 'none';
-    showLogin();
-    return;
-  }
-
-  fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: storedEmail, deviceId, mode: 'login' })
-  })
-    .then(res => res.json())
-    .then(data => {
-      bootLoading.style.display = 'none';
-      if (data.ok) {
-        showApp();
-      } else {
-        localStorage.removeItem('kd_logged_in');
-        localStorage.removeItem('kd_email');
-        showLogin();
-      }
-    })
-    .catch(() => {
-      // Lỗi mạng tạm thời: không đăng xuất oan, cứ cho vào bình thường
-      bootLoading.style.display = 'none';
-      showApp();
-    });
-}
-
-verifyAndBoot();
 
 let loginErrorTimer = null;
 function showLoginError(msg) {
@@ -452,74 +435,101 @@ function showLoginError(msg) {
   }, 2000);
 }
 
-// Thời gian tối thiểu hiện icon xoay khi đăng nhập (ms) - có thể đổi số này sau này
-const MIN_LOGIN_LOADING_MS = 1500;
-
 function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
+  const password = loginPassword.value;
   loginError.textContent = '';
 
-  if (!email) {
-    showLoginError('Vui lòng nhập email');
+  if (!email || !password) {
+    showLoginError('Vui lòng nhập email và mật khẩu');
     return;
   }
 
   loginBtn.disabled = true;
-  loginBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
-
-  const startTime = Date.now();
+  loginBtn.textContent = 'Đang xử lý...';
 
   fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, deviceId, mode: 'login' })
+    body: JSON.stringify({ email, password, mode: 'login' })
   })
     .then(res => res.json())
     .then(data => {
-      const elapsed = Date.now() - startTime;
-      const remaining = MIN_LOGIN_LOADING_MS - elapsed;
-
-      const finish = () => {
-        if (data.ok) {
-          localStorage.setItem('kd_logged_in', '1');
-          localStorage.setItem('kd_email', email);
-          showApp();
-        } else if (data.error === 'device_mismatch') {
-          showLoginError('Email này đã đăng nhập trên thiết bị khác');
-        } else {
-          showLoginError('Tài khoản không tồn tại');
-        }
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
-      };
-
-      if (remaining > 0) {
-        setTimeout(finish, remaining);
+      if (data.ok) {
+        localStorage.setItem('kd_logged_in', '1');
+        showApp();
+      } else if (data.error === 'wrong_password') {
+        showLoginError('Sai mật khẩu');
       } else {
-        finish();
+        showLoginError('Tài khoản không tồn tại');
       }
     })
     .catch(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = MIN_LOGIN_LOADING_MS - elapsed;
-
-      const finish = () => {
-        showLoginError('Lỗi kết nối, thử lại sau');
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
-      };
-
-      if (remaining > 0) {
-        setTimeout(finish, remaining);
-      } else {
-        finish();
-      }
+      showLoginError('Lỗi kết nối, thử lại sau');
+    })
+    .finally(() => {
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
     });
 }
 
 loginBtn.addEventListener('click', doLogin);
 loginEmail.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') doLogin();
+});
+loginPassword.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ---- Đổi mật khẩu (không cần đã đăng nhập, chỉ cần email + mật khẩu cũ) ----
+let changePassMode = false;
+
+changePassBtn.addEventListener('click', () => {
+  if (!changePassMode) {
+    changePassMode = true;
+    changePassExtra.style.display = 'block';
+    changePassBtn.textContent = 'Xác nhận';
+    return;
+  }
+
+  const email = loginEmail.value.trim().toLowerCase();
+  const oldPassword = loginPassword.value;
+  const newPassword = newPasswordInput.value;
+
+  if (!email || !oldPassword || !newPassword) {
+    showLoginError('Vui lòng nhập đủ thông tin');
+    return;
+  }
+
+  changePassBtn.disabled = true;
+  changePassBtn.textContent = 'Đang xử lý...';
+
+  fetch('/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, oldPassword, newPassword })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        showLoginError('Đổi mật khẩu thành công');
+        changePassMode = false;
+        changePassExtra.style.display = 'none';
+        newPasswordInput.value = '';
+        changePassBtn.textContent = 'Đổi mật khẩu';
+      } else if (data.error === 'wrong_password') {
+        showLoginError('Mật khẩu hiện tại không đúng');
+      } else if (data.error === 'not_found') {
+        showLoginError('Tài khoản không tồn tại');
+      } else {
+        showLoginError('Có lỗi xảy ra, thử lại sau');
+      }
+    })
+    .catch(() => showLoginError('Lỗi kết nối, thử lại sau'))
+    .finally(() => {
+      changePassBtn.disabled = false;
+      if (changePassMode) changePassBtn.textContent = 'Xác nhận';
+    });
 });
 
 const loginIcon = document.getElementById('login-icon');
