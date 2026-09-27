@@ -11,15 +11,15 @@
 
   :root {
     --bg: #fff;
-    --surface: #f5f5f5;
+    --card: #f4f4f4;
     --text: #555;
     --text-muted: #bdbdbd;
     --bg-menu: #bdbdbd;
     --green: linear-gradient(90deg, #7be0b5, #3ed194);
     --pink: linear-gradient(90deg, #ff998b, #ff728f);
     --grey: linear-gradient(90deg, #bebebe, #909090);
-    --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.14);
-    --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1);
+    --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.1);
+    --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1), inset 0 0 6px 3px rgba(255, 255, 255, 1);
   }
 
   html, body { height: 100%; }
@@ -86,7 +86,7 @@
     border: none;
     border-radius: 50px;
     outline: none;
-    background: var(--surface);
+    background: var(--card);
     color: var(--text);
   }
   
@@ -130,7 +130,7 @@
   }
   
   .font-item {
-    background: var(--surface);
+    background: var(--card);
     border-radius: 50px;
     padding: 8px 8px 8px 22px;
     display: flex;
@@ -197,7 +197,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: var(--shadow-card), inset 0 0 6px 3px rgba(255, 255, 255, 1);
+    box-shadow: var(--shadow-card);
 }
   
   .login-icon {
@@ -358,7 +358,7 @@
     max-width: 340px;
     border-radius: 999px;
     background: #f4f4f4;
-    box-shadow: var(--shadow-card), inset 0 0 6px 3px rgba(255, 255, 255, 1);
+    box-shadow: var(--shadow-card);
     opacity: 0;
     transform: translate(24px, -50%);
     pointer-events: none;
@@ -439,10 +439,13 @@
 
   <div class="menu-wrap" id="menu-wrap">
     <div class="icon-menu" id="icon-menu">
-      <a class="menu-btn" href="#" target="_blank" aria-label="Web"><i class="ri-global-line"></i></a>
-      <a class="menu-btn" href="#" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
-      <a class="menu-btn" href="#" target="_blank" aria-label="Messenger"><i class="ri-messenger-fill"></i></a>
-      <a class="menu-btn" href="#" target="_blank" aria-label="Zalo" style="font-size: 13px;"><b>Zalo</b></a><button class="menu-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-r-line"></i></button>
+      <a class="menu-btn" href=" https://kemdoan.github.io/font/" target="_blank" aria-label="Web"><i class="ri-global-line"></i></a>
+      
+      <a class="menu-btn" href=" https://facebook.com/fontkemdoan/" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
+      
+      <a class="menu-btn" href=" http://zalo.me/0559970246" target="_blank" aria-label="Zalo" style="font-size: 13px;"><b>Zalo</b></a>
+      
+      <button class="menu-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-line"></i></button>
     </div>
     <button class="menu-toggle" id="menu-toggle" aria-label="Menu"><i class="ri-menu-line"></i></button>
   </div>
@@ -456,7 +459,7 @@
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành viên</div>
       <div class="login-input-wrap">
-        <i class="ri-user-fill login-input-icon"></i>
+        <i class="ri-user-line login-input-icon"></i>
         <input type="email" id="login-email" placeholder="abcd@gmail.com">
       </div>
       <div class="login-input-wrap">
@@ -464,7 +467,7 @@
         <input type="password" id="login-password" placeholder="Mật khẩu">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
-        <i class="ri-lock-2-line login-input-icon"></i>
+        <i class="ri-lock-line login-input-icon"></i>
         <input type="password" id="new-password" placeholder="Mật khẩu mới">
       </div>
       <div class="login-btn-row">
