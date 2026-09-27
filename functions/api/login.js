@@ -55,7 +55,12 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'wrong_password' });
   }
 
-  return json({ ok: true, avatar: match.avatar || null, name: match.name || null });
+  // Đăng nhập thành công -> cấp session token gắn với phiên bản mật khẩu hiện tại
+  const pwver = (await env.KD_SESSIONS.get('pwver:' + email)) || '1';
+  const token = crypto.randomUUID();
+  await env.KD_SESSIONS.put('session:' + token, JSON.stringify({ email, pwver }));
+
+  return json({ ok: true, avatar: match.avatar || null, name: match.name || null, token });
 }
 
 function json(obj, status = 200) {
