@@ -321,6 +321,7 @@
   
   #login-btn:disabled,
   #change-pass-btn:disabled {
+    opacity: 0.6;
     cursor: default;
   }
 
@@ -349,6 +350,10 @@
 </head>
 <body>
 
+  <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text-muted);"></i>
+  </div>
+
   <div class="login-panel" id="login-panel" style="display:none;">
     <div class="login-card">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
@@ -359,7 +364,7 @@
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" placeholder="Mật khẩu">
+        <input type="password" id="login-password" placeholder="Mật khẩu hiện tại">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
         <i class="ri-lock-2-line login-input-icon"></i>
@@ -427,12 +432,41 @@ function loadManifest() {
     });
 }
 
-// Ghi nhớ đăng nhập vĩnh viễn trên máy này, chỉ mất khi xóa cache trình duyệt
-if (localStorage.getItem('kd_logged_in') === '1') {
-  showApp();
-} else {
-  showLogin();
+// Xác minh session mỗi lần mở trang -> nếu mật khẩu đã đổi ở máy khác, tự bung về login
+function verifyAndBoot() {
+  const token = localStorage.getItem('kd_session_token');
+  const bootLoading = document.getElementById('boot-loading');
+
+  if (!token) {
+    bootLoading.style.display = 'none';
+    showLogin();
+    return;
+  }
+
+  fetch('/api/verify-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  })
+    .then(res => res.json())
+    .then(data => {
+      bootLoading.style.display = 'none';
+      if (data.ok) {
+        showApp();
+      } else {
+        localStorage.removeItem('kd_logged_in');
+        localStorage.removeItem('kd_session_token');
+        showLogin();
+      }
+    })
+    .catch(() => {
+      // Lỗi mạng tạm thời: không đăng xuất oan
+      bootLoading.style.display = 'none';
+      showApp();
+    });
 }
+
+verifyAndBoot();
 
 let loginErrorTimer = null;
 function showLoginError(msg) {
@@ -465,6 +499,7 @@ function doLogin() {
     .then(data => {
       if (data.ok) {
         localStorage.setItem('kd_logged_in', '1');
+        localStorage.setItem('kd_session_token', data.token);
         showApp();
       } else if (data.error === 'wrong_password') {
         showLoginError('Sai mật khẩu');
@@ -612,9 +647,10 @@ function render(list) {
   list.forEach(font => {
     const div = document.createElement('div');
     div.className = 'font-item';
+    const token = localStorage.getItem('kd_session_token') || '';
     div.innerHTML = `
       <span class="font-name">${font.name}</span>
-      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
+      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}&token=${encodeURIComponent(token)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
     `;
     container.appendChild(div);
   });
