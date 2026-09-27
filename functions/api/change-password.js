@@ -20,7 +20,6 @@ export async function onRequestPost(context) {
   const repo = 'fontsdata';
   const path = 'emails.json';
 
-  // Lấy file kèm sha để có thể ghi đè lại
   const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
     headers: {
       'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
@@ -80,6 +79,10 @@ export async function onRequestPost(context) {
   if (!putRes.ok) {
     return json({ ok: false, error: 'Cannot save new password' }, 500);
   }
+
+  // Tăng phiên bản mật khẩu -> mọi session/token cũ (mọi máy) lập tức bị vô hiệu
+  const currentPwver = parseInt((await env.KD_SESSIONS.get('pwver:' + email)) || '1', 10);
+  await env.KD_SESSIONS.put('pwver:' + email, String(currentPwver + 1));
 
   return json({ ok: true });
 }
