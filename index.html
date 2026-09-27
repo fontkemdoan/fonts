@@ -16,7 +16,7 @@
     --text-muted: #bdbdbd;
     --green: linear-gradient(90deg, #7be0b5, #3ed194);
     --pink: linear-gradient(90deg, #ff998b, #ff728f);
-    --grey: linear-gradient(90deg, #909090, #606060);
+    --grey: linear-gradient(90deg, #bebebe, #909090);
     --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.14);
     --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1);
   }
@@ -302,9 +302,12 @@
     transition: background 0.15s ease, transform 0.15s ease;
   }
 
-  #login-btn,
-  #change-pass-btn {
+  #login-btn {
     background: var(--green);
+    color: #fff;
+  }
+  #change-pass-btn {
+    background: var(--grey);
     color: #fff;
   }
   
@@ -321,7 +324,6 @@
   
   #login-btn:disabled,
   #change-pass-btn:disabled {
-    opacity: 0.6;
     cursor: default;
   }
 
@@ -364,7 +366,7 @@
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" placeholder="Mật khẩu hiện tại">
+        <input type="password" id="login-password" placeholder="Mật khẩu">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
         <i class="ri-lock-2-line login-input-icon"></i>
@@ -582,10 +584,10 @@ changePassBtn.addEventListener('click', () => {
       } else if (data.error === 'not_found') {
         showLoginError('Tài khoản không tồn tại');
       } else {
-        showLoginError('Có lỗi xảy ra, thử lại sau');
+        showLoginError('Có lỗi xảy ra, hãy thử lại sau');
       }
     })
-    .catch(() => showLoginError('Lỗi kết nối, thử lại sau'))
+    .catch(() => showLoginError('Lỗi kết nối, hãy thử lại sau'))
     .finally(() => {
       changePassBtn.disabled = false;
       loginBtn.disabled = false;
@@ -686,3 +688,4 @@ clearBtn.addEventListener('click', () => {
 </script>
 </body>
 </html>
+ 
