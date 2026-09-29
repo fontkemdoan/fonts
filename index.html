@@ -10,15 +10,16 @@
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
   :root {
-    --bg: #fff;
-    --card: #f5f5f8;
+    --bg: #f4f5f6;
+    --card: #fff;
     --text: #444;
-    --text-muted: #b6b6b6;
+    --text-muted: #909090;
+    --green2: #3ed194;
     --green: linear-gradient(130deg, #7be0b5, #3ed194);
     --pink: linear-gradient(130deg, #ff998b, #ff728f);
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
-    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --shadow-card: 0 6px 30px rgba(0, 0, 0, 0.1), inset 0 0 5px 2px rgba(255, 255, 255, 1);
+    --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.1);
+    --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.05);
   }
 
   html, body { height: 100%; }
@@ -328,8 +329,8 @@
   }
 
   #login-error {
-    margin-top: 14px;
-    color: #666;
+    margin-top: 15px;
+    color: var(--green2);
     font-size: 14px;
     text-align: center;
     height: 20px;
@@ -344,7 +345,7 @@
     width: calc(100% - 40px);
     max-width: 420px;
     height: 64px;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.1));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -352,17 +353,32 @@
     z-index: 1000;
   }
 
-  /* Nền thanh menu: 2 đầu bo tròn + phần giữa khuyết cong ôm lấy logo */
   .nav-bg {
     position: absolute;
     inset: 0;
     display: flex;
     pointer-events: none;
   }
-  .nav-bg-side { flex: 1; background: #fff; }
-  .nav-bg-side.left { border-radius: 50px 0 0 50px; }
-  .nav-bg-side.right { border-radius: 0 50px 50px 0; }
-  .nav-bg svg { display: block; width: 140px; height: 64px; flex-shrink: 0; margin: 0 -0.5px; }
+  .nav-bg-side {
+    flex: 1;
+    background: var(--card);
+  }
+  
+  .nav-bg-side.left {
+    border-radius: 50px 0 0 50px
+  }
+  
+  .nav-bg-side.right {
+    border-radius: 0 50px 50px 0;
+  }
+  
+  .nav-bg svg {
+    display: block;
+    width: 140px;
+    height: 64px;
+    flex-shrink: 0;
+    margin: 0 -0.5px;
+  }
 
   .nav-btn {
     width: 40px;
@@ -383,11 +399,17 @@
     z-index: 1;
   }
 
-  .nav-btn i { line-height: 1; }
+  .nav-btn i {
+    line-height: 1;
+  }
 
-  .nav-btn:hover { color: #3ed194; }
+  .nav-btn:hover {
+    color: var(--green2);
+  }
 
-  .nav-btn:active { transform: scale(0.9); }
+  .nav-btn:active {
+    transform: scale(0.9);
+  }
 
   .nav-center {
     position: relative;
