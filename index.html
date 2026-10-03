@@ -94,11 +94,8 @@
     color: var(--text-muted);
   }
 
-  #clear-btn {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
+  #clear-btn,
+  .preview-clear-btn {
     width: 22px;
     height: 22px;
     border: none;
@@ -111,12 +108,21 @@
     justify-content: center;
     padding: 0;
   }
+
+  #clear-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
   
-  #clear-btn.show {
+  #clear-btn.show,
+  .preview-clear-btn.show {
     display: flex;
   }
   
-  #clear-btn i {
+  #clear-btn i,
+  .preview-clear-btn i {
     font-size: 14px;
     line-height: 1;
   }
@@ -143,6 +149,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+    cursor: pointer;
   }
   
   .font-name {
@@ -162,20 +169,28 @@
 
   .preview-panel.open { display: block; }
 
+  .preview-input-wrap {
+    position: relative;
+    width: 100%;
+  }
+
   .preview-input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 10px 40px 10px 16px;
     font-size: 14px;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
+    border: none;
+    border-radius: 50px;
     outline: none;
     background: var(--bg);
     color: var(--text);
     box-sizing: border-box;
   }
 
-  .preview-input:focus {
-    border-color: var(--green2);
+  .preview-clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .preview-text {
@@ -818,7 +833,7 @@ loginEmail.addEventListener('input', () => {
 
 // Cache các font đã tải để xem trước: file -> tên family đã đăng ký trong document.fonts
 const loadedPreviewFonts = new Map();
-const DEFAULT_PREVIEW_TEXT = 'Xem trước font của bạn';
+const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
 
 function render(list) {
   const container = document.getElementById('results');
@@ -846,7 +861,10 @@ function render(list) {
     const panel = document.createElement('div');
     panel.className = 'preview-panel';
     panel.innerHTML = `
-      <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}">
+      <div class="preview-input-wrap">
+        <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}">
+        <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
+      </div>
       <div class="preview-loading" style="display:none;"><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
       <div class="preview-text"></div>
     `;
@@ -855,7 +873,10 @@ function render(list) {
     card.appendChild(panel);
     container.appendChild(card);
 
-    item.querySelector('.font-name').addEventListener('click', () => togglePreview(font, panel));
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.download-btn')) return;
+      togglePreview(font, panel);
+    });
   });
 }
 
@@ -875,9 +896,17 @@ async function togglePreview(font, panel) {
   const inputEl = panel.querySelector('.preview-input');
   const loadingEl = panel.querySelector('.preview-loading');
   const previewTextEl = panel.querySelector('.preview-text');
+  const previewClearBtn = panel.querySelector('.preview-clear-btn');
 
   const applyText = () => {
     previewTextEl.textContent = inputEl.value || DEFAULT_PREVIEW_TEXT;
+    previewClearBtn.classList.toggle('show', inputEl.value.length > 0);
+  };
+
+  previewClearBtn.onclick = () => {
+    inputEl.value = '';
+    applyText();
+    inputEl.focus();
   };
 
   if (loadedPreviewFonts.has(font.file)) {
