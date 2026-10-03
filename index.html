@@ -198,15 +198,31 @@
     -webkit-appearance: none;
     appearance: none;
     display: block;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     height: 6px;
-    margin: 14px 0 6px;
+    margin: 0;
     border-radius: 50px;
     outline: none;
     cursor: pointer;
     background:
       var(--green) 0 0 / calc(10px + (100% - 20px) * var(--pct)) 100% no-repeat,
-      var(--text-muted);
+      var(--bg);
+  }
+
+  .preview-size-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 6px;
+  }
+
+  .preview-size-value {
+    min-width: 40px;
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .preview-size-slider::-webkit-slider-runnable-track {
@@ -917,7 +933,10 @@ function render(list) {
         <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}">
         <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
       </div>
-      <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="28" aria-label="Cỡ chữ">
+      <div class="preview-size-row">
+        <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="28" aria-label="Cỡ chữ">
+        <span class="preview-size-value">28px</span>
+      </div>
       <div class="preview-loading" style="display:none;"><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
       <div class="preview-text"></div>
     `;
@@ -951,10 +970,12 @@ async function togglePreview(font, panel) {
   const previewTextEl = panel.querySelector('.preview-text');
   const previewClearBtn = panel.querySelector('.preview-clear-btn');
   const sizeSlider = panel.querySelector('.preview-size-slider');
+  const sizeValue = panel.querySelector('.preview-size-value');
 
   const applySize = () => {
     const v = Number(sizeSlider.value);
     previewTextEl.style.fontSize = v + 'px';
+    sizeValue.textContent = v + 'px';
     sizeSlider.style.setProperty('--pct', (v - 1) / 99);
   };
   sizeSlider.oninput = applySize;
