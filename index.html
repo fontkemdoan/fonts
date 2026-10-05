@@ -10,12 +10,12 @@
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
   :root {
-    --bg: #f4f5f6;
+    --bg: #f5f6fb;
     --card: #fff;
     --text: #444;
     --text-muted: #909090;
-    --green2: #3ed194;
-    --green: linear-gradient(130deg, #7be0b5, #3ed194);
+    --green2: #1ed194;
+    --green: linear-gradient(130deg, #5be0b5, #1ed194);
     --pink: linear-gradient(130deg, #ff998b, #ff728f);
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
     --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.1);
@@ -341,11 +341,11 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: var(--grey);
+    background: var(--green);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    font-size: 30px;
     color: var(--bg);
     border: 3px solid #fff;
     box-shadow: var(--shadow-soft);
@@ -622,7 +622,7 @@
 
   <div class="login-panel" id="login-panel" style="display:none;">
     <div class="login-card">
-      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
+      <div class="login-icon" id="login-icon"><img src="ava.jpg"></div>
       <div class="login-title">Thành viên</div>
       <div class="login-input-wrap">
         <i class="ri-user-line login-input-icon"></i>
@@ -864,7 +864,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 let previewTimer = null;
 
 function resetLoginIcon() {
-  loginIcon.innerHTML = '<i class="ri-user-line"></i>';
+  loginIcon.innerHTML = '<img src="ava.jpg">';
   loginTitle.textContent = DEFAULT_TITLE;
 }
 
