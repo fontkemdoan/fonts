@@ -168,7 +168,7 @@
     display: none;
     background: var(--card);
     border-radius: 0 0 25px 25px;
-    padding: 8px 18px;
+    padding: 0 18px 14px 18px;
   }
 
   .preview-panel.open { display: block; }
@@ -1035,7 +1035,7 @@ async function togglePreview(font, panel) {
   } catch (e) {
     loadingEl.style.display = 'none';
     previewTextEl.style.fontFamily = '';
-    previewTextEl.textContent = 'Không thể tải font để xem trước';
+    previewTextEl.textContent = 'Không thể preview file zip';
   }
 }
 
