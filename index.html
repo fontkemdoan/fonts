@@ -138,7 +138,7 @@
   .font-card {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0;
   }
 
   .font-item {
@@ -150,6 +150,11 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
+    transition: border-radius 0.15s ease;
+  }
+
+  .font-item.expanded {
+    border-radius: 25px 25px 0 0;
   }
   
   .font-name {
@@ -162,9 +167,8 @@
   .preview-panel {
     display: none;
     background: var(--card);
-    border-radius: 20px;
+    border-radius: 0 0 20px 20px;
     padding: 14px 18px;
-    margin-top: -2px;
   }
 
   .preview-panel.open { display: block; }
@@ -952,17 +956,24 @@ function render(list) {
 }
 
 async function togglePreview(font, panel) {
-  
+
+  const itemEl = panel.previousElementSibling;
+
   document.querySelectorAll('.preview-panel.open').forEach(p => {
-    if (p !== panel) p.classList.remove('open');
+    if (p !== panel) {
+      p.classList.remove('open');
+      if (p.previousElementSibling) p.previousElementSibling.classList.remove('expanded');
+    }
   });
 
   if (panel.classList.contains('open')) {
     panel.classList.remove('open');
+    itemEl.classList.remove('expanded');
     return;
   }
 
   panel.classList.add('open');
+  itemEl.classList.add('expanded');
 
   const inputEl = panel.querySelector('.preview-input');
   const loadingEl = panel.querySelector('.preview-loading');
