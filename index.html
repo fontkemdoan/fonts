@@ -10,16 +10,18 @@
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
   :root {
-    --bg: #f5f6fb;
+    --bg: #fff;
     --card: #fff;
-    --text: #444;
-    --text-muted: #909090;
+    --text: #fff;
+    --text-muted: #fff;
+    --text-black: #555;
+    --border: 1px solid #fff;
     --green2: #1ed194;
     --green: linear-gradient(130deg, #5be0b5, #1ed194);
-    --pink: linear-gradient(130deg, #ff998b, #ff728f);
+    --pink: linear-gradient(130deg, #f29584, #e87563);
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
-    --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.1);
-    --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.05);
+    --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.01);
   }
 
   html, body { height: 100%; }
@@ -34,7 +36,19 @@
     flex-direction: column;
     min-height: 100vh;
     min-height: 100dvh;
-  }
+    position: relative;
+}
+
+  body::before {
+    content: "";
+    position: fixed;
+    z-index: -1;  
+    inset: 0;
+    background: url('bg.jpg') center / cover no-repeat;
+    
+    opacity: 1;
+    pointer-events: none;
+}
 
   .content { flex: 1; }
 
@@ -46,13 +60,12 @@
   }
   
   .logo-img {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: var(--shadow-soft);
+    border: none;
     object-fit: cover;
-    background: #ddd;
+    background: var(--bg);
   }
   
   .logo-text {
@@ -75,23 +88,26 @@
     transform: translateY(-50%);
     font-size: 20px;
     line-height: 1;
-    color: var(--text-muted);
+    color: var(--text);
     pointer-events: none;
+    z-index: 1;
   }
   
   #search {
     width: 100%;
     padding: 14px 44px 14px 46px;
     font-size: 16px;
-    border: none;
+    border: var(--border);
     border-radius: 50px;
     outline: none;
-    background: var(--card);
+    background: rgba(255,255,255, 0.1);
     color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
   
   #search::placeholder {
-    color: var(--text-muted);
+    color: var(--text);
   }
 
   #clear-btn,
@@ -99,8 +115,8 @@
     width: 22px;
     height: 22px;
     border: none;
-    background: #d2d2d8;
-    color: #fff;
+    background: var(--bg);
+    color: var(--text-black);
     border-radius: 50%;
     cursor: pointer;
     display: none;
@@ -142,7 +158,6 @@
   }
 
   .font-item {
-    background: var(--card);
     border-radius: 50px;
     padding: 8px 8px 8px 22px;
     display: flex;
@@ -151,6 +166,10 @@
     gap: 12px;
     cursor: pointer;
     transition: border-radius 0.15s ease;
+    background: rgba(255,255,255, 0.1);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 
   .font-item.expanded {
@@ -229,7 +248,7 @@
     min-width: 40px;
     text-align: right;
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--text);
     font-variant-numeric: tabular-nums;
   }
 
@@ -253,8 +272,7 @@
     margin-top: -7px;
     border-radius: 50%;
     background: var(--green2);
-    border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    border: var(--border);
     box-sizing: border-box;
   }
 
@@ -292,7 +310,7 @@
     height: 33px;
     border-radius: 50%;
     background: var(--green);
-    color: #fff;
+    color: var(--text);;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -315,7 +333,7 @@
 
   #status {
     text-align: center;
-    color: #888;
+    color: var(--text);
     margin-top: 16px;
     font-size: 14px;
   }
@@ -324,21 +342,60 @@
     flex: 1;
     width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+  }
+
+  .login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: flex-start;
+    gap: 14px;
+    margin-bottom: 140px;
+  }
+
+  .login-logo .logo-img {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+  }
+
+  .login-logo-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .login-logo-name {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .login-logo-slogan {
+    margin-top: 2px;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--text);
   }
   
   .login-card {
-    position: relative;
-    width: 100%;
-    max-width: 340px;
-    background: var(--card);
-    border-radius: 30px;
-    padding: 70px 32px 36px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: var(--shadow-card);
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  background: rgba(255,255,255, 0.14);
+  border: var(--border);
+  border-radius: 30px;
+  padding: 50px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
   
   .login-icon {
@@ -346,17 +403,16 @@
     top: -50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: var(--green);
+    background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    color: var(--bg);
-    border: 3px solid #fff;
-    box-shadow: var(--shadow-soft);
+    font-size: 40px;
+    color: var(--text-black);
+    border: var(--border);
     overflow: hidden;
   }
   
@@ -368,7 +424,7 @@
   
   .login-title {
     margin-top: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text);
   }
@@ -393,19 +449,19 @@
   #login-password,
   #new-password {
     width: 100%;
-    padding: 14px 18px 14px 46px;
+    padding: 14px 14px 14px 50px;
     font-size: 15px;
-    border: none;
+    border: var(--border);
     border-radius: 50px;
     outline: none;
-    background: var(--bg);
+    background: none;
     color: var(--text);
   }
   
   #login-email::placeholder,
   #login-password::placeholder,
   #new-password::placeholder {
-    color: var(--text-muted);
+    color: var(--text);
     font-style: italic;
   }
 
@@ -444,13 +500,10 @@
     transition: background 0.15s ease, transform 0.15s ease;
   }
 
-  #login-btn {
-    background: var(--green);
-    color: #fff;
-  }
+  #login-btn,
   #change-pass-btn {
-    background: var(--grey);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text-black);
   }
   
   #login-btn:active,
@@ -470,12 +523,14 @@
   }
 
   #login-error {
+    width: 100%;
+    max-width: 340px;
     margin-top: 15px;
-    color: var(--green2);
+    color: var(--text);;
     font-size: 14px;
     text-align: center;
-    height: 20px;
-    overflow: hidden;
+    min-height: 20px;
+    position: relative;
   }
 
   .bottom-nav {
@@ -485,40 +540,15 @@
     transform: translateX(-50%);
     width: calc(100% - 40px);
     max-width: 420px;
-    height: 64px;
+    height: 50px;
     filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.1));
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 18px;
+    background: var(--bg);
+    border-radius: 50px;
     z-index: 1000;
-  }
-
-  .nav-bg {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    pointer-events: none;
-  }
-  .nav-bg-side {
-    flex: 1;
-    background: var(--card);
-  }
-  
-  .nav-bg-side.left {
-    border-radius: 50px 0 0 50px
-  }
-  
-  .nav-bg-side.right {
-    border-radius: 0 50px 50px 0;
-  }
-  
-  .nav-bg svg {
-    display: block;
-    width: 140px;
-    height: 64px;
-    flex-shrink: 0;
-    margin: 0 -0.5px;
   }
 
   .nav-btn {
@@ -527,7 +557,7 @@
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: var(--text-muted);
+    color: var(--text-black);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -545,48 +575,24 @@
   }
 
   .nav-btn:hover {
-    color: var(--green2);
+    color: #e87563;
   }
 
   .nav-btn:active {
     transform: scale(0.9);
   }
 
-  .nav-center {
-    position: relative;
-    top: -22px;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--card);
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 3px solid #fff;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .nav-center img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   .nav-text {
   font-size: 15px;
   font-weight: 600;
-  }
 
   .bottom-fade {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 160px;
-    background: linear-gradient(to bottom, transparent 0%, var(--bg) 50%);
+    height: 140px;
+    background: linear-gradient(to bottom, transparent 0%, #0f1a20 50%);
     pointer-events: none;
     z-index: 999;
   }
@@ -610,17 +616,10 @@
   <div class="bottom-fade"></div>
 
   <div class="bottom-nav" id="bottom-nav">
-    <div class="nav-bg">
-      <div class="nav-bg-side left"></div>
-      <svg viewBox="0 0 140 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H9.82A20 20 0 0 1 30 16.72A41 41 0 0 0 110 16.72A20 20 0 0 1 130 0H140V64H0Z" fill="#fff"/></svg>
-      <div class="nav-bg-side right"></div>
-    </div>
-    <a class="nav-btn" href="#" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
+    <a class="nav-btn" href="#" aria-label="web"><i class="ri-global-line"></i></a>
     <a class="nav-btn" href="#" target="_blank" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
-    <div class="nav-center">
-      <img src="kemdoan.jpg" alt="logo">
-    </div>
-    <a class="nav-btn nav-text" href="#" target="_blank" aria-label="Nhắn tin">Zalo</a>
+    <a class="nav-btn" href="#" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
+     <a class="nav-btn nav-text" href="#" target="_blank" aria-label="Nhắn tin">Zalo</a>
     <button class="nav-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-line"></i></button>
   </div>
 
@@ -629,9 +628,16 @@
   </div>
 
   <div class="login-panel" id="login-panel" style="display:none;">
+    <div class="login-logo">
+      <img src="kemdoanwhite.jpg" alt="logo" class="logo-img">
+      <div class="login-logo-text">
+        <div class="login-logo-name">KEM ĐOÀN</div>
+        <div class="login-logo-slogan">Design & Việt hóa font</div>
+      </div>
+    </div>
     <div class="login-card">
-      <div class="login-icon" id="login-icon"><img src="ava.jpg"></div>
-      <div class="login-title">Thành viên</div>
+      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
+      <div class="login-title">Thành Viên</div>
       <div class="login-input-wrap">
         <i class="ri-user-line login-input-icon"></i>
         <input type="email" id="login-email" placeholder="abcd@gmail.com">
@@ -648,13 +654,13 @@
         <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
         <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
       </div>
-      <div id="login-error"></div>
     </div>
+    <div id="login-error"></div>
   </div>
 
   <div class="content" id="content" style="display:none;">
     <div class="logo-wrap">
-      <img src="kemdoan.jpg" alt="logo" class="logo-img">
+      <img src="kemdoanwhite.jpg" alt="logo" class="logo-img">
       <div class="logo-text">Kem Đoàn</div>
     </div>
 
@@ -739,7 +745,8 @@ function verifyAndBoot() {
     });
 }
 
-verifyAndBoot();
+const SKIP_LOGIN = true; // true = bỏ qua login, false = login bình thường
+if (SKIP_LOGIN) { document.getElementById('boot-loading').style.display = 'none'; showApp(); } else { verifyAndBoot(); }
 
 let loginErrorTimer = null;
 function showLoginError(msg) {
@@ -867,12 +874,13 @@ changePassBtn.addEventListener('click', () => {
 
 const loginIcon = document.getElementById('login-icon');
 const loginTitle = document.querySelector('.login-title');
-const DEFAULT_TITLE = 'Thành viên';
+const DEFAULT_TITLE = 'Thành Viên';
+const DEFAULT_ICON = '<i class="ri-user-line"></i>';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 let previewTimer = null;
 
 function resetLoginIcon() {
-  loginIcon.innerHTML = '<img src="ava.jpg">';
+  loginIcon.innerHTML = DEFAULT_ICON;
   loginTitle.textContent = DEFAULT_TITLE;
 }
 
@@ -887,6 +895,8 @@ function previewAvatar(email) {
       if (data.ok) {
         if (data.avatar) {
           loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+        } else {
+          loginIcon.innerHTML = DEFAULT_ICON;
         }
         loginTitle.textContent = data.name || DEFAULT_TITLE;
       } else {
