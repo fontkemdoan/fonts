@@ -105,6 +105,15 @@
     color: var(--text);
   }
 
+  #search:-webkit-autofill,
+  #search:-webkit-autofill:hover,
+  #search:-webkit-autofill:focus,
+  #search:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--text);
+    caret-color: var(--text);
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
   #clear-btn,
   .preview-clear-btn {
     width: 22px;
@@ -702,7 +711,7 @@
 
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
-      <input type="text" id="search" placeholder="Nhập tên font...">
+      <input type="text" id="search" placeholder="Nhập tên font..." autocomplete="off" autocorrect="off" spellcheck="false">
       <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
 
