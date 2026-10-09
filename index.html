@@ -11,12 +11,10 @@
 
   :root {
     --bg: #fff;
-    --card: #fff;
     --text: #fff;
-    --text-muted: #fff;
     --text-black: #555;
     --border: 1px solid #f0f0f0;
-    --pink: linear-gradient(130deg, #f29584, #e87563);
+    --pink: linear-gradient(130deg, #f2ac9f, #ee9081);
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
     --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.05);
     --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.01);
@@ -92,7 +90,7 @@
   
   #search {
     width: 100%;
-    padding: 14px 44px 14px 46px;
+    padding: 14px 52px 14px 46px;
     font-size: 16px;
     border: var(--border);
     border-radius: 50px;
@@ -124,9 +122,15 @@
 
   #clear-btn {
     position: absolute;
-    right: 14px;
+    right: 9px;
     top: 50%;
     transform: translateY(-50%);
+    width: 33px;
+    height: 33px;
+  }
+
+  #clear-btn i {
+    font-size: 17px;
   }
   
   #clear-btn.show,
@@ -314,7 +318,7 @@
   .preview-loading {
     margin-top: 12px;
     font-size: 14px;
-    color: var(--text-muted);
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -341,6 +345,7 @@
   
   .download-btn:hover {
     background: var(--pink);
+    color: var(--text);
   }
   
   .download-btn:active {
@@ -457,7 +462,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 18px;
-    color: var(--text-muted);
+    color: var(--text);
     pointer-events: none;
   }
   
@@ -639,7 +644,7 @@
   </div>
 
   <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
-    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text-muted);"></i>
+    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text);"></i>
   </div>
 
   <div class="login-panel" id="login-panel" style="display:none;">
