@@ -338,6 +338,7 @@
     color: var(--text);
     word-break: break-word;
     min-height: 36px;
+    text-align: center;
   }
 
   .preview-loading {
@@ -698,7 +699,7 @@
       <div class="login-title">Thành Viên</div>
       <div class="login-input-wrap">
         <i class="ri-user-line login-input-icon"></i>
-        <input type="email" id="login-email" placeholder="abcd@gmail.com">
+        <input type="email" id="login-email" placeholder="abcd@gmail.com" autocapitalize="off" autocorrect="off" spellcheck="false">
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
@@ -1010,7 +1011,7 @@ function render(list) {
     panel.className = 'preview-panel';
     panel.innerHTML = `
       <div class="preview-input-wrap">
-        <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}">
+        <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
       </div>
       <div class="preview-size-row">
