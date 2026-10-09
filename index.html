@@ -189,9 +189,12 @@
 
   .preview-panel {
     display: none;
-    background: var(--card);
     border-radius: 0 0 25px 25px;
     padding: 0 18px 14px 18px;
+    background: rgba(255,255,255, 0.1);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 
   .preview-panel.open { display: block; }
