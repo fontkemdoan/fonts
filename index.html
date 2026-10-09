@@ -163,6 +163,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: var(--border);
     gap: 12px;
     cursor: pointer;
     transition: border-radius 0.15s ease;
@@ -211,7 +212,7 @@
     border: none;
     border-radius: 50px;
     outline: none;
-    background: var(--bg);
+    background: rgba(255,255,255, 0.1);
     color: var(--text);
     box-sizing: border-box;
   }
@@ -468,16 +469,15 @@
     font-style: italic;
   }
 
-  #login-email:-webkit-autofill,
-  #login-email:-webkit-autofill:hover,
-  #login-email:-webkit-autofill:focus,
-  #login-password:-webkit-autofill,
-  #login-password:-webkit-autofill:hover,
-  #login-password:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
-    -webkit-text-fill-color: var(--text);
-    transition: background-color 9999s ease-in-out 0s;
-  }
+#login-email:-webkit-autofill,
+#login-email:-webkit-autofill:hover,
+#login-email:-webkit-autofill:focus,
+#login-password:-webkit-autofill,
+#login-password:-webkit-autofill:hover,
+#login-password:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  transition: background-color 9999s ease-in-out 0s;
+}
 
   .login-btn-row {
     display: flex;
@@ -748,8 +748,7 @@ function verifyAndBoot() {
     });
 }
 
-const SKIP_LOGIN = true; // true = bỏ qua login, false = login bình thường
-if (SKIP_LOGIN) { document.getElementById('boot-loading').style.display = 'none'; showApp(); } else { verifyAndBoot(); }
+verifyAndBoot();
 
 let loginErrorTimer = null;
 function showLoginError(msg) {
