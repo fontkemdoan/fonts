@@ -198,6 +198,22 @@
 
   .preview-panel.open { display: block; }
 
+.font-card:has(.preview-panel.open) {
+  background: rgba(255,255,255,0.2);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: var(--border);
+  border-radius: 25px;
+}
+
+.font-card:has(.preview-panel.open) .font-item,
+.font-card:has(.preview-panel.open) .preview-panel {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: none;
+}
+  
   .preview-input-wrap {
     position: relative;
     width: 100%;
