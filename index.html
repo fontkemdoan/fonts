@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kem Đoàn</title>
+<link rel="icon" type="image" href="kemdoan.jpg">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<style>
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+  :root {
+    --bg: #fff;
+    --card: #fff;
+    --text: #fff;
+    --text-muted: #fff;
+    --text-black: #555;
+    --border: 1px solid #f0f0f0;
+    --green2: #1ed194;
+    --green: linear-gradient(130deg, #5be0b5, #1ed194);
+    --pink: linear-gradient(130deg, #f29584, #e87563);
+    --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
+    --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.01);
+  }
+
+  html, body { height: 100%; }
+  
+  body {
+    font-family: -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 30px 20px calc(110px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+}
+
+  body::before {
+    content: "";
+    position: fixed;
+    z-index: -1;  
+    inset: 0;
+    background: url('bg.jpg') center / cover no-repeat;
+    
+    opacity: 1;
+    pointer-events: none;
+}
+
+  .content { flex: 1; }
+
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .logo-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: none;
+    object-fit: cover;
+    background: var(--bg);
+  }
+  
+  .logo-text {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .search-wrap {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  #search {
+    width: 100%;
+    padding: 14px 44px 14px 46px;
+    font-size: 16px;
+    border: var(--border);
+    border-radius: 50px;
+    outline: none;
+    background: rgba(255,255,255, 0.2);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  
+  #search::placeholder {
+    color: var(--text);
+  }
+
+  #clear-btn,
+  .preview-clear-btn {
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: var(--bg);
+    color: var(--text-black);
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  #clear-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  #clear-btn.show,
+  .preview-clear-btn.show {
+    display: flex;
+  }
+  
+  #clear-btn i,
+  .preview-clear-btn i {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  #results {
+    max-width: 480px;
+    margin: 12px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .font-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .font-item {
+    border-radius: 50px;
+    padding: 8px 8px 8px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: var(--border);
+    gap: 12px;
+    cursor: pointer;
+    transition: border-radius 0.15s ease;
+    background: rgba(255,255,255, 0.2);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .font-item.expanded {
+    border-radius: 25px 25px 0 0;
+  }
+
+  .font-item.expanded .font-name {
+    font-weight: 700;
+  }
+  
+  .font-name {
+    font-size: 15px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+
+  .preview-panel {
+    display: none;
+    border: var(--border);
+    border-radius: 0 0 25px 25px;
+    padding: 0 18px 14px 18px;
+    background: rgba(255,255,255, 0.2);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .preview-panel.open { display: block; }
+
+  .preview-input-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .preview-input {
+    width: 100%;
+    padding: 10px 40px 10px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 50px;
+    outline: none;
+    background: rgba(255,255,255, 0.2);
+    color: var(--text);
+    box-sizing: border-box;
+  }
+
+  .preview-clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .preview-size-slider {
+    --pct: 0.27;
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    flex: 1;
+    min-width: 0;
+    height: 6px;
+    margin: 0;
+    border-radius: 50px;
+    outline: none;
+    cursor: pointer;
+    background:
+      var(--green) 0 0 / calc(10px + (100% - 20px) * var(--pct)) 100% no-repeat,
+      var(--bg);
+  }
+
+  .preview-size-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 6px;
+  }
+
+  .preview-size-value {
+    min-width: 40px;
+    text-align: right;
+    font-size: 13px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .preview-size-slider::-webkit-slider-runnable-track {
+    height: 6px;
+    background: transparent;
+    border-radius: 50px;
+  }
+
+  .preview-size-slider::-moz-range-track {
+    height: 6px;
+    background: transparent;
+    border-radius: 50px;
+  }
+
+  .preview-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: none;
+    box-sizing: border-box;
+  }
+
+  .preview-size-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--text-black);
+    border: none;
+    box-sizing: border-box;
+  }
+
+  .preview-text {
+    margin-top: 12px;
+    font-size: 30px;
+    line-height: 1.3;
+    color: var(--text);
+    word-break: break-word;
+    min-height: 36px;
+  }
+
+  .preview-loading {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .download-btn {
+    flex-shrink: 0;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 17px;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  
+  .download-btn i {
+    line-height: 1;
+  }
+  
+  .download-btn:hover {
+    background: var(--pink);
+  }
+  
+  .download-btn:active {
+    transform: scale(0.94);
+  }
+
+  #status {
+    text-align: center;
+    color: var(--text);
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  .login-panel {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: flex-start;
+    gap: 14px;
+    margin-bottom: 140px;
+  }
+
+  .login-logo .logo-img {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+  }
+
+  .login-logo-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .login-logo-name {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .login-logo-slogan {
+    margin-top: 2px;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  
+  .login-card {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  background: rgba(255,255,255, 0.2);
+  border: var(--border);
+  border-radius: 30px;
+  padding: 50px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+  
+  .login-icon {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--text-black);
+    border: var(--border);
+    overflow: hidden;
+  }
+  
+  .login-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .login-title {
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .login-input-wrap {
+    position: relative;
+    width: 100%;
+    margin-top: 14px;
+  }
+  
+  .login-input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  
+  #login-email,
+  #login-password,
+  #new-password {
+    width: 100%;
+    padding: 14px 14px 14px 50px;
+    font-size: 15px;
+    border: var(--border);
+    border-radius: 50px;
+    outline: none;
+    background: none;
+    color: var(--text);
+  }
+  
+  #login-email::placeholder,
+  #login-password::placeholder,
+  #new-password::placeholder {
+    color: var(--text);
+    font-style: italic;
+  }
+
+#login-email:-webkit-autofill,
+#login-email:-webkit-autofill:hover,
+#login-email:-webkit-autofill:focus,
+#login-password:-webkit-autofill,
+#login-password:-webkit-autofill:hover,
+#login-password:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+  .login-btn-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 14px;
+  }
+
+  #login-btn,
+  #change-pass-btn {
+    flex: 1;
+    margin-top: 0;
+    padding: 14px 0;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  #login-btn,
+  #change-pass-btn {
+    background: var(--bg);
+    color: var(--text-black);
+  }
+  
+  #login-btn:active,
+  #change-pass-btn:active {
+    transform: scale(0.94);
+  }
+  
+  #login-btn i,
+  #change-pass-btn i {
+    font-size: 18px;
+    line-height: 1;
+  }
+  
+  #login-btn:disabled,
+  #change-pass-btn:disabled {
+    cursor: default;
+  }
+
+  #login-error {
+    width: 100%;
+    max-width: 340px;
+    margin-top: 15px;
+    color: var(--text);;
+    font-size: 14px;
+    text-align: center;
+    min-height: 20px;
+    position: relative;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 420px;
+    height: 50px;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    background: var(--bg);
+    border-radius: 50px;
+    z-index: 1000;
+  }
+
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav-btn i {
+    line-height: 1;
+  }
+
+  .nav-btn:hover {
+    color: #e87563;
+  }
+
+  .nav-btn:active {
+    transform: scale(0.9);
+  }
+
+  .nav-text {
+  font-size: 15px;
+  font-weight: 600;
+
+  .bottom-fade {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 140px;
+    background: linear-gradient(to bottom, transparent 0%, #0f1a20 50%);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @keyframes kd-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .kd-spinner {
+    display: inline-block;
+    animation: kd-spin 0.8s linear infinite;
+    font-size: 18px;
+    line-height: 1;
+  }
+  
+</style>
+</head>
+<body>
+
+  <div class="bottom-fade"></div>
+
+  <div class="bottom-nav" id="bottom-nav">
+    <a class="nav-btn" href="#" aria-label="web"><i class="ri-global-line"></i></a>
+    <a class="nav-btn" href="#" target="_blank" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
+    <a class="nav-btn" href="#" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
+     <a class="nav-btn nav-text" href="#" target="_blank" aria-label="Nhắn tin">Zalo</a>
+    <button class="nav-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-line"></i></button>
+  </div>
+
+  <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text-muted);"></i>
+  </div>
+
+  <div class="login-panel" id="login-panel" style="display:none;">
+    <div class="login-logo">
+      <img src="kemdoanwhite.jpg" alt="logo" class="logo-img">
+      <div class="login-logo-text">
+        <div class="login-logo-name">KEM ĐOÀN</div>
+        <div class="login-logo-slogan">Design & Việt hóa font</div>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
+      <div class="login-title">Thành Viên</div>
+      <div class="login-input-wrap">
+        <i class="ri-user-line login-input-icon"></i>
+        <input type="email" id="login-email" placeholder="abcd@gmail.com">
+      </div>
+      <div class="login-input-wrap">
+        <i class="ri-lock-line login-input-icon"></i>
+        <input type="password" id="login-password" placeholder="Mật khẩu">
+      </div>
+      <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
+        <i class="ri-lock-line login-input-icon"></i>
+        <input type="password" id="new-password" placeholder="Mật khẩu mới">
+      </div>
+      <div class="login-btn-row">
+        <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
+        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+      </div>
+    </div>
+    <div id="login-error"></div>
+  </div>
+
+  <div class="content" id="content" style="display:none;">
+    <div class="logo-wrap">
+      <img src="kemdoanwhite.jpg" alt="logo" class="logo-img">
+      <div class="logo-text">Kem Đoàn</div>
+    </div>
+
+    <div class="search-wrap">
+      <i class="ri-search-line search-icon"></i>
+      <input type="text" id="search" placeholder="Nhập tên font...">
+      <button id="clear-btn"><i class="ri-close-line"></i></button>
+    </div>
+
+    <div id="results"></div>
+    <div id="status"></div>
+  </div>
+
+<script>
+let allFonts = [];
+const searchInput = document.getElementById('search');
+const clearBtn = document.getElementById('clear-btn');
+const statusEl = document.getElementById('status');
+const loginPanel = document.getElementById('login-panel');
+const contentEl = document.getElementById('content');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
+const loginBtn = document.getElementById('login-btn');
+const loginError = document.getElementById('login-error');
+const changePassBtn = document.getElementById('change-pass-btn');
+const changePassExtra = document.getElementById('change-pass-extra');
+const newPasswordInput = document.getElementById('new-password');
+const logoutBtn = document.getElementById('logout-btn');
+
+function showApp() {
+  loginPanel.style.display = 'none';
+  contentEl.style.display = '';
+  loadManifest();
+}
+
+function showLogin() {
+  contentEl.style.display = 'none';
+  loginPanel.style.display = 'flex';
+}
+
+function loadManifest() {
+  fetch('manifest.json')
+    .then(res => res.json())
+    .then(data => {
+      allFonts = data;
+    })
+    .catch(err => {
+      statusEl.textContent = 'Lỗi sever - ' + err;
+    });
+}
+
+function verifyAndBoot() {
+  const token = localStorage.getItem('kd_session_token');
+  const bootLoading = document.getElementById('boot-loading');
+
+  if (!token) {
+    bootLoading.style.display = 'none';
+    showLogin();
+    return;
+  }
+
+  fetch('/api/verify-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  })
+    .then(res => res.json())
+    .then(data => {
+      bootLoading.style.display = 'none';
+      if (data.ok) {
+        showApp();
+      } else {
+        localStorage.removeItem('kd_logged_in');
+        localStorage.removeItem('kd_session_token');
+        showLogin();
+      }
+    })
+    .catch(() => {
+
+      bootLoading.style.display = 'none';
+      showApp();
+    });
+}
+
+verifyAndBoot();
+
+let loginErrorTimer = null;
+function showLoginError(msg) {
+  loginError.textContent = msg;
+  clearTimeout(loginErrorTimer);
+  loginErrorTimer = setTimeout(() => {
+    loginError.textContent = '';
+  }, 2000);
+}
+
+function doLogin() {
+  const email = loginEmail.value.trim().toLowerCase();
+  const password = loginPassword.value;
+  loginError.textContent = '';
+
+  if (!email || !password) {
+    showLoginError('Vui lòng nhập email và mật khẩu');
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, mode: 'login' })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        localStorage.setItem('kd_logged_in', '1');
+        localStorage.setItem('kd_session_token', data.token);
+        showApp();
+      } else if (data.error === 'wrong_password') {
+        showLoginError('Sai mật khẩu');
+      } else {
+        showLoginError('Tài khoản không tồn tại');
+      }
+    })
+    .catch(() => {
+      showLoginError('Lỗi kết nối, hãy thử lại sau');
+    })
+    .finally(() => {
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+    });
+}
+
+loginBtn.addEventListener('click', () => {
+  if (changePassMode) {
+    exitChangePassMode();
+  } else {
+    doLogin();
+  }
+});
+loginEmail.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !changePassMode) doLogin();
+});
+loginPassword.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !changePassMode) doLogin();
+});
+
+let changePassMode = false;
+
+function enterChangePassMode() {
+  changePassMode = true;
+  changePassExtra.style.display = 'block';
+  changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
+  loginBtn.innerHTML = '<i class="ri-arrow-left-line"></i> Quay lại';
+}
+
+function exitChangePassMode() {
+  changePassMode = false;
+  changePassExtra.style.display = 'none';
+  newPasswordInput.value = '';
+  changePassBtn.innerHTML = '<i class="ri-key-2-line"></i> Đổi Pass';
+  loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
+}
+
+changePassBtn.addEventListener('click', () => {
+  if (!changePassMode) {
+    enterChangePassMode();
+    return;
+  }
+
+  const email = loginEmail.value.trim().toLowerCase();
+  const oldPassword = loginPassword.value;
+  const newPassword = newPasswordInput.value;
+
+  if (!email || !oldPassword || !newPassword) {
+    showLoginError('Vui lòng nhập đầy đủ thông tin');
+    return;
+  }
+
+  changePassBtn.disabled = true;
+  loginBtn.disabled = true;
+  changePassBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
+
+  fetch('/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, oldPassword, newPassword })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        showLoginError('Đổi mật khẩu thành công');
+        exitChangePassMode();
+      } else if (data.error === 'wrong_password') {
+        showLoginError('Mật khẩu hiện tại không đúng');
+      } else if (data.error === 'not_found') {
+        showLoginError('Tài khoản không tồn tại');
+      } else {
+        showLoginError('Có lỗi xảy ra, hãy thử lại sau');
+      }
+    })
+    .catch(() => showLoginError('Lỗi kết nối, hãy thử lại sau'))
+    .finally(() => {
+      changePassBtn.disabled = false;
+      loginBtn.disabled = false;
+      if (changePassMode) changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
+    });
+});
+
+const loginIcon = document.getElementById('login-icon');
+const loginTitle = document.querySelector('.login-title');
+const DEFAULT_TITLE = 'Thành Viên';
+const DEFAULT_ICON = '<i class="ri-user-line"></i>';
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let previewTimer = null;
+
+function resetLoginIcon() {
+  loginIcon.innerHTML = DEFAULT_ICON;
+  loginTitle.textContent = DEFAULT_TITLE;
+}
+
+function previewAvatar(email) {
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, mode: 'preview' })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        if (data.avatar) {
+          loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+        } else {
+          loginIcon.innerHTML = DEFAULT_ICON;
+        }
+        loginTitle.textContent = data.name || DEFAULT_TITLE;
+      } else {
+        resetLoginIcon();
+      }
+    })
+    .catch(() => resetLoginIcon());
+}
+
+loginEmail.addEventListener('input', () => {
+  clearTimeout(previewTimer);
+  const val = loginEmail.value.trim().toLowerCase();
+  if (!emailRegex.test(val)) {
+    resetLoginIcon();
+    return;
+  }
+  previewTimer = setTimeout(() => previewAvatar(val), 400);
+});
+
+const loadedPreviewFonts = new Map();
+const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
+const DEFAULT_PREVIEW_SIZE = 30;
+
+function render(list) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+
+  if (list.length === 0) {
+    statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>( Vui lòng nhập chính xác tên font<br>hoặc font chưa được cập nhật )</i>';
+    return;
+  }
+
+  statusEl.textContent = '';
+  list.forEach(font => {
+    const token = localStorage.getItem('kd_session_token') || '';
+
+    const card = document.createElement('div');
+    card.className = 'font-card';
+
+    const item = document.createElement('div');
+    item.className = 'font-item';
+    item.innerHTML = `
+      <span class="font-name">${font.name}</span>
+      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}&token=${encodeURIComponent(token)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
+    `;
+
+    const panel = document.createElement('div');
+    panel.className = 'preview-panel';
+    panel.innerHTML = `
+      <div class="preview-input-wrap">
+        <input type="text" class="preview-input" placeholder="Nhập chữ để xem trước..." value="${DEFAULT_PREVIEW_TEXT}">
+        <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
+      </div>
+      <div class="preview-size-row">
+        <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="30" aria-label="Cỡ chữ">
+        <span class="preview-size-value">30px</span>
+      </div>
+      <div class="preview-loading" style="display:none;"><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
+      <div class="preview-text"></div>
+    `;
+
+    card.appendChild(item);
+    card.appendChild(panel);
+    container.appendChild(card);
+
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.download-btn')) return;
+      togglePreview(font, panel);
+    });
+  });
+}
+
+async function togglePreview(font, panel) {
+
+  const itemEl = panel.previousElementSibling;
+
+  document.querySelectorAll('.preview-panel.open').forEach(p => {
+    if (p !== panel) {
+      p.classList.remove('open');
+      if (p.previousElementSibling) p.previousElementSibling.classList.remove('expanded');
+    }
+  });
+
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    itemEl.classList.remove('expanded');
+    return;
+  }
+
+  panel.classList.add('open');
+  itemEl.classList.add('expanded');
+
+  const inputEl = panel.querySelector('.preview-input');
+  const loadingEl = panel.querySelector('.preview-loading');
+  const previewTextEl = panel.querySelector('.preview-text');
+  const previewClearBtn = panel.querySelector('.preview-clear-btn');
+  const sizeSlider = panel.querySelector('.preview-size-slider');
+  const sizeValue = panel.querySelector('.preview-size-value');
+
+  const applySize = () => {
+    const v = Number(sizeSlider.value);
+    previewTextEl.style.fontSize = v + 'px';
+    sizeValue.textContent = v + 'px';
+    sizeSlider.style.setProperty('--pct', (v - 1) / 99);
+  };
+  sizeSlider.oninput = applySize;
+  sizeSlider.value = DEFAULT_PREVIEW_SIZE; // mỗi lần mở preview đều về size mặc định
+  applySize();
+
+  const applyText = () => {
+    previewTextEl.textContent = inputEl.value || DEFAULT_PREVIEW_TEXT;
+    previewClearBtn.classList.toggle('show', inputEl.value.length > 0);
+  };
+
+  previewClearBtn.onclick = () => {
+    inputEl.value = '';
+    applyText();
+    inputEl.focus();
+  };
+
+  if (loadedPreviewFonts.has(font.file)) {
+    previewTextEl.style.fontFamily = `"${loadedPreviewFonts.get(font.file)}", sans-serif`;
+    applyText();
+    inputEl.oninput = applyText;
+    return;
+  }
+
+  loadingEl.style.display = 'flex';
+  previewTextEl.textContent = '';
+
+  try {
+    const token = localStorage.getItem('kd_session_token') || '';
+    const res = await fetch(`/api/download?file=${encodeURIComponent(font.file)}&token=${encodeURIComponent(token)}`);
+    if (!res.ok) throw new Error('fetch failed');
+
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const familyName = 'kd-preview-' + loadedPreviewFonts.size;
+
+    const fontFace = new FontFace(familyName, `url(${objectUrl})`);
+    await fontFace.load();
+    document.fonts.add(fontFace);
+
+    loadedPreviewFonts.set(font.file, familyName);
+
+    loadingEl.style.display = 'none';
+    previewTextEl.style.fontFamily = `"${familyName}", sans-serif`;
+    applyText();
+    inputEl.oninput = applyText;
+  } catch (e) {
+    loadingEl.style.display = 'none';
+    previewTextEl.style.fontFamily = '';
+    previewTextEl.textContent = 'Không thể preview file zip';
+  }
+}
+
+function normalize(str) {
+  return str.toLowerCase().replace(/[\s\-_]+/g, '');
+}
+
+searchInput.addEventListener('input', (e) => {
+  const raw = e.target.value.trim();
+  clearBtn.classList.toggle('show', raw.length > 0);
+
+  if (!raw) {
+    document.getElementById('results').innerHTML = '';
+    statusEl.textContent = '';
+    return;
+  }
+
+  const q = normalize(raw);
+  const filtered = allFonts.filter(f => normalize(f.name).includes(q));
+  render(filtered.slice(0, 100));
+});
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  clearBtn.classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  statusEl.textContent = '';
+  searchInput.focus();
+});
+
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('kd_logged_in');
+  localStorage.removeItem('kd_session_token');
+  showLogin();
+});
+</script>
+</body>
+</html>
