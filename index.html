@@ -333,7 +333,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   .preview-size-value {
     min-width: 40px;
     text-align: right;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text);
     font-variant-numeric: tabular-nums;
   }
@@ -1132,7 +1132,6 @@ async function togglePreview(font, panel) {
 
     suckBusy = true;
 
-    // Tách chữ thành từng span (khoảng trắng giữ nguyên để xuống dòng tự nhiên)
     previewTextEl.textContent = '';
     const chars = [];
     Array.from(text.normalize('NFC')).forEach(ch => {
@@ -1147,7 +1146,6 @@ async function togglePreview(font, panel) {
       }
     });
 
-    // Tạo chỗ trống bên dưới và đặt icon thùng rác ở giữa
     const baseH = previewTextEl.offsetHeight;
     previewTextEl.style.paddingBottom = '46px';
 
@@ -1275,11 +1273,10 @@ function slideTextLeft(input, duration = 300) {
   const clip = document.createElement('div');
   Object.assign(clip.style, {
     position: 'absolute',
-    left: (input.offsetLeft + bl) + 'px',
+    left: (input.offsetLeft + bl + padL) + 'px',
     top: (input.offsetTop + bt) + 'px',
-    width: (input.clientWidth - padR) + 'px',
+    width: (input.clientWidth - padL - padR) + 'px',
     height: input.clientHeight + 'px',
-    paddingLeft: padL + 'px',
     boxSizing: 'border-box',
     overflow: 'hidden',
     pointerEvents: 'none',
@@ -1299,7 +1296,7 @@ function slideTextLeft(input, duration = 300) {
   input.parentNode.appendChild(clip);
   input.classList.add('clearing');
 
-  const dist = padL + span.offsetWidth + 10;
+  const dist = span.offsetWidth + 10;
   const cleanup = () => {
     clip.remove();
     input.classList.remove('clearing');
