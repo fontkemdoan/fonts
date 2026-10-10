@@ -232,7 +232,7 @@
   .preview-panel.open { display: block; }
   .preview-panel { position: relative; }
 
-  .preview-text { position: relative; transition: padding-bottom 0.25s ease; }
+  .preview-text { position: relative; transition: padding-bottom 0.17s ease; }
 
   .preview-char {
     display: inline-block;
@@ -1119,7 +1119,7 @@ async function togglePreview(font, panel) {
   applySize();
 
   const applyText = () => {
-    previewTextEl.textContent = inputEl.value || DEFAULT_PREVIEW_TEXT;
+    previewTextEl.textContent = inputEl.value;
   };
 
   let suckBusy = false;
@@ -1160,14 +1160,14 @@ async function togglePreview(font, panel) {
 
     const trashIn = trash.animate(
       [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }],
-      { duration: 250, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
+      { duration: 167, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
     );
 
     trashIn.onfinish = () => {
       const tr = trash.getBoundingClientRect();
       const tx = tr.left + tr.width / 2;
       const ty = tr.top + tr.height / 2;
-      const perChar = Math.min(40, 450 / Math.max(chars.length, 1));
+      const perChar = Math.min(27, 300 / Math.max(chars.length, 1));
       let last = null;
 
       chars.forEach((sp, i) => {
@@ -1180,7 +1180,7 @@ async function togglePreview(font, panel) {
             { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
             { transform: `translate(${dx}px,${dy}px) scale(0.05) rotate(${rot}deg)`, opacity: 0 }
           ],
-          { duration: 480, delay: i * perChar, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'forwards' }
+          { duration: 320, delay: i * perChar, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'forwards' }
         );
       });
 
@@ -1193,13 +1193,13 @@ async function togglePreview(font, panel) {
           { transform: 'scale(1.18) rotate(-8deg)', offset: 0.75 },
           { transform: 'scale(1) rotate(0deg)' }
         ],
-        { duration: 480 + chars.length * perChar, iterations: 1 }
+        { duration: 320 + chars.length * perChar, iterations: 1 }
       );
 
       const finish = () => {
         trash.animate(
           [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0)' }],
-          { duration: 200, easing: 'ease-in', fill: 'forwards' }
+          { duration: 133, easing: 'ease-in', fill: 'forwards' }
         ).onfinish = () => {
           trash.remove();
           previewTextEl.style.paddingBottom = '';
@@ -1218,15 +1218,12 @@ async function togglePreview(font, panel) {
     inputEl.value = '';
     inputEl.focus();
 
-    const showDefault = () => {
+    const showEmpty = () => {
       if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
-      applyText();
-      previewTextEl.classList.remove('fade-in');
-      void previewTextEl.offsetWidth;
-      previewTextEl.classList.add('fade-in');
+      applyText(); // ô trống thì preview để trống
     };
 
-    if (hadText) suckTextIntoTrash(showDefault); else showDefault();
+    if (hadText) suckTextIntoTrash(showEmpty); else showEmpty();
   };
 
   if (loadedPreviewFonts.has(font.file)) {
