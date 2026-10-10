@@ -230,6 +230,7 @@
   }
 
   .preview-panel.open { display: block; }
+  input.clearing::placeholder { color: transparent !important; }
   .preview-panel { position: relative; }
 
   .preview-text { position: relative; transition: padding-bottom 0.17s ease; }
@@ -1115,7 +1116,7 @@ async function togglePreview(font, panel) {
     sizeSlider.style.setProperty('--pct', (v - 1) / 99);
   };
   sizeSlider.oninput = applySize;
-  sizeSlider.value = DEFAULT_PREVIEW_SIZE; // mỗi lần mở preview đều về size mặc định
+  sizeSlider.value = DEFAULT_PREVIEW_SIZE; 
   applySize();
 
   const applyText = () => {
@@ -1124,7 +1125,6 @@ async function togglePreview(font, panel) {
 
   let suckBusy = false;
 
-  // Hiệu ứng: icon thùng rác hiện bên dưới, hút từng chữ vào
   const suckTextIntoTrash = (done) => {
     const text = previewTextEl.textContent;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1184,7 +1184,6 @@ async function togglePreview(font, panel) {
         );
       });
 
-      // Thùng rác rung nhẹ khi đang hút
       trash.animate(
         [
           { transform: 'scale(1) rotate(0deg)' },
@@ -1215,11 +1214,12 @@ async function togglePreview(font, panel) {
     spinIcon(previewClearBtn);
     if (suckBusy) return;
     const hadText = inputEl.value.length > 0;
+    slideTextLeft(inputEl);
     inputEl.value = '';
 
     const showEmpty = () => {
-      if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
-      applyText(); // ô trống thì preview để trống
+      if (inputEl.value.length > 0) return; 
+      applyText();
     };
 
     if (hadText) suckTextIntoTrash(showEmpty); else showEmpty();
@@ -1261,11 +1261,68 @@ async function togglePreview(font, panel) {
   }
 }
 
+function slideTextLeft(input, duration = 300) {
+  const text = input.value;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!text || reduce || !input.animate) return;
+
+  const cs = getComputedStyle(input);
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const padR = parseFloat(cs.paddingRight) || 0;
+  const bl = parseFloat(cs.borderLeftWidth) || 0;
+  const bt = parseFloat(cs.borderTopWidth) || 0;
+
+  const clip = document.createElement('div');
+  Object.assign(clip.style, {
+    position: 'absolute',
+    left: (input.offsetLeft + bl) + 'px',
+    top: (input.offsetTop + bt) + 'px',
+    width: (input.clientWidth - padR) + 'px',
+    height: input.clientHeight + 'px',
+    paddingLeft: padL + 'px',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: cs.fontSize,
+    fontFamily: cs.fontFamily,
+    fontWeight: cs.fontWeight,
+    letterSpacing: cs.letterSpacing,
+    color: cs.color
+  });
+  const span = document.createElement('span');
+  span.textContent = text;
+  span.style.whiteSpace = 'pre';
+  span.style.flexShrink = '0';
+  clip.appendChild(span);
+  input.parentNode.appendChild(clip);
+  input.classList.add('clearing');
+
+  const dist = padL + span.offsetWidth + 10;
+  const cleanup = () => {
+    clip.remove();
+    input.classList.remove('clearing');
+    input.removeEventListener('input', cleanup);
+  };
+  input.addEventListener('input', cleanup);
+
+  const anim = span.animate(
+    [
+      { transform: 'translateX(0)', opacity: 1 },
+      { transform: 'translateX(' + (-dist * 0.6) + 'px)', opacity: 1, offset: 0.6 },
+      { transform: 'translateX(' + (-dist) + 'px)', opacity: 0 }
+    ],
+    { duration, easing: 'cubic-bezier(.45,0,.55,1)', fill: 'forwards' }
+  );
+  anim.onfinish = cleanup;
+}
+
 function spinIcon(btn) {
   const icon = btn.querySelector('i');
   if (!icon) return;
   icon.classList.remove('spin-360');
-  void icon.offsetWidth; // restart animation
+  void icon.offsetWidth;
   icon.classList.add('spin-360');
 }
 
@@ -1289,6 +1346,7 @@ searchInput.addEventListener('input', (e) => {
 
 clearBtn.addEventListener('click', () => {
   spinIcon(clearBtn);
+  slideTextLeft(searchInput);
   searchInput.value = '';
   document.getElementById('results').innerHTML = '';
   statusEl.textContent = '';
