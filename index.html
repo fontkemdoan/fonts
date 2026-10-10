@@ -398,7 +398,10 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    align-self: flex-start;
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
     gap: 14px;
     margin-bottom: 140px;
   }
@@ -443,7 +446,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   .login-card {
     position: relative;
     width: 100%;
-    max-width: 340px;
+    max-width: 480px;
     height: auto;
     background: rgba(255,255,255, 0.2);
     border: var(--border);
@@ -582,7 +585,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
 
   #login-error {
     width: 100%;
-    max-width: 340px;
+    max-width: 480px;
     margin-top: 15px;
     color: var(--text);;
     font-size: 14px;
@@ -597,7 +600,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     width: calc(100% - 40px);
-    max-width: 420px;
+    max-width: 480px;
     height: 50px;
     display: flex;
     align-items: center;
