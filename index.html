@@ -162,12 +162,12 @@
   }
 
   .preview-clear-btn i {
-    font-size: 17px;
+    font-size: 14px;
     line-height: 1;
   }
 
   #clear-btn i {
-    font-size: 20px;
+    font-size: 17px;
     line-height: 1;
   }
 
@@ -230,6 +230,36 @@
   }
 
   .preview-panel.open { display: block; }
+  .preview-panel { position: relative; }
+
+  .preview-text { position: relative; transition: padding-bottom 0.25s ease; }
+
+  .preview-char {
+    display: inline-block;
+    will-change: transform, opacity;
+  }
+
+  .preview-trash {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--text);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .preview-text.fade-in { animation: previewFadeIn 0.35s ease; }
+
+  @keyframes previewFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
 .font-card:has(.preview-panel.open) {
   background: rgba(255,255,255,0.2);
@@ -1092,11 +1122,111 @@ async function togglePreview(font, panel) {
     previewTextEl.textContent = inputEl.value || DEFAULT_PREVIEW_TEXT;
   };
 
+  let suckBusy = false;
+
+  // Hiệu ứng: icon thùng rác hiện bên dưới, hút từng chữ vào
+  const suckTextIntoTrash = (done) => {
+    const text = previewTextEl.textContent;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!text.trim() || reduce || !previewTextEl.animate) { done(); return; }
+
+    suckBusy = true;
+
+    // Tách chữ thành từng span (khoảng trắng giữ nguyên để xuống dòng tự nhiên)
+    previewTextEl.textContent = '';
+    const chars = [];
+    Array.from(text.normalize('NFC')).forEach(ch => {
+      if (/\s/.test(ch)) {
+        previewTextEl.appendChild(document.createTextNode(ch));
+      } else {
+        const sp = document.createElement('span');
+        sp.className = 'preview-char';
+        sp.textContent = ch;
+        previewTextEl.appendChild(sp);
+        chars.push(sp);
+      }
+    });
+
+    // Tạo chỗ trống bên dưới và đặt icon thùng rác ở giữa
+    const baseH = previewTextEl.offsetHeight;
+    previewTextEl.style.paddingBottom = '46px';
+
+    const trash = document.createElement('div');
+    trash.className = 'preview-trash';
+    trash.innerHTML = '<i class="ri-delete-bin-line"></i>';
+    trash.style.left = (previewTextEl.offsetLeft + previewTextEl.offsetWidth / 2) + 'px';
+    trash.style.top = (previewTextEl.offsetTop + baseH + 6) + 'px';
+    panel.appendChild(trash);
+
+    const trashIn = trash.animate(
+      [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }],
+      { duration: 250, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
+    );
+
+    trashIn.onfinish = () => {
+      const tr = trash.getBoundingClientRect();
+      const tx = tr.left + tr.width / 2;
+      const ty = tr.top + tr.height / 2;
+      const perChar = Math.min(40, 450 / Math.max(chars.length, 1));
+      let last = null;
+
+      chars.forEach((sp, i) => {
+        const r = sp.getBoundingClientRect();
+        const dx = tx - (r.left + r.width / 2);
+        const dy = ty - (r.top + r.height / 2);
+        const rot = (Math.random() * 2 - 1) * 200;
+        last = sp.animate(
+          [
+            { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
+            { transform: `translate(${dx}px,${dy}px) scale(0.05) rotate(${rot}deg)`, opacity: 0 }
+          ],
+          { duration: 480, delay: i * perChar, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'forwards' }
+        );
+      });
+
+      // Thùng rác rung nhẹ khi đang hút
+      trash.animate(
+        [
+          { transform: 'scale(1) rotate(0deg)' },
+          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.25 },
+          { transform: 'scale(1.18) rotate(8deg)', offset: 0.5 },
+          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.75 },
+          { transform: 'scale(1) rotate(0deg)' }
+        ],
+        { duration: 480 + chars.length * perChar, iterations: 1 }
+      );
+
+      const finish = () => {
+        trash.animate(
+          [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0)' }],
+          { duration: 200, easing: 'ease-in', fill: 'forwards' }
+        ).onfinish = () => {
+          trash.remove();
+          previewTextEl.style.paddingBottom = '';
+          suckBusy = false;
+          done();
+        };
+      };
+      if (last) last.onfinish = finish; else finish();
+    };
+  };
+
   previewClearBtn.onclick = () => {
     spinIcon(previewClearBtn);
+    if (suckBusy) return;
+    const hadText = inputEl.value.length > 0;
     inputEl.value = '';
-    applyText();
     inputEl.focus();
+
+    const showDefault = () => {
+      if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
+      applyText();
+      previewTextEl.classList.remove('fade-in');
+      void previewTextEl.offsetWidth;
+      previewTextEl.classList.add('fade-in');
+    };
+
+    if (hadText) suckTextIntoTrash(showDefault); else showDefault();
   };
 
   if (loadedPreviewFonts.has(font.file)) {
