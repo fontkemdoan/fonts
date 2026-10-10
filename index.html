@@ -16,15 +16,15 @@
     --border: 1px solid #f0f0f0;
     --pink: linear-gradient(130deg, #f2ac9f, #ee9081);
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
-    --shadow-soft: 0 6px 10px rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 6px 10px rgba(0, 0, 0, 0.01);
+    --shadow-soft: 0 6px 10px rgba(230,91,69, 0.3);
+    --shadow-card: 0 14px 30px rgba(230,91,69, 0.3);
   }
 
   html, body { height: 100%; }
   
   body {
     font-family: -apple-system, sans-serif;
-    background: #9fc3dd;
+    background: linear-gradient(-140deg, #f59886, #7ebeed);;
     color: var(--text);
     margin: 0;
     padding: 30px 20px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -454,7 +454,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     align-items: center;
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
-}
+  }
   
   .login-icon {
     position: absolute;
@@ -472,6 +472,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     color: var(--text-black);
     border: 2px solid #fff;
     overflow: hidden;
+    box-shadow: var(--shadow-soft);
   }
   
   .login-icon img {
@@ -598,7 +599,6 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     width: calc(100% - 40px);
     max-width: 420px;
     height: 50px;
-    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.1));
     display: flex;
     align-items: center;
     justify-content: space-between;
