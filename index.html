@@ -1216,7 +1216,6 @@ async function togglePreview(font, panel) {
     if (suckBusy) return;
     const hadText = inputEl.value.length > 0;
     inputEl.value = '';
-    inputEl.focus();
 
     const showEmpty = () => {
       if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
@@ -1293,7 +1292,6 @@ clearBtn.addEventListener('click', () => {
   searchInput.value = '';
   document.getElementById('results').innerHTML = '';
   statusEl.textContent = '';
-  searchInput.focus();
 });
 
 logoutBtn.addEventListener('click', () => {
