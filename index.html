@@ -719,7 +719,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   
   #families {
     max-width: 480px;
-    margin: 16px auto 90px;
+    margin: 25px auto 90px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -1341,7 +1341,7 @@ async function togglePreview(font, panel) {
   } catch (e) {
     loadingEl.style.display = 'none';
     previewTextEl.style.fontFamily = '';
-    previewTextEl.textContent = 'Không thể preview file zip';
+    previewTextEl.textContent = 'File zip';
   }
 }
 
