@@ -411,7 +411,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   }
   
   .download-btn:hover {
-    background: var(--pink);
+    background: rgba(0,0,0, 0.2);
     color: var(--text);
   }
   
@@ -698,8 +698,8 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     left: 0;
     right: 0;
     bottom: 0;
-    height: 100px;
-    background: linear-gradient(to bottom, transparent 0%, #9fc3dd 80%);
+    height: 120px;
+    background: linear-gradient(to bottom, transparent 0%, #9fc3dd 60%);
     pointer-events: none;
     z-index: 999;
   }
@@ -714,6 +714,87 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     animation: kd-spin 0.8s linear infinite;
     font-size: 18px;
     line-height: 1;
+  }
+  
+  #families {
+    max-width: 480px;
+    margin: 16px auto 90px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  
+  #families.hidden {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    display: none;
+  }
+  
+  .family-card {
+    border: var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255, 0.2);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .family-name {
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    overflow-wrap: anywhere;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .family-foot {
+    border-top: 1px solid rgba(255,255,255,0.4);
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 400;
+  }
+  
+  .family-download {
+    height: 25px;
+    width: 25px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  
+  .family-download i {
+    line-height: 1;
+  }
+
+  .family-download:hover {
+    background: rgba(0,0,0, 0.2);
+  }
+
+  .family-download:active {
+    transform: scale(0.94);
+  }
+  
+  .family-card.fade-in {
+    animation: previewFadeIn 0.40s ease both;
   }
   
 </style>
@@ -781,6 +862,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
       <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
 
+    <div id="families" class="hidden"></div>
     <div id="results"></div>
     <div id="status"></div>
   </div>
@@ -801,6 +883,7 @@ const changePassBtn = document.getElementById('change-pass-btn');
 const changePassExtra = document.getElementById('change-pass-extra');
 const newPasswordInput = document.getElementById('new-password');
 const logoutBtn = document.getElementById('logout-btn');
+const familiesEl = document.getElementById('families');
 
 function showApp() {
   loginPanel.style.display = 'none';
@@ -811,6 +894,7 @@ function showApp() {
 
 function showLogin() {
   contentEl.style.display = 'none';
+  familiesEl.classList.add('hidden');
   brandHeader.style.display = 'flex';
   loginPanel.style.display = 'flex';
 }
@@ -820,6 +904,7 @@ function loadManifest() {
     .then(res => res.json())
     .then(data => {
       allFonts = data;
+      buildFamilies();
     })
     .catch(err => {
       statusEl.textContent = 'Lỗi sever - ' + err;
@@ -1327,19 +1412,53 @@ function normalize(str) {
   return str.toLowerCase().replace(/[\s\-_]+/g, '');
 }
 
-searchInput.addEventListener('input', (e) => {
-  const raw = e.target.value.trim();
+function familyKey(f) {
+  return String(f.file).split('/')[0];
+}
 
+function buildFamilies() {
+  const map = new Map();
+  allFonts.forEach(f => {
+    const k = familyKey(f);
+    if (!map.has(k)) map.set(k, { name: k, count: 0, link: f.group_file || f.family_file || '' });
+    map.get(k).count++;
+  });
+  const token = localStorage.getItem('kd_session_token') || '';
+  familiesEl.innerHTML = '';
+  [...map.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+    const href = '/api/download?file=' + encodeURIComponent(g.link || (g.name + '.zip')) + '&token=' + encodeURIComponent(token);
+    const card = document.createElement('div');
+    card.className = 'family-card';
+    card.innerHTML = `
+      <div class="family-name">${g.name}</div>
+      <div class="family-foot">
+        <span>${g.count} Font</span>
+        <a class="family-download" href="${href}" download aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
+      </div>`;
+    familiesEl.appendChild(card);
+  });
+  updateFamilies();
+}
+
+function updateFamilies() {
+  const hide = document.activeElement === searchInput || searchInput.value.trim() !== '';
+  familiesEl.classList.toggle('hidden', hide || !familiesEl.children.length);
+}
+searchInput.addEventListener('focus', updateFamilies);
+searchInput.addEventListener('blur', () => setTimeout(updateFamilies, 0));
+
+function runSearch() {
+  const raw = searchInput.value.trim();
   if (!raw) {
     document.getElementById('results').innerHTML = '';
     statusEl.textContent = '';
     return;
   }
-
   const q = normalize(raw);
-  const filtered = allFonts.filter(f => normalize(f.name).includes(q));
-  render(filtered.slice(0, 100));
-});
+  render(allFonts.filter(f => normalize(f.name).includes(q)).slice(0, 100));
+}
+
+searchInput.addEventListener('input', () => { runSearch(); updateFamilies(); });
 
 clearBtn.addEventListener('click', () => {
   spinIcon(clearBtn);
@@ -1347,6 +1466,7 @@ clearBtn.addEventListener('click', () => {
   searchInput.value = '';
   document.getElementById('results').innerHTML = '';
   statusEl.textContent = '';
+  updateFamilies();
 });
 
 logoutBtn.addEventListener('click', () => {
