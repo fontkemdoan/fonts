@@ -768,7 +768,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
 
   <div class="content" id="content" style="display:none;">
     <div class="login-logo search-brand">
-      <img src="kemdoanwhitepng.png" alt="logo" class="brand-logo-img">
+      <img src="kemdoanwhite.png" alt="logo" class="brand-logo-img">
       <div class="login-logo-text">
         <div class="login-logo-name">KEM ĐOÀN</div>
         <div class="login-logo-slogan">Font Việt hóa</div>
@@ -1259,7 +1259,7 @@ async function togglePreview(font, panel) {
   }
 }
 
-function slideTextLeft(input, duration = 300) {
+function slideTextLeft(input, duration = 200) {
   const text = input.value;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!text || reduce || !input.animate) return;
