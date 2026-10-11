@@ -6,6 +6,7 @@
 <title>Kem Đoàn</title>
 <link rel="icon" type="image" href="img/kemdoan.jpg">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
@@ -1423,17 +1424,15 @@ function buildFamilies() {
     if (!map.has(k)) map.set(k, { name: k, count: 0, link: f.group_file || f.family_file || '' });
     map.get(k).count++;
   });
-  const token = localStorage.getItem('kd_session_token') || '';
   familiesEl.innerHTML = '';
   [...map.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-    const href = '/api/download?file=' + encodeURIComponent(g.link || (g.name + '.zip')) + '&token=' + encodeURIComponent(token);
     const card = document.createElement('div');
     card.className = 'family-card';
     card.innerHTML = `
       <div class="family-name">${g.name}</div>
       <div class="family-foot">
         <span>${g.count} Font</span>
-        <a class="family-download" href="${href}" download aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
+        <a class="family-download" href="#" data-folder="${g.name}" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
       </div>`;
     familiesEl.appendChild(card);
   });
@@ -1446,6 +1445,56 @@ function updateFamilies() {
 }
 searchInput.addEventListener('focus', updateFamilies);
 searchInput.addEventListener('blur', () => setTimeout(updateFamilies, 0));
+
+// Tải cả thư mục: tải từng font qua /api/download rồi nén zip ngay trên trình duyệt
+familiesEl.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.family-download');
+  if (!btn) return;
+  e.preventDefault();
+  if (btn.dataset.busy) return;
+  const folder = btn.dataset.folder;
+  const files = allFonts.filter(f => familyKey(f) === folder);
+  const token = localStorage.getItem('kd_session_token') || '';
+  const icon = btn.querySelector('i');
+  btn.dataset.busy = '1';
+  icon.className = '';
+  icon.style.cssText = 'font-size:11px;font-weight:700;font-style:normal;';
+  icon.textContent = '0';
+
+  const zip = new JSZip();
+  let ok = 0, i = 0;
+  const worker = async () => {
+    while (i < files.length) {
+      const f = files[i++];
+      try {
+        const res = await fetch('/api/download?file=' + encodeURIComponent(f.file) + '&token=' + encodeURIComponent(token));
+        if (!res.ok) continue;
+        zip.file(f.file.split('/').pop(), await res.blob());
+        ok++;
+        icon.textContent = ok;
+      } catch (_) {}
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
+
+  if (ok === 0) {
+    alert('Tải không thành công');
+  } else {
+    const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = folder + '.zip';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+  icon.textContent = '';
+  icon.style.cssText = '';
+  icon.className = 'ri-download-cloud-2-line';
+  delete btn.dataset.busy;
+});
 
 function runSearch() {
   const raw = searchInput.value.trim();
