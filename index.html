@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +19,21 @@
     --grey: linear-gradient(130deg, #cdcdcd, #a0a0a0);
     --shadow-soft: 0 6px 10px rgba(230,91,69, 0.3);
     --shadow-card: 0 14px 30px rgba(230,91,69, 0.3);
+  }
+
+  /* Glass style */
+  #search,
+  .font-item,
+  .preview-panel,
+  .font-card:has(.preview-panel.open),
+  .login-card,
+  .family-card,
+  .dym-chip {
+    color: var(--text);
+    border: var(--border);
+    background: rgba(255,255,255, 0.2);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
   }
 
   html, body { height: 100%; }
@@ -93,13 +108,8 @@
     width: 100%;
     padding: 14px 54px 14px 42px;
     font-size: 15px;
-    border: var(--border);
     border-radius: 999px;
     outline: none;
-    background: rgba(255,255,255, 0.2);
-    color: var(--text);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
   }
   
   #search::placeholder {
@@ -184,14 +194,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: var(--border);
     gap: 12px;
     cursor: pointer;
     transition: border-radius 0.15s ease;
-    background: rgba(255,255,255, 0.2);
-    color: var(--text);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
   }
 
   .font-item.expanded {
@@ -213,13 +218,8 @@
 
   .preview-panel {
     display: none;
-    border: var(--border);
     border-radius: 0 0 25px 25px;
     padding: 0 8px 14px 8px;
-    background: rgba(255,255,255, 0.2);
-    color: var(--text);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
   }
 
   .preview-panel.open { display: block; }
@@ -256,10 +256,6 @@
   }
 
 .font-card:has(.preview-panel.open) {
-  background: rgba(255,255,255,0.2);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border: var(--border);
   border-radius: 25px;
 }
 
@@ -283,7 +279,7 @@
     border: none;
     border-radius: 999px;
     outline: none;
-    background: rgba(0,0,0, 0.14);
+    background: rgba(0,0,0, 0.15);
     color: var(--text);
     box-sizing: border-box;
   }
@@ -419,7 +415,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     position: fixed;
     inset: 0;
     z-index: 1;
-    padding: 35px 20px 0; /* bù chiều cao #login-error để card nằm đúng tâm */
+    padding: 35px 20px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -445,7 +441,6 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     width: 44px;
     height: 50px;
     flex-shrink: 0;
-    
     border: none;
     object-fit: cover;
     background: none;
@@ -483,15 +478,11 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     width: 100%;
     max-width: 480px;
     height: auto;
-    background: rgba(255,255,255, 0.2);
-    border: var(--border);
     border-radius: 25px;
     padding: 50px 30px 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
   }
   
   .login-icon {
@@ -669,11 +660,8 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     line-height: 1;
   }
 
-  .nav-btn:hover {
-    color: #e87563;
-  }
-
   .nav-btn:active {
+    color: #e87563;
     transform: scale(0.9);
   }
 
@@ -722,13 +710,8 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   }
   
   .family-card {
-    border: var(--border);
     border-radius: 16px;
     overflow: hidden;
-    background: rgba(255,255,255, 0.2);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    color: var(--text);
     display: flex;
     flex-direction: column;
   }
@@ -786,6 +769,45 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
     animation: previewFadeIn 0.40s ease both;
   }
   
+  .did-you-mean {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  
+  .dym-chip {
+    display: block;
+    margin: 8px auto 0;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Dark */
+  html[data-theme="dark"] #search,
+  html[data-theme="dark"] .font-item,
+  html[data-theme="dark"] .preview-panel,
+  html[data-theme="dark"] .font-card:has(.preview-panel.open),
+  html[data-theme="dark"] .login-card,
+  html[data-theme="dark"] .family-card,
+  html[data-theme="dark"] .dym-chip {
+    color: var(--text);
+    border: none;
+    background: rgba(0,0,0, 0.15);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  
+  html[data-theme="dark"] .family-foot {
+    border-top: 1px solid rgba(255,255,255,0.25);
+  }
+
+  html[data-theme="dark"] .preview-input {
+    background: rgba(255,255,255, 0.2);
+  }
+
 </style>
 </head>
 <body>
@@ -793,7 +815,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   <div class="bottom-fade"></div>
 
   <div class="bottom-nav" id="bottom-nav">
-    <a class="nav-btn" href=" https://kemdoan.github.io/font/" aria-label="web"><i class="ri-global-line"></i></a>
+    <button class="nav-btn" id="theme-toggle" aria-label="Đổi giao diện sáng/tối"><i class="ri-sun-line"></i></button>
     <a class="nav-btn" href=" https://www.facebook.com/fontkemdoan" target="_blank" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
     <a class="nav-btn" href=" https://www.facebook.com/fontkemdoan" target="_blank" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
      <a class="nav-btn nav-text" href=" http://zalo.me/0559970246" target="_blank" aria-label="Nhắn tin">Zalo</a>
@@ -1112,7 +1134,13 @@ function render(list) {
   container.innerHTML = '';
 
   if (list.length === 0) {
-    statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br>Vui lòng nhập chính xác tên font<br>hoặc font chưa được cập nhật.<br><br><i>Gợi ý: Chỉ cần nhập tên font<br>ví dụ Kemdoan Regular → Kemdoan';
+    const sugg = suggestFonts(searchInput.value);
+    const suggHtml = sugg.length
+      ? '<div class="did-you-mean">Có phải bạn muốn tìm font ' +
+        sugg.map(n => '<button type="button" class="dym-chip" data-name="' + escapeAttr(n) + '">' + escapeHtml(n) + '</button>').join('') +
+        '</div>'
+      : '';
+    statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>Gợi ý: Chỉ cần nhập tên font<br>Ví dụ Kemdoan Regular → Kemdoan</i>' + suggHtml;
     return;
   }
 
@@ -1434,7 +1462,6 @@ function updateFamilies() {
 searchInput.addEventListener('focus', updateFamilies);
 searchInput.addEventListener('blur', () => setTimeout(updateFamilies, 0));
 
-// Tải cả thư mục: tải từng font qua /api/download rồi nén zip ngay trên trình duyệt
 familiesEl.addEventListener('click', async (e) => {
   const btn = e.target.closest('.family-download');
   if (!btn) return;
@@ -1484,6 +1511,74 @@ familiesEl.addEventListener('click', async (e) => {
   delete btn.dataset.busy;
 });
 
+function escapeHtml(t) {
+  return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(t) { return escapeHtml(t); }
+
+function foldText(str) {
+  return String(str).toLowerCase()
+    .replace(/đ/g, 'd')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+function editDistance(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  let prev = new Array(n + 1), cur = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    cur[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+    }
+    [prev, cur] = [cur, prev];
+  }
+  return prev[n];
+}
+
+function fuzzyScore(q, name) {
+  let best = editDistance(q, name);
+  const L = q.length;
+  for (const len of [L - 1, L, L + 1]) {
+    if (len < 2 || len > name.length) continue;
+    for (let i = 0; i + len <= name.length; i++) {
+      const d = editDistance(q, name.substr(i, len));
+      if (d < best) best = d;
+      if (best === 0) return 0;
+    }
+  }
+  return best;
+}
+
+function suggestFonts(raw, max = 2) {
+  const q = foldText(raw);
+  if (q.length < 3 || !allFonts.length) return [];
+  const maxDist = Math.max(1, Math.round(q.length / 3));
+  const seen = new Set();
+  const scored = [];
+  allFonts.forEach(f => {
+    const name = f.name;
+    if (seen.has(name)) return;
+    seen.add(name);
+    const d = fuzzyScore(q, foldText(name));
+    if (d <= maxDist) scored.push({ name, d, len: name.length });
+  });
+  scored.sort((a, b) => a.d - b.d || a.len - b.len || a.name.localeCompare(b.name));
+  return scored.slice(0, max).map(x => x.name);
+}
+
+statusEl.addEventListener('click', e => {
+  const chip = e.target.closest('.dym-chip');
+  if (!chip) return;
+  searchInput.value = chip.dataset.name;
+  runSearch();
+  updateFamilies();
+});
+
 function runSearch() {
   const raw = searchInput.value.trim();
   if (!raw) {
@@ -1511,6 +1606,18 @@ logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('kd_session_token');
   showLogin();
 });
+</script>
+<script>
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = btn.querySelector('i');
+  btn.addEventListener('click', () => {
+    const dark = root.getAttribute('data-theme') !== 'dark';
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    icon.className = dark ? 'ri-moon-line' : 'ri-sun-line';
+  });
+})();
 </script>
 </body>
 </html>
