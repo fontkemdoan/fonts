@@ -1,490 +1,49 @@
-let allFonts = [];
-const searchInput = document.getElementById('search');
-const clearBtn = document.getElementById('clear-btn');
-const statusEl = document.getElementById('status');
-const loginPanel = document.getElementById('login-panel');
-const brandHeader = document.getElementById('brand-header');
-const contentEl = document.getElementById('content');
-const loginEmail = document.getElementById('login-email');
-const loginPassword = document.getElementById('login-password');
-const loginBtn = document.getElementById('login-btn');
-const loginError = document.getElementById('login-error');
-const changePassBtn = document.getElementById('change-pass-btn');
-const changePassExtra = document.getElementById('change-pass-extra');
-const newPasswordInput = document.getElementById('new-password');
-const logoutBtn = document.getElementById('logout-btn');
-const familiesEl = document.getElementById('families');
-const resultsEl = document.getElementById('results');
+(() => {
+'use strict';
 
+const $ = (id) => document.getElementById(id);
+
+// ================= Tiện ích =================
+// ---- Session token ----
 const getToken = () => localStorage.getItem('kd_session_token') || '';
+const setToken = (t) => localStorage.setItem('kd_session_token', t);
+const clearToken = () => localStorage.removeItem('kd_session_token');
+
 const downloadUrl = (file) =>
   '/api/download?file=' + encodeURIComponent(file) + '&token=' + encodeURIComponent(getToken());
 
-function showApp() {
-  loginPanel.style.display = 'none';
-  brandHeader.style.display = 'none';
-  contentEl.style.display = '';
-  loadManifest();
-}
-
-function showLogin() {
-  contentEl.style.display = 'none';
-  familiesEl.classList.add('hidden');
-  brandHeader.style.display = 'flex';
-  loginPanel.style.display = 'flex';
-}
-
-function loadManifest() {
-  if (allFonts.length) { updateFamilies(); return; }
-  fetch('manifest.json')
-    .then(res => res.json())
-    .then(data => {
-      allFonts = data;
-      buildFamilies();
-    })
-    .catch(err => {
-      statusEl.textContent = 'Lỗi server - ' + err;
-    });
-}
-
-function verifyAndBoot() {
-  const token = getToken();
-  const bootLoading = document.getElementById('boot-loading');
-
-  if (!token) {
-    bootLoading.style.display = 'none';
-    showLogin();
-    return;
-  }
-
-  fetch('/api/verify-session', {
+async function postJson(url, body) {
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token })
-  })
-    .then(res => res.json())
-    .then(data => {
-      bootLoading.style.display = 'none';
-      if (data.ok) {
-        showApp();
-      } else {
-        localStorage.removeItem('kd_session_token');
-        showLogin();
-      }
-    })
-    .catch(() => {
-
-      bootLoading.style.display = 'none';
-      showApp();
-    });
-}
-
-verifyAndBoot();
-
-let loginErrorTimer = null;
-function showLoginError(msg) {
-  loginError.textContent = msg;
-  clearTimeout(loginErrorTimer);
-  loginErrorTimer = setTimeout(() => {
-    loginError.textContent = '';
-  }, 2000);
-}
-
-function doLogin() {
-  const email = loginEmail.value.trim().toLowerCase();
-  const password = loginPassword.value;
-  loginError.textContent = '';
-
-  if (!email || !password) {
-    showLoginError('Vui lòng nhập email và mật khẩu');
-    return;
-  }
-
-  loginBtn.disabled = true;
-  loginBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
-
-  fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, mode: 'login' })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.ok) {
-        localStorage.setItem('kd_session_token', data.token);
-        showApp();
-      } else if (data.error === 'wrong_password') {
-        showLoginError('Sai mật khẩu');
-      } else {
-        showLoginError('Tài khoản không tồn tại');
-      }
-    })
-    .catch(() => {
-      showLoginError('Lỗi kết nối, hãy thử lại sau');
-    })
-    .finally(() => {
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
-    });
-}
-
-loginBtn.addEventListener('click', () => {
-  if (changePassMode) {
-    exitChangePassMode();
-  } else {
-    doLogin();
-  }
-});
-loginEmail.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !changePassMode) doLogin();
-});
-loginPassword.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !changePassMode) doLogin();
-});
-
-let changePassMode = false;
-
-function enterChangePassMode() {
-  changePassMode = true;
-  changePassExtra.style.display = 'block';
-  changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
-  loginBtn.innerHTML = '<i class="ri-arrow-left-line"></i> Quay lại';
-}
-
-function exitChangePassMode() {
-  changePassMode = false;
-  changePassExtra.style.display = 'none';
-  newPasswordInput.value = '';
-  changePassBtn.innerHTML = '<i class="ri-key-2-line"></i> Đổi Pass';
-  loginBtn.innerHTML = '<i class="ri-arrow-right-line"></i> Đăng nhập';
-}
-
-changePassBtn.addEventListener('click', () => {
-  if (!changePassMode) {
-    enterChangePassMode();
-    return;
-  }
-
-  const email = loginEmail.value.trim().toLowerCase();
-  const oldPassword = loginPassword.value;
-  const newPassword = newPasswordInput.value;
-
-  if (!email || !oldPassword || !newPassword) {
-    showLoginError('Vui lòng nhập đầy đủ thông tin');
-    return;
-  }
-
-  changePassBtn.disabled = true;
-  loginBtn.disabled = true;
-  changePassBtn.innerHTML = '<i class="ri-loader-4-line kd-spinner"></i>';
-
-  fetch('/api/change-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, oldPassword, newPassword })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.ok) {
-        showLoginError('Đổi mật khẩu thành công');
-        exitChangePassMode();
-      } else if (data.error === 'wrong_password') {
-        showLoginError('Mật khẩu hiện tại không đúng');
-      } else if (data.error === 'not_found') {
-        showLoginError('Tài khoản không tồn tại');
-      } else {
-        showLoginError('Có lỗi xảy ra, hãy thử lại sau');
-      }
-    })
-    .catch(() => showLoginError('Lỗi kết nối, hãy thử lại sau'))
-    .finally(() => {
-      changePassBtn.disabled = false;
-      loginBtn.disabled = false;
-      if (changePassMode) changePassBtn.innerHTML = '<i class="ri-check-line"></i> Xác nhận';
-    });
-});
-
-const loginIcon = document.getElementById('login-icon');
-const loginTitle = document.querySelector('.login-title');
-const DEFAULT_TITLE = 'Thành Viên';
-const DEFAULT_ICON = '<i class="ri-user-line"></i>';
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-let previewTimer = null;
-
-function resetLoginIcon() {
-  loginIcon.innerHTML = DEFAULT_ICON;
-  loginTitle.textContent = DEFAULT_TITLE;
-}
-
-function previewAvatar(email) {
-  fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, mode: 'preview' })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.ok) {
-        if (data.avatar) {
-          loginIcon.innerHTML = `<img src="avatars/${escapeHtml(data.avatar)}" alt="avatar">`;
-        } else {
-          loginIcon.innerHTML = DEFAULT_ICON;
-        }
-        loginTitle.textContent = data.name || DEFAULT_TITLE;
-      } else {
-        resetLoginIcon();
-      }
-    })
-    .catch(() => resetLoginIcon());
-}
-
-loginEmail.addEventListener('input', () => {
-  clearTimeout(previewTimer);
-  const val = loginEmail.value.trim().toLowerCase();
-  if (!emailRegex.test(val)) {
-    resetLoginIcon();
-    return;
-  }
-  previewTimer = setTimeout(() => previewAvatar(val), 400);
-});
-
-const loadedPreviewFonts = new Map();
-const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
-const DEFAULT_PREVIEW_SIZE = 30;
-
-function render(list) {
-  resultsEl.innerHTML = '';
-
-  if (list.length === 0) {
-    const sugg = suggestFonts(searchInput.value);
-    const suggHtml = sugg.length
-      ? '<div class="did-you-mean">Có phải bạn muốn tìm font ' +
-        sugg.map(n => '<button type="button" class="dym-chip" data-name="' + escapeHtml(n) + '">' + escapeHtml(n) + '</button>').join('') +
-        '</div>'
-      : '';
-    statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>Gợi ý: Chỉ cần nhập tên font<br>Ví dụ Kemdoan Regular → Kemdoan</i>' + suggHtml;
-    return;
-  }
-
-  statusEl.textContent = '';
-  list.forEach(font => {
-    const card = document.createElement('div');
-    card.className = 'font-card';
-
-    const item = document.createElement('div');
-    item.className = 'font-item';
-    item.innerHTML = `
-      <span class="font-name">${escapeHtml(font.name)}</span>
-      <a class="download-btn" href="${downloadUrl(font.file)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
-    `;
-
-    const panel = document.createElement('div');
-    panel.className = 'preview-panel';
-    panel.innerHTML = `
-      <div class="preview-input-wrap">
-        <input type="text" class="preview-input" placeholder="Nhập chữ để xem..." value="${DEFAULT_PREVIEW_TEXT}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
-      </div>
-      <div class="preview-size-row">
-        <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="${DEFAULT_PREVIEW_SIZE}" aria-label="Cỡ chữ">
-        <span class="preview-size-value">${DEFAULT_PREVIEW_SIZE}px</span>
-      </div>
-      <div class="preview-loading" style="display:none;"><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
-      <div class="preview-text"></div>
-    `;
-
-    card.appendChild(item);
-    card.appendChild(panel);
-    resultsEl.appendChild(card);
-
-    item.addEventListener('click', (e) => {
-      if (e.target.closest('.download-btn')) return;
-      togglePreview(font, panel);
-    });
+    body: JSON.stringify(body)
   });
+  return res.json();
 }
 
-async function togglePreview(font, panel) {
+// ---- Chuẩn hóa chuỗi để tìm kiếm: bỏ dấu, bỏ ký tự đặc biệt, chữ thường ----
+function foldText(str) {
+  return String(str).toLowerCase()
+    .replace(/đ/g, 'd')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '');
+}
 
-  const itemEl = panel.previousElementSibling;
+// ---- Hiệu ứng ----
+const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  document.querySelectorAll('.preview-panel.open').forEach(p => {
-    if (p !== panel) {
-      p.classList.remove('open');
-      if (p.previousElementSibling) p.previousElementSibling.classList.remove('expanded');
-    }
-  });
-
-  if (panel.classList.contains('open')) {
-    panel.classList.remove('open');
-    itemEl.classList.remove('expanded');
-    return;
-  }
-
-  panel.classList.add('open');
-  itemEl.classList.add('expanded');
-
-  const inputEl = panel.querySelector('.preview-input');
-  const loadingEl = panel.querySelector('.preview-loading');
-  const previewTextEl = panel.querySelector('.preview-text');
-  const previewClearBtn = panel.querySelector('.preview-clear-btn');
-  const sizeSlider = panel.querySelector('.preview-size-slider');
-  const sizeValue = panel.querySelector('.preview-size-value');
-
-  const applySize = () => {
-    const v = Number(sizeSlider.value);
-    previewTextEl.style.fontSize = v + 'px';
-    sizeValue.textContent = v + 'px';
-    sizeSlider.style.setProperty('--pct', (v - 1) / 99);
-  };
-  sizeSlider.oninput = applySize;
-  sizeSlider.value = DEFAULT_PREVIEW_SIZE; 
-  applySize();
-
-  const applyText = () => {
-    previewTextEl.textContent = inputEl.value;
-  };
-
-  let suckBusy = false;
-
-  const suckTextIntoTrash = (done) => {
-    const text = previewTextEl.textContent;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!text.trim() || reduce || !previewTextEl.animate) { done(); return; }
-
-    suckBusy = true;
-
-    previewTextEl.textContent = '';
-    const chars = [];
-    Array.from(text.normalize('NFC')).forEach(ch => {
-      if (/\s/.test(ch)) {
-        previewTextEl.appendChild(document.createTextNode(ch));
-      } else {
-        const sp = document.createElement('span');
-        sp.className = 'preview-char';
-        sp.textContent = ch;
-        previewTextEl.appendChild(sp);
-        chars.push(sp);
-      }
-    });
-
-    const baseH = previewTextEl.offsetHeight;
-    previewTextEl.style.paddingBottom = '46px';
-
-    const trash = document.createElement('div');
-    trash.className = 'preview-trash';
-    trash.innerHTML = '<i class="ri-delete-bin-line"></i>';
-    trash.style.left = (previewTextEl.offsetLeft + previewTextEl.offsetWidth / 2) + 'px';
-    trash.style.top = (previewTextEl.offsetTop + baseH + 6) + 'px';
-    panel.appendChild(trash);
-
-    const trashIn = trash.animate(
-      [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }],
-      { duration: 167, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
-    );
-
-    trashIn.onfinish = () => {
-      const tr = trash.getBoundingClientRect();
-      const tx = tr.left + tr.width / 2;
-      const ty = tr.top + tr.height / 2;
-      const perChar = Math.min(27, 300 / Math.max(chars.length, 1));
-      let last = null;
-
-      chars.forEach((sp, i) => {
-        const r = sp.getBoundingClientRect();
-        const dx = tx - (r.left + r.width / 2);
-        const dy = ty - (r.top + r.height / 2);
-        const rot = (Math.random() * 2 - 1) * 240;
-        last = sp.animate(
-          [
-            { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
-            { transform: `translate(${dx}px,${dy}px) scale(0.05) rotate(${rot}deg)`, opacity: 0 }
-          ],
-          { duration: 330, delay: i * perChar, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'forwards' }
-        );
-      });
-
-      trash.animate(
-        [
-          { transform: 'scale(1) rotate(0deg)' },
-          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.25 },
-          { transform: 'scale(1.18) rotate(8deg)', offset: 0.5 },
-          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.75 },
-          { transform: 'scale(1) rotate(0deg)' }
-        ],
-        { duration: 330 + chars.length * perChar, iterations: 1 }
-      );
-
-      const finish = () => {
-        trash.animate(
-          [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0)' }],
-          { duration: 133, easing: 'ease-in', fill: 'forwards' }
-        ).onfinish = () => {
-          trash.remove();
-          previewTextEl.style.paddingBottom = '';
-          suckBusy = false;
-          done();
-        };
-      };
-      if (last) last.onfinish = finish; else finish();
-    };
-  };
-
-  previewClearBtn.onclick = () => {
-    spinIcon(previewClearBtn);
-    if (suckBusy) return;
-    const hadText = inputEl.value.length > 0;
-    slideTextLeft(inputEl);
-    inputEl.value = '';
-
-    const showEmpty = () => {
-      if (inputEl.value.length > 0) return; 
-      applyText();
-    };
-
-    if (hadText) suckTextIntoTrash(showEmpty); else showEmpty();
-  };
-
-  const showFont = (family) => {
-    loadingEl.style.display = 'none';
-    previewTextEl.style.fontFamily = `"${family}", sans-serif`;
-    applyText();
-    inputEl.oninput = applyText;
-  };
-
-  if (loadedPreviewFonts.has(font.file)) {
-    showFont(loadedPreviewFonts.get(font.file));
-    return;
-  }
-
-  loadingEl.style.display = 'flex';
-  previewTextEl.textContent = '';
-
-  try {
-    const res = await fetch(downloadUrl(font.file));
-    if (!res.ok) throw new Error('fetch failed');
-
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const familyName = 'kd-preview-' + loadedPreviewFonts.size;
-
-    const fontFace = new FontFace(familyName, `url(${objectUrl})`);
-    await fontFace.load();
-    document.fonts.add(fontFace);
-
-    loadedPreviewFonts.set(font.file, familyName);
-    showFont(familyName);
-  } catch (e) {
-    loadingEl.style.display = 'none';
-    previewTextEl.style.fontFamily = '';
-    previewTextEl.textContent = 'File zip';
-  }
+function spinIcon(btn) {
+  const icon = btn.querySelector('i');
+  if (!icon) return;
+  icon.classList.remove('spin-360');
+  void icon.offsetWidth;
+  icon.classList.add('spin-360');
 }
 
 function slideTextLeft(input, duration = 200) {
   const text = input.value;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!text || reduce || !input.animate) return;
+  if (!text || prefersReducedMotion() || !input.animate) return;
 
   const cs = getComputedStyle(input);
   const padL = parseFloat(cs.paddingLeft) || 0;
@@ -537,110 +96,500 @@ function slideTextLeft(input, duration = 200) {
   anim.onfinish = cleanup;
 }
 
-function spinIcon(btn) {
-  const icon = btn.querySelector('i');
-  if (!icon) return;
-  icon.classList.remove('spin-360');
-  void icon.offsetWidth;
-  icon.classList.add('spin-360');
+// ---- Lưu blob thành file tải về ----
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
-function normalize(str) {
-  return str.toLowerCase().replace(/[\s\-_]+/g, '');
-}
+// ---- JSZip chỉ tải khi cần (lúc bấm tải cả bộ font) ----
+const JSZIP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+let jszipPromise = null;
 
-function familyKey(f) {
-  return String(f.file).split('/')[0];
-}
-
-function buildFamilies() {
-  const map = new Map();
-  allFonts.forEach(f => {
-    const k = familyKey(f);
-    if (!map.has(k)) map.set(k, { name: k, count: 0 });
-    map.get(k).count++;
-  });
-  familiesEl.innerHTML = '';
-  [...map.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-    const card = document.createElement('div');
-    card.className = 'family-card';
-    card.innerHTML = `
-      <div class="family-name">${escapeHtml(g.name)}</div>
-      <div class="family-foot">
-        <span>${g.count} Font</span>
-        <a class="family-download" href="#" data-folder="${escapeHtml(g.name)}" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
-      </div>`;
-    familiesEl.appendChild(card);
-  });
-  updateFamilies();
-}
-
-function updateFamilies() {
-  const hide = document.activeElement === searchInput || searchInput.value.trim() !== '';
-  familiesEl.classList.toggle('hidden', hide || !familiesEl.children.length);
-}
-searchInput.addEventListener('focus', updateFamilies);
-searchInput.addEventListener('blur', () => setTimeout(updateFamilies, 0));
-
-familiesEl.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.family-download');
-  if (!btn) return;
-  e.preventDefault();
-  if (btn.dataset.busy) return;
-  const folder = btn.dataset.folder;
-  const files = allFonts.filter(f => familyKey(f) === folder);
-  const icon = btn.querySelector('i');
-  btn.dataset.busy = '1';
-  icon.className = '';
-  icon.style.cssText = 'font-size:13px;font-style:normal';
-  icon.textContent = '0';
-
-  const zip = new JSZip();
-  let ok = 0, i = 0;
-  const worker = async () => {
-    while (i < files.length) {
-      const f = files[i++];
-      try {
-        const res = await fetch(downloadUrl(f.file));
-        if (!res.ok) continue;
-        zip.file(f.file.split('/').pop(), await res.blob());
-        ok++;
-        icon.textContent = ok;
-      } catch (_) {}
-    }
-  };
-  await Promise.all(Array.from({ length: 6 }, worker));
-
-  if (ok === 0) {
-    alert('Tải không thành công');
-  } else {
-    const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = folder + '.zip';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+function loadJSZip() {
+  if (window.JSZip) return Promise.resolve(window.JSZip);
+  if (!jszipPromise) {
+    jszipPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = JSZIP_SRC;
+      s.onload = () => resolve(window.JSZip);
+      s.onerror = () => { jszipPromise = null; reject(new Error('Cannot load JSZip')); };
+      document.head.appendChild(s);
+    });
   }
-  icon.textContent = '';
-  icon.style.cssText = '';
-  icon.className = 'ri-download-cloud-2-line';
-  delete btn.dataset.busy;
-});
-
-function escapeHtml(t) {
-  return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return jszipPromise;
 }
 
-function foldText(str) {
-  return String(str).toLowerCase()
-    .replace(/đ/g, 'd')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '');
+// ================= Giao diện sáng/tối =================
+function initTheme() {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = btn.querySelector('i');
+
+  const sync = () => {
+    icon.className = root.getAttribute('data-theme') === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
+  };
+  sync();
+
+  btn.addEventListener('click', () => {
+    const theme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    try { localStorage.setItem('kd_theme', theme); } catch (e) {}
+    sync();
+  });
 }
 
+// ================= Đăng nhập / đổi mật khẩu =================
+const loginPanel = $('login-panel');
+const brand = $('brand');
+const contentEl = $('content');
+const bootLoading = $('boot-loading');
+const loginEmail = $('login-email');
+const loginPassword = $('login-password');
+const newPasswordInput = $('new-password');
+const changePassExtra = $('change-pass-extra');
+const loginBtn = $('login-btn');
+const changePassBtn = $('change-pass-btn');
+const logoutBtn = $('logout-btn');
+const loginError = $('login-error');
+const loginIcon = $('login-icon');
+const loginTitle = document.querySelector('.login-title');
+
+const SPINNER = '<i class="ri-loader-4-line kd-spinner"></i>';
+const LABEL = {
+  login: '<i class="ri-arrow-right-line"></i> Đăng nhập',
+  back: '<i class="ri-arrow-left-line"></i> Quay lại',
+  changePass: '<i class="ri-key-2-line"></i> Đổi Pass',
+  confirm: '<i class="ri-check-line"></i> Xác nhận'
+};
+const DEFAULT_TITLE = 'Thành Viên';
+const DEFAULT_ICON = '<i class="ri-user-line"></i>';
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+let changePassMode = false;
+let loginErrorTimer = null;
+let previewTimer = null;
+
+// ---- Chuyển màn hình ----
+function showApp() {
+  loginPanel.hidden = true;
+  brand.classList.add('search-brand');
+  brand.hidden = false;
+  contentEl.hidden = false;
+  loadFonts();
+}
+
+function showLogin() {
+  contentEl.hidden = true;
+  brand.classList.remove('search-brand');
+  brand.hidden = false;
+  loginPanel.hidden = false;
+}
+
+async function verifyAndBoot() {
+  const token = getToken();
+  if (!token) {
+    bootLoading.hidden = true;
+    showLogin();
+    return;
+  }
+
+  let data;
+  try {
+    data = await postJson('/api/verify-session', { token });
+  } catch (e) {
+    // Không kết nối được server -> vẫn cho vào app
+    bootLoading.hidden = true;
+    showApp();
+    return;
+  }
+
+  bootLoading.hidden = true;
+  if (data.ok) {
+    showApp();
+  } else {
+    clearToken();
+    showLogin();
+  }
+}
+
+// ---- Thông báo lỗi ----
+function showLoginError(msg) {
+  loginError.textContent = msg;
+  clearTimeout(loginErrorTimer);
+  loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 2000);
+}
+
+// ---- Đăng nhập ----
+async function doLogin() {
+  const email = loginEmail.value.trim().toLowerCase();
+  const password = loginPassword.value;
+  loginError.textContent = '';
+
+  if (!email || !password) {
+    showLoginError('Vui lòng nhập email và mật khẩu');
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = SPINNER;
+
+  try {
+    const data = await postJson('/api/login', { email, password, mode: 'login' });
+    if (data.ok) {
+      setToken(data.token);
+      showApp();
+    } else if (data.error === 'wrong_password') {
+      showLoginError('Sai mật khẩu');
+    } else {
+      showLoginError('Tài khoản không tồn tại');
+    }
+  } catch (e) {
+    showLoginError('Lỗi kết nối, hãy thử lại sau');
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = LABEL.login;
+  }
+}
+
+// ---- Đổi mật khẩu ----
+function enterChangePassMode() {
+  changePassMode = true;
+  changePassExtra.hidden = false;
+  changePassBtn.innerHTML = LABEL.confirm;
+  loginBtn.innerHTML = LABEL.back;
+}
+
+function exitChangePassMode() {
+  changePassMode = false;
+  changePassExtra.hidden = true;
+  newPasswordInput.value = '';
+  changePassBtn.innerHTML = LABEL.changePass;
+  loginBtn.innerHTML = LABEL.login;
+}
+
+async function doChangePassword() {
+  const email = loginEmail.value.trim().toLowerCase();
+  const oldPassword = loginPassword.value;
+  const newPassword = newPasswordInput.value;
+
+  if (!email || !oldPassword || !newPassword) {
+    showLoginError('Vui lòng nhập đầy đủ thông tin');
+    return;
+  }
+
+  changePassBtn.disabled = true;
+  loginBtn.disabled = true;
+  changePassBtn.innerHTML = SPINNER;
+
+  try {
+    const data = await postJson('/api/change-password', { email, oldPassword, newPassword });
+    if (data.ok) {
+      showLoginError('Đổi mật khẩu thành công');
+      exitChangePassMode();
+    } else if (data.error === 'wrong_password') {
+      showLoginError('Mật khẩu hiện tại không đúng');
+    } else if (data.error === 'not_found') {
+      showLoginError('Tài khoản không tồn tại');
+    } else {
+      showLoginError('Có lỗi xảy ra, hãy thử lại sau');
+    }
+  } catch (e) {
+    showLoginError('Lỗi kết nối, hãy thử lại sau');
+  } finally {
+    changePassBtn.disabled = false;
+    loginBtn.disabled = false;
+    if (changePassMode) changePassBtn.innerHTML = LABEL.confirm;
+  }
+}
+
+// ---- Xem trước avatar theo email ----
+function resetLoginIcon() {
+  loginIcon.innerHTML = DEFAULT_ICON;
+  loginTitle.textContent = DEFAULT_TITLE;
+}
+
+async function previewAvatar(email) {
+  try {
+    const data = await postJson('/api/login', { email, mode: 'preview' });
+    if (!data.ok) {
+      resetLoginIcon();
+      return;
+    }
+    if (data.avatar) {
+      const img = document.createElement('img');
+      img.src = 'avatars/' + data.avatar;
+      img.alt = 'avatar';
+      loginIcon.replaceChildren(img);
+    } else {
+      loginIcon.innerHTML = DEFAULT_ICON;
+    }
+    loginTitle.textContent = data.name || DEFAULT_TITLE;
+  } catch (e) {
+    resetLoginIcon();
+  }
+}
+
+// ---- Khởi tạo ----
+function initAuth() {
+  loginBtn.addEventListener('click', () => {
+    if (changePassMode) exitChangePassMode(); else doLogin();
+  });
+
+  changePassBtn.addEventListener('click', () => {
+    if (changePassMode) doChangePassword(); else enterChangePassMode();
+  });
+
+  [loginEmail, loginPassword].forEach((input) => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !changePassMode) doLogin();
+    });
+  });
+
+  loginEmail.addEventListener('input', () => {
+    clearTimeout(previewTimer);
+    const val = loginEmail.value.trim().toLowerCase();
+    if (!emailRegex.test(val)) {
+      resetLoginIcon();
+      return;
+    }
+    previewTimer = setTimeout(() => previewAvatar(val), 400);
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    clearToken();
+    showLogin();
+  });
+
+  verifyAndBoot();
+}
+
+// ================= Xem trước font =================
+const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
+const DEFAULT_PREVIEW_SIZE = 30;
+
+const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
+const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
+let fontSeq = 0;
+
+// Gắn sự kiện mở/đóng preview cho 1 thẻ font
+function bindPreview(card, font) {
+  const panel = card.querySelector('.preview-panel');
+  panel.querySelector('.preview-input').value = DEFAULT_PREVIEW_TEXT;
+
+  card.querySelector('.font-item').addEventListener('click', (e) => {
+    if (e.target.closest('.download-btn')) return;
+    togglePreview(font, panel);
+  });
+}
+
+function closePanel(panel) {
+  panel.classList.remove('open');
+  if (panel.previousElementSibling) panel.previousElementSibling.classList.remove('expanded');
+}
+
+// Chữ bị "hút" vào thùng rác; trả về Promise khi xong
+function suckTextIntoTrash(panel, textEl) {
+  return new Promise((done) => {
+    const text = textEl.textContent;
+    if (!text.trim() || prefersReducedMotion() || !textEl.animate) { done(); return; }
+
+    sucking.add(panel);
+
+    textEl.textContent = '';
+    const chars = [];
+    Array.from(text.normalize('NFC')).forEach((ch) => {
+      if (/\s/.test(ch)) {
+        textEl.appendChild(document.createTextNode(ch));
+      } else {
+        const sp = document.createElement('span');
+        sp.className = 'preview-char';
+        sp.textContent = ch;
+        textEl.appendChild(sp);
+        chars.push(sp);
+      }
+    });
+
+    const baseH = textEl.offsetHeight;
+    textEl.style.paddingBottom = '46px';
+
+    const trash = document.createElement('div');
+    trash.className = 'preview-trash';
+    trash.innerHTML = '<i class="ri-delete-bin-line"></i>';
+    trash.style.left = (textEl.offsetLeft + textEl.offsetWidth / 2) + 'px';
+    trash.style.top = (textEl.offsetTop + baseH + 6) + 'px';
+    panel.appendChild(trash);
+
+    const trashIn = trash.animate(
+      [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }],
+      { duration: 167, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
+    );
+
+    trashIn.onfinish = () => {
+      const tr = trash.getBoundingClientRect();
+      const tx = tr.left + tr.width / 2;
+      const ty = tr.top + tr.height / 2;
+      const perChar = Math.min(27, 300 / Math.max(chars.length, 1));
+      let last = null;
+
+      chars.forEach((sp, i) => {
+        const r = sp.getBoundingClientRect();
+        const dx = tx - (r.left + r.width / 2);
+        const dy = ty - (r.top + r.height / 2);
+        const rot = (Math.random() * 2 - 1) * 240;
+        last = sp.animate(
+          [
+            { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
+            { transform: `translate(${dx}px,${dy}px) scale(0.05) rotate(${rot}deg)`, opacity: 0 }
+          ],
+          { duration: 330, delay: i * perChar, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'forwards' }
+        );
+      });
+
+      trash.animate(
+        [
+          { transform: 'scale(1) rotate(0deg)' },
+          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.25 },
+          { transform: 'scale(1.18) rotate(8deg)', offset: 0.5 },
+          { transform: 'scale(1.18) rotate(-8deg)', offset: 0.75 },
+          { transform: 'scale(1) rotate(0deg)' }
+        ],
+        { duration: 330 + chars.length * perChar, iterations: 1 }
+      );
+
+      const finish = () => {
+        trash.animate(
+          [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0)' }],
+          { duration: 133, easing: 'ease-in', fill: 'forwards' }
+        ).onfinish = () => {
+          trash.remove();
+          textEl.style.paddingBottom = '';
+          sucking.delete(panel);
+          done();
+        };
+      };
+      if (last) last.onfinish = finish; else finish();
+    };
+  });
+}
+
+async function togglePreview(font, panel) {
+  const itemEl = panel.previousElementSibling;
+
+  document.querySelectorAll('.preview-panel.open').forEach((p) => {
+    if (p !== panel) closePanel(p);
+  });
+
+  if (panel.classList.contains('open')) {
+    closePanel(panel);
+    return;
+  }
+
+  panel.classList.add('open');
+  itemEl.classList.add('expanded');
+
+  const q = (sel) => panel.querySelector(sel);
+  const inputEl = q('.preview-input');
+  const loadingEl = q('.preview-loading');
+  const previewTextEl = q('.preview-text');
+  const previewClearBtn = q('.preview-clear-btn');
+  const sizeSlider = q('.preview-size-slider');
+  const sizeValue = q('.preview-size-value');
+
+  const applySize = () => {
+    const v = Number(sizeSlider.value);
+    previewTextEl.style.fontSize = v + 'px';
+    sizeValue.textContent = v + 'px';
+    sizeSlider.style.setProperty('--pct', (v - 1) / 99);
+  };
+  sizeSlider.oninput = applySize;
+  sizeSlider.value = DEFAULT_PREVIEW_SIZE;
+  applySize();
+
+  const applyText = () => {
+    previewTextEl.textContent = inputEl.value;
+  };
+
+  previewClearBtn.onclick = async () => {
+    spinIcon(previewClearBtn);
+    if (sucking.has(panel)) return;
+    const hadText = inputEl.value.length > 0;
+    slideTextLeft(inputEl);
+    inputEl.value = '';
+    if (hadText) await suckTextIntoTrash(panel, previewTextEl);
+    if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
+    applyText();
+  };
+
+  const showFont = (family) => {
+    loadingEl.hidden = true;
+    previewTextEl.style.fontFamily = `"${family}", sans-serif`;
+    applyText();
+    inputEl.oninput = applyText;
+  };
+
+  if (loadedPreviewFonts.has(font.file)) {
+    showFont(loadedPreviewFonts.get(font.file));
+    return;
+  }
+
+  loadingEl.hidden = false;
+  previewTextEl.textContent = '';
+
+  try {
+    const res = await fetch(downloadUrl(font.file));
+    if (!res.ok) throw new Error('fetch failed');
+
+    const objectUrl = URL.createObjectURL(await res.blob());
+    const familyName = 'kd-preview-' + fontSeq++;
+
+    const fontFace = new FontFace(familyName, `url(${objectUrl})`);
+    await fontFace.load();
+    document.fonts.add(fontFace);
+
+    loadedPreviewFonts.set(font.file, familyName);
+    showFont(familyName);
+  } catch (e) {
+    loadingEl.hidden = true;
+    previewTextEl.style.fontFamily = '';
+    previewTextEl.textContent = 'File zip';
+  }
+}
+
+// ================= Danh sách font, tìm kiếm, tải bộ font =================
+const searchInput = $('search');
+const clearBtn = $('clear-btn');
+const statusEl = $('status');
+const resultsEl = $('results');
+const familiesEl = $('families');
+const fontCardTpl = $('font-card-tpl');
+const familyCardTpl = $('family-card-tpl');
+
+const MAX_RESULTS = 50;
+let allFonts = [];
+
+const familyKey = (f) => String(f.file).split('/')[0];
+
+// ---- Tải danh sách font ----
+async function loadFonts() {
+  if (allFonts.length) { updateFamilies(); return; } // đã tải rồi (đăng nhập lại)
+  try {
+    const res = await fetch('manifest.json');
+    allFonts = await res.json();
+    allFonts.forEach((f) => { f._key = foldText(f.name); });
+    buildFamilies();
+  } catch (err) {
+    statusEl.textContent = 'Lỗi server - ' + err;
+  }
+}
+
+// ---- Gợi ý khi gõ sai tên (fuzzy) ----
 function editDistance(a, b) {
   const m = a.length, n = b.length;
   if (!m) return n;
@@ -664,7 +613,7 @@ function fuzzyScore(q, name) {
   for (const len of [L - 1, L, L + 1]) {
     if (len < 2 || len > name.length) continue;
     for (let i = 0; i + len <= name.length; i++) {
-      const d = editDistance(q, name.substr(i, len));
+      const d = editDistance(q, name.slice(i, i + len));
       if (d < best) best = d;
       if (best === 0) return 0;
     }
@@ -678,64 +627,167 @@ function suggestFonts(raw, max = 2) {
   const maxDist = Math.max(1, Math.round(q.length / 3));
   const seen = new Set();
   const scored = [];
-  allFonts.forEach(f => {
-    const name = f.name;
-    if (seen.has(name)) return;
-    seen.add(name);
-    const d = fuzzyScore(q, foldText(name));
-    if (d <= maxDist) scored.push({ name, d, len: name.length });
+  allFonts.forEach((f) => {
+    if (seen.has(f.name)) return;
+    seen.add(f.name);
+    const d = fuzzyScore(q, f._key);
+    if (d <= maxDist) scored.push({ name: f.name, d, len: f.name.length });
   });
   scored.sort((a, b) => a.d - b.d || a.len - b.len || a.name.localeCompare(b.name));
-  return scored.slice(0, max).map(x => x.name);
+  return scored.slice(0, max).map((x) => x.name);
 }
 
-statusEl.addEventListener('click', e => {
-  const chip = e.target.closest('.dym-chip');
-  if (!chip) return;
-  searchInput.value = chip.dataset.name;
-  runSearch();
-  updateFamilies();
-});
+// ---- Hiển thị kết quả ----
+function showNotFound() {
+  statusEl.innerHTML =
+    '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>Gợi ý: Chỉ cần nhập tên font<br>Ví dụ Kemdoan Regular → Kemdoan</i>';
+
+  const sugg = suggestFonts(searchInput.value);
+  if (!sugg.length) return;
+
+  const box = document.createElement('div');
+  box.className = 'did-you-mean';
+  box.append('Có phải bạn muốn tìm font ');
+  sugg.forEach((name) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'dym-chip';
+    chip.dataset.name = name;
+    chip.textContent = name;
+    box.appendChild(chip);
+  });
+  statusEl.appendChild(box);
+}
+
+function render(list) {
+  resultsEl.innerHTML = '';
+
+  if (list.length === 0) {
+    showNotFound();
+    return;
+  }
+
+  statusEl.textContent = '';
+  const frag = document.createDocumentFragment();
+  list.forEach((font) => {
+    const card = fontCardTpl.content.firstElementChild.cloneNode(true);
+    card.querySelector('.font-name').textContent = font.name;
+    card.querySelector('.download-btn').href = downloadUrl(font.file);
+    bindPreview(card, font);
+    frag.appendChild(card);
+  });
+  resultsEl.appendChild(frag);
+}
 
 function runSearch() {
-  const raw = searchInput.value.trim();
-  if (!raw) {
+  const q = foldText(searchInput.value);
+  if (!q) {
     resultsEl.innerHTML = '';
     statusEl.textContent = '';
     return;
   }
-  const q = normalize(raw);
-  render(allFonts.filter(f => normalize(f.name).includes(q)).slice(0, 50));
+  render(allFonts.filter((f) => f._key.includes(q)).slice(0, MAX_RESULTS));
 }
 
-searchInput.addEventListener('input', () => { runSearch(); updateFamilies(); });
-
-clearBtn.addEventListener('click', () => {
-  spinIcon(clearBtn);
-  slideTextLeft(searchInput);
-  searchInput.value = '';
-  runSearch();
-  updateFamilies();
-});
-
-logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('kd_session_token');
-  showLogin();
-});
-
-(function () {
-  const root = document.documentElement;
-  const btn = document.getElementById('theme-toggle');
-  const icon = btn.querySelector('i');
-  const sync = () => {
-    icon.className = root.getAttribute('data-theme') === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
-  };
-  sync();
-  btn.addEventListener('click', () => {
-    const dark = root.getAttribute('data-theme') !== 'dark';
-    const theme = dark ? 'dark' : 'light';
-    root.setAttribute('data-theme', theme);
-    try { localStorage.setItem('kd_theme', theme); } catch (e) {}
-    sync();
+// ---- Danh sách bộ font (hiện khi chưa tìm kiếm) ----
+function buildFamilies() {
+  const counts = new Map();
+  allFonts.forEach((f) => {
+    const k = familyKey(f);
+    counts.set(k, (counts.get(k) || 0) + 1);
   });
+
+  familiesEl.innerHTML = '';
+  [...counts].sort(([a], [b]) => a.localeCompare(b)).forEach(([name, count]) => {
+    const card = familyCardTpl.content.firstElementChild.cloneNode(true);
+    card.querySelector('.family-name').textContent = name;
+    card.querySelector('.family-count').textContent = count + ' Font';
+    card.querySelector('.family-download').dataset.folder = name;
+    familiesEl.appendChild(card);
+  });
+  updateFamilies();
+}
+
+function updateFamilies() {
+  const hide = document.activeElement === searchInput || searchInput.value.trim() !== '';
+  familiesEl.hidden = hide || !familiesEl.children.length;
+}
+
+// Tải cả bộ font thành 1 file zip
+async function downloadFamily(btn) {
+  const folder = btn.dataset.folder;
+  const files = allFonts.filter((f) => familyKey(f) === folder);
+  const icon = btn.querySelector('i');
+
+  btn.dataset.busy = '1';
+  icon.className = 'dl-count';
+  icon.textContent = '0';
+
+  try {
+    const JSZip = await loadJSZip();
+    const zip = new JSZip();
+    let ok = 0, i = 0;
+
+    const worker = async () => {
+      while (i < files.length) {
+        const f = files[i++];
+        try {
+          const res = await fetch(downloadUrl(f.file));
+          if (!res.ok) continue;
+          zip.file(f.file.split('/').pop(), await res.blob());
+          icon.textContent = ++ok;
+        } catch (_) {}
+      }
+    };
+    await Promise.all(Array.from({ length: 6 }, worker));
+
+    if (ok === 0) {
+      alert('Tải không thành công');
+    } else {
+      saveBlob(await zip.generateAsync({ type: 'blob', compression: 'STORE' }), folder + '.zip');
+    }
+  } catch (_) {
+    alert('Tải không thành công');
+  } finally {
+    icon.textContent = '';
+    icon.className = 'ri-download-cloud-2-line';
+    delete btn.dataset.busy;
+  }
+}
+
+// ---- Sự kiện ----
+function initFonts() {
+  searchInput.addEventListener('input', () => { runSearch(); updateFamilies(); });
+  searchInput.addEventListener('focus', updateFamilies);
+  searchInput.addEventListener('blur', () => setTimeout(updateFamilies, 0));
+
+  clearBtn.addEventListener('click', () => {
+    spinIcon(clearBtn);
+    slideTextLeft(searchInput);
+    searchInput.value = '';
+    runSearch();
+    updateFamilies();
+  });
+
+  statusEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.dym-chip');
+    if (!chip) return;
+    searchInput.value = chip.dataset.name;
+    runSearch();
+    updateFamilies();
+  });
+
+  familiesEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.family-download');
+    if (!btn) return;
+    e.preventDefault();
+    if (!btn.dataset.busy) downloadFamily(btn);
+  });
+}
+
+// ================= Khởi động =================
+initTheme();
+initFonts();
+initAuth(); // xác thực xong sẽ tự gọi loadFonts()
+
 })();

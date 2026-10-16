@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
+<meta charset="UTF-8">
 <script>
   try {
     const t = localStorage.getItem('kd_theme');
@@ -9,40 +10,38 @@
     }
   } catch (e) {}
 </script>
-
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kem Đoàn</title>
 <link rel="icon" href="img/kemdoan.jpg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="bottom-fade"></div>
 
-  <div class="bottom-nav" id="bottom-nav">
+  <nav class="bottom-nav" id="bottom-nav">
     <button class="nav-btn" id="theme-toggle" aria-label="Đổi giao diện sáng/tối"><i class="ri-sun-line"></i></button>
     <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
     <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
-     <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin">Zalo</a>
+    <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin">Zalo</a>
     <button class="nav-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-line"></i></button>
+  </nav>
+
+  <div class="boot-loading" id="boot-loading">
+    <i class="ri-loader-4-line kd-spinner"></i>
   </div>
 
-  <div id="boot-loading" style="flex:1; display:flex; align-items:center; justify-content:center;">
-    <i class="ri-loader-4-line kd-spinner" style="font-size:36px; color: var(--text);"></i>
-  </div>
-
-  <div class="login-logo" id="brand-header" style="display:none;">
+  <header class="login-logo" id="brand" hidden>
     <img src="img/kemdoanwhite.png" alt="logo" class="brand-logo-img">
     <div class="login-logo-text">
       <div class="login-logo-name">KEM ĐOÀN</div>
       <div class="login-logo-slogan">Font Việt hóa</div>
     </div>
-  </div>
+  </header>
 
-  <div class="login-panel" id="login-panel" style="display:none;">
+  <div class="login-panel" id="login-panel" hidden>
     <div class="login-card">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành Viên</div>
@@ -54,7 +53,7 @@
         <i class="ri-lock-line login-input-icon"></i>
         <input type="password" id="login-password" placeholder="Mật khẩu">
       </div>
-      <div class="login-input-wrap" id="change-pass-extra" style="display:none;">
+      <div class="login-input-wrap" id="change-pass-extra" hidden>
         <i class="ri-lock-line login-input-icon"></i>
         <input type="password" id="new-password" placeholder="Mật khẩu mới">
       </div>
@@ -66,25 +65,48 @@
     <div id="login-error"></div>
   </div>
 
-  <div class="content" id="content" style="display:none;">
-    <div class="login-logo search-brand">
-      <img src="img/kemdoanwhite.png" alt="logo" class="brand-logo-img">
-      <div class="login-logo-text">
-        <div class="login-logo-name">KEM ĐOÀN</div>
-        <div class="login-logo-slogan">Font Việt hóa</div>
-      </div>
-    </div>
-
+  <main class="content" id="content" hidden>
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
       <input type="text" id="search" placeholder="Nhập tên font..." autocomplete="off" autocorrect="off" spellcheck="false">
       <button id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
 
-    <div id="families" class="hidden"></div>
+    <div id="families" hidden></div>
     <div id="results"></div>
     <div id="status"></div>
-  </div>
+  </main>
+
+  <template id="font-card-tpl">
+    <div class="font-card">
+      <div class="font-item">
+        <span class="font-name"></span>
+        <a class="download-btn" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
+      </div>
+      <div class="preview-panel">
+        <div class="preview-input-wrap">
+          <input type="text" class="preview-input" placeholder="Nhập chữ để xem..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="preview-clear-btn" aria-label="Xóa"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="preview-size-row">
+          <input type="range" class="preview-size-slider" min="1" max="100" step="1" aria-label="Cỡ chữ">
+          <span class="preview-size-value"></span>
+        </div>
+        <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
+        <div class="preview-text"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="family-card-tpl">
+    <div class="family-card">
+      <div class="family-name"></div>
+      <div class="family-foot">
+        <span class="family-count"></span>
+        <a class="family-download" href="#" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
+      </div>
+    </div>
+  </template>
 
 <script src="script.js"></script>
 </body>

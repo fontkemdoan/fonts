@@ -1,5 +1,7 @@
 * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 :root {
   --bg: #fff;
   --text: #fff;
@@ -49,6 +51,18 @@ body::before {
 }
 
 .content { flex: 1; }
+
+.boot-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boot-loading .kd-spinner {
+  font-size: 36px;
+  color: var(--text);
+}
 
 .search-wrap {
   position: relative;
@@ -622,10 +636,6 @@ font-weight: 600;
   gap: 12px;
 }
 
-#families.hidden {
-  display: none;
-}
-
 .family-card {
   border-radius: 16px;
   overflow: hidden;
@@ -675,6 +685,11 @@ font-weight: 600;
 
 .family-download:active {
   transform: scale(0.94);
+}
+
+.family-download .dl-count {
+  font-size: 13px;
+  font-style: normal;
 }
 
 .did-you-mean {
