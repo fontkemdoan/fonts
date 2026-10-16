@@ -316,7 +316,7 @@ function initAuth() {
 }
 
 // ================= Xem trước font =================
-const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
+const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
