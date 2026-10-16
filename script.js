@@ -14,6 +14,11 @@ const changePassExtra = document.getElementById('change-pass-extra');
 const newPasswordInput = document.getElementById('new-password');
 const logoutBtn = document.getElementById('logout-btn');
 const familiesEl = document.getElementById('families');
+const resultsEl = document.getElementById('results');
+
+const getToken = () => localStorage.getItem('kd_session_token') || '';
+const downloadUrl = (file) =>
+  '/api/download?file=' + encodeURIComponent(file) + '&token=' + encodeURIComponent(getToken());
 
 function showApp() {
   loginPanel.style.display = 'none';
@@ -30,6 +35,7 @@ function showLogin() {
 }
 
 function loadManifest() {
+  if (allFonts.length) { updateFamilies(); return; }
   fetch('manifest.json')
     .then(res => res.json())
     .then(data => {
@@ -37,12 +43,12 @@ function loadManifest() {
       buildFamilies();
     })
     .catch(err => {
-      statusEl.textContent = 'Lỗi sever - ' + err;
+      statusEl.textContent = 'Lỗi server - ' + err;
     });
 }
 
 function verifyAndBoot() {
-  const token = localStorage.getItem('kd_session_token');
+  const token = getToken();
   const bootLoading = document.getElementById('boot-loading');
 
   if (!token) {
@@ -62,7 +68,6 @@ function verifyAndBoot() {
       if (data.ok) {
         showApp();
       } else {
-        localStorage.removeItem('kd_logged_in');
         localStorage.removeItem('kd_session_token');
         showLogin();
       }
@@ -106,7 +111,6 @@ function doLogin() {
     .then(res => res.json())
     .then(data => {
       if (data.ok) {
-        localStorage.setItem('kd_logged_in', '1');
         localStorage.setItem('kd_session_token', data.token);
         showApp();
       } else if (data.error === 'wrong_password') {
@@ -222,7 +226,7 @@ function previewAvatar(email) {
     .then(data => {
       if (data.ok) {
         if (data.avatar) {
-          loginIcon.innerHTML = `<img src="avatars/${data.avatar}" alt="avatar">`;
+          loginIcon.innerHTML = `<img src="avatars/${escapeHtml(data.avatar)}" alt="avatar">`;
         } else {
           loginIcon.innerHTML = DEFAULT_ICON;
         }
@@ -249,14 +253,13 @@ const DEFAULT_PREVIEW_TEXT = 'Phông chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
 
 function render(list) {
-  const container = document.getElementById('results');
-  container.innerHTML = '';
+  resultsEl.innerHTML = '';
 
   if (list.length === 0) {
     const sugg = suggestFonts(searchInput.value);
     const suggHtml = sugg.length
       ? '<div class="did-you-mean">Có phải bạn muốn tìm font ' +
-        sugg.map(n => '<button type="button" class="dym-chip" data-name="' + escapeAttr(n) + '">' + escapeHtml(n) + '</button>').join('') +
+        sugg.map(n => '<button type="button" class="dym-chip" data-name="' + escapeHtml(n) + '">' + escapeHtml(n) + '</button>').join('') +
         '</div>'
       : '';
     statusEl.innerHTML = '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>Gợi ý: Chỉ cần nhập tên font<br>Ví dụ Kemdoan Regular → Kemdoan</i>' + suggHtml;
@@ -265,16 +268,14 @@ function render(list) {
 
   statusEl.textContent = '';
   list.forEach(font => {
-    const token = localStorage.getItem('kd_session_token') || '';
-
     const card = document.createElement('div');
     card.className = 'font-card';
 
     const item = document.createElement('div');
     item.className = 'font-item';
     item.innerHTML = `
-      <span class="font-name">${font.name}</span>
-      <a class="download-btn" href="/api/download?file=${encodeURIComponent(font.file)}&token=${encodeURIComponent(token)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
+      <span class="font-name">${escapeHtml(font.name)}</span>
+      <a class="download-btn" href="${downloadUrl(font.file)}" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
     `;
 
     const panel = document.createElement('div');
@@ -285,8 +286,8 @@ function render(list) {
         <button class="preview-clear-btn show" aria-label="Xóa"><i class="ri-close-line"></i></button>
       </div>
       <div class="preview-size-row">
-        <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="30" aria-label="Cỡ chữ">
-        <span class="preview-size-value">30px</span>
+        <input type="range" class="preview-size-slider" min="1" max="100" step="1" value="${DEFAULT_PREVIEW_SIZE}" aria-label="Cỡ chữ">
+        <span class="preview-size-value">${DEFAULT_PREVIEW_SIZE}px</span>
       </div>
       <div class="preview-loading" style="display:none;"><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
       <div class="preview-text"></div>
@@ -294,7 +295,7 @@ function render(list) {
 
     card.appendChild(item);
     card.appendChild(panel);
-    container.appendChild(card);
+    resultsEl.appendChild(card);
 
     item.addEventListener('click', (e) => {
       if (e.target.closest('.download-btn')) return;
@@ -444,10 +445,15 @@ async function togglePreview(font, panel) {
     if (hadText) suckTextIntoTrash(showEmpty); else showEmpty();
   };
 
-  if (loadedPreviewFonts.has(font.file)) {
-    previewTextEl.style.fontFamily = `"${loadedPreviewFonts.get(font.file)}", sans-serif`;
+  const showFont = (family) => {
+    loadingEl.style.display = 'none';
+    previewTextEl.style.fontFamily = `"${family}", sans-serif`;
     applyText();
     inputEl.oninput = applyText;
+  };
+
+  if (loadedPreviewFonts.has(font.file)) {
+    showFont(loadedPreviewFonts.get(font.file));
     return;
   }
 
@@ -455,8 +461,7 @@ async function togglePreview(font, panel) {
   previewTextEl.textContent = '';
 
   try {
-    const token = localStorage.getItem('kd_session_token') || '';
-    const res = await fetch(`/api/download?file=${encodeURIComponent(font.file)}&token=${encodeURIComponent(token)}`);
+    const res = await fetch(downloadUrl(font.file));
     if (!res.ok) throw new Error('fetch failed');
 
     const blob = await res.blob();
@@ -468,11 +473,7 @@ async function togglePreview(font, panel) {
     document.fonts.add(fontFace);
 
     loadedPreviewFonts.set(font.file, familyName);
-
-    loadingEl.style.display = 'none';
-    previewTextEl.style.fontFamily = `"${familyName}", sans-serif`;
-    applyText();
-    inputEl.oninput = applyText;
+    showFont(familyName);
   } catch (e) {
     loadingEl.style.display = 'none';
     previewTextEl.style.fontFamily = '';
@@ -556,7 +557,7 @@ function buildFamilies() {
   const map = new Map();
   allFonts.forEach(f => {
     const k = familyKey(f);
-    if (!map.has(k)) map.set(k, { name: k, count: 0, link: f.group_file || f.family_file || '' });
+    if (!map.has(k)) map.set(k, { name: k, count: 0 });
     map.get(k).count++;
   });
   familiesEl.innerHTML = '';
@@ -564,10 +565,10 @@ function buildFamilies() {
     const card = document.createElement('div');
     card.className = 'family-card';
     card.innerHTML = `
-      <div class="family-name">${g.name}</div>
+      <div class="family-name">${escapeHtml(g.name)}</div>
       <div class="family-foot">
         <span>${g.count} Font</span>
-        <a class="family-download" href="#" data-folder="${g.name}" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
+        <a class="family-download" href="#" data-folder="${escapeHtml(g.name)}" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
       </div>`;
     familiesEl.appendChild(card);
   });
@@ -588,7 +589,6 @@ familiesEl.addEventListener('click', async (e) => {
   if (btn.dataset.busy) return;
   const folder = btn.dataset.folder;
   const files = allFonts.filter(f => familyKey(f) === folder);
-  const token = localStorage.getItem('kd_session_token') || '';
   const icon = btn.querySelector('i');
   btn.dataset.busy = '1';
   icon.className = '';
@@ -601,7 +601,7 @@ familiesEl.addEventListener('click', async (e) => {
     while (i < files.length) {
       const f = files[i++];
       try {
-        const res = await fetch('/api/download?file=' + encodeURIComponent(f.file) + '&token=' + encodeURIComponent(token));
+        const res = await fetch(downloadUrl(f.file));
         if (!res.ok) continue;
         zip.file(f.file.split('/').pop(), await res.blob());
         ok++;
@@ -633,7 +633,6 @@ familiesEl.addEventListener('click', async (e) => {
 function escapeHtml(t) {
   return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function escapeAttr(t) { return escapeHtml(t); }
 
 function foldText(str) {
   return String(str).toLowerCase()
@@ -701,7 +700,7 @@ statusEl.addEventListener('click', e => {
 function runSearch() {
   const raw = searchInput.value.trim();
   if (!raw) {
-    document.getElementById('results').innerHTML = '';
+    resultsEl.innerHTML = '';
     statusEl.textContent = '';
     return;
   }
@@ -715,13 +714,11 @@ clearBtn.addEventListener('click', () => {
   spinIcon(clearBtn);
   slideTextLeft(searchInput);
   searchInput.value = '';
-  document.getElementById('results').innerHTML = '';
-  statusEl.textContent = '';
+  runSearch();
   updateFamilies();
 });
 
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('kd_logged_in');
   localStorage.removeItem('kd_session_token');
   showLogin();
 });
