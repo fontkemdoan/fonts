@@ -181,7 +181,6 @@ body::before {
 }
 
 .preview-panel.open { display: block; }
-input.clearing::placeholder { color: transparent !important; }
 
 .preview-char {
   display: inline-block;

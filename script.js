@@ -41,61 +41,6 @@ function spinIcon(btn) {
   icon.classList.add('spin-360');
 }
 
-function slideTextLeft(input, duration = 200) {
-  const text = input.value;
-  if (!text || prefersReducedMotion() || !input.animate) return;
-
-  const cs = getComputedStyle(input);
-  const padL = parseFloat(cs.paddingLeft) || 0;
-  const padR = parseFloat(cs.paddingRight) || 0;
-  const bl = parseFloat(cs.borderLeftWidth) || 0;
-  const bt = parseFloat(cs.borderTopWidth) || 0;
-
-  const clip = document.createElement('div');
-  Object.assign(clip.style, {
-    position: 'absolute',
-    left: (input.offsetLeft + bl + padL) + 'px',
-    top: (input.offsetTop + bt) + 'px',
-    width: (input.clientWidth - padL - padR) + 'px',
-    height: input.clientHeight + 'px',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: cs.fontSize,
-    fontFamily: cs.fontFamily,
-    fontWeight: cs.fontWeight,
-    letterSpacing: cs.letterSpacing,
-    color: cs.color
-  });
-  const span = document.createElement('span');
-  span.textContent = text;
-  span.style.whiteSpace = 'pre';
-  span.style.flexShrink = '0';
-  clip.appendChild(span);
-  input.parentNode.appendChild(clip);
-  input.classList.add('clearing');
-
-  const dist = span.offsetWidth + 10;
-  const cleanup = () => {
-    clip.remove();
-    input.classList.remove('clearing');
-    input.removeEventListener('input', cleanup);
-  };
-  input.addEventListener('input', cleanup);
-
-  const anim = span.animate(
-    [
-      { transform: 'translateX(0)', opacity: 1 },
-      { transform: 'translateX(' + (-dist * 0.6) + 'px)', opacity: 1, offset: 0.6 },
-      { transform: 'translateX(' + (-dist) + 'px)', opacity: 0 }
-    ],
-    { duration, easing: 'cubic-bezier(.45,0,.55,1)', fill: 'forwards' }
-  );
-  anim.onfinish = cleanup;
-}
-
 // ---- Lưu blob thành file tải về ----
 function saveBlob(blob, name) {
   const url = URL.createObjectURL(blob);
@@ -520,7 +465,6 @@ async function togglePreview(font, panel) {
     spinIcon(previewClearBtn);
     if (sucking.has(panel)) return;
     const hadText = inputEl.value.length > 0;
-    slideTextLeft(inputEl);
     inputEl.value = '';
     if (hadText) await suckTextIntoTrash(panel, previewTextEl);
     if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
@@ -763,7 +707,6 @@ function initFonts() {
 
   clearBtn.addEventListener('click', () => {
     spinIcon(clearBtn);
-    slideTextLeft(searchInput);
     searchInput.value = '';
     runSearch();
     updateFamilies();
