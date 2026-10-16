@@ -727,7 +727,7 @@ html[data-theme="dark"] .font-card:has(.preview-panel.open),
 html[data-theme="dark"] .login-card,
 html[data-theme="dark"] .family-card,
 html[data-theme="dark"] .dym-chip {
-  border: none;
+  border: 1px solid rgba(0,0,0, 0);
   background: rgba(0,0,0, 0.2);
 }
 
