@@ -1,6 +1,6 @@
-export async function onRequestPost(context) {
-  const { request, env } = context;
+import { json, contentsUrl, githubHeaders, normEmail, findUser, getPwver } from '../_lib.js';
 
+export async function onRequestPost({ request, env }) {
   let body;
   try {
     body = await request.json();
@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Invalid request' }, 400);
   }
 
-  const email = (body.email || '').trim().toLowerCase();
+  const email = normEmail(body.email);
   const password = body.password || '';
   const mode = body.mode === 'login' ? 'login' : 'preview';
 
@@ -16,16 +16,8 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Missing email' }, 400);
   }
 
-  const owner = 'fontkemdoan';
-  const repo = 'fontsdata';
-  const path = 'emails.json';
-
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: {
-      'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3.raw',
-      'User-Agent': 'font-search-app'
-    }
+  const res = await fetch(contentsUrl('emails.json'), {
+    headers: githubHeaders(env, 'application/vnd.github.v3.raw')
   });
   if (!res.ok) return json({ ok: false, error: 'Cannot load email list' }, 500);
 
@@ -36,7 +28,7 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Invalid email list format' }, 500);
   }
 
-  const match = list.find(item => String(item.email || '').trim().toLowerCase() === email);
+  const match = findUser(list, email);
   if (!match) {
     return json({ ok: false });
   }
@@ -56,16 +48,9 @@ export async function onRequestPost(context) {
   }
 
   // Đăng nhập thành công -> cấp session token gắn với phiên bản mật khẩu hiện tại
-  const pwver = (await env.KD_SESSIONS.get('pwver:' + email)) || '1';
+  const pwver = await getPwver(env, email);
   const token = crypto.randomUUID();
   await env.KD_SESSIONS.put('session:' + token, JSON.stringify({ email, pwver }));
 
   return json({ ok: true, avatar: match.avatar || null, name: match.name || null, token });
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
 }

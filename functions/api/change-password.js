@@ -1,6 +1,18 @@
-export async function onRequestPost(context) {
-  const { request, env } = context;
+import { json, contentsUrl, githubHeaders, normEmail, findUser, getPwver } from '../_lib.js';
 
+// base64 <-> UTF-8 (thay cho escape/unescape đã lỗi thời)
+function decodeBase64Utf8(b64) {
+  const bin = atob(b64.replace(/\n/g, ''));
+  return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+}
+
+function encodeBase64Utf8(str) {
+  let bin = '';
+  for (const b of new TextEncoder().encode(str)) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+export async function onRequestPost({ request, env }) {
   let body;
   try {
     body = await request.json();
@@ -8,7 +20,7 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Invalid request' }, 400);
   }
 
-  const email = (body.email || '').trim().toLowerCase();
+  const email = normEmail(body.email);
   const oldPassword = body.oldPassword || '';
   const newPassword = body.newPassword || '';
 
@@ -16,63 +28,44 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Missing fields' }, 400);
   }
 
-  const owner = 'fontkemdoan';
-  const repo = 'fontsdata';
-  const path = 'emails.json';
+  const emailsUrl = contentsUrl('emails.json');
 
-  const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: {
-      'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'font-search-app'
-    }
+  const getRes = await fetch(emailsUrl, {
+    headers: githubHeaders(env, 'application/vnd.github.v3+json')
   });
   if (!getRes.ok) return json({ ok: false, error: 'Cannot load email list' }, 500);
 
   const fileData = await getRes.json();
   const sha = fileData.sha;
 
-  let decoded;
+  let list;
   try {
-    decoded = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
+    list = JSON.parse(decodeBase64Utf8(fileData.content));
   } catch (e) {
     return json({ ok: false, error: 'Cannot decode file' }, 500);
   }
 
-  let list;
-  try {
-    list = JSON.parse(decoded);
-  } catch (e) {
-    return json({ ok: false, error: 'Invalid list format' }, 500);
-  }
-
-  const index = list.findIndex(item => String(item.email || '').trim().toLowerCase() === email);
-  if (index === -1) {
+  const match = findUser(list, email);
+  if (!match) {
     return json({ ok: false, error: 'not_found' });
   }
-
-  const match = list[index];
 
   if (String(match.password || '') !== oldPassword) {
     return json({ ok: false, error: 'wrong_password' });
   }
 
   match.password = newPassword;
-  list[index] = match;
 
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-
-  const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+  const putRes = await fetch(emailsUrl, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-      'User-Agent': 'font-search-app',
+      ...githubHeaders(env, 'application/vnd.github.v3+json'),
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       message: `Change password for ${email}`,
-      content: encoded,
-      sha: sha
+      content: encodeBase64Utf8(JSON.stringify(list, null, 2)),
+      sha
     })
   });
 
@@ -81,15 +74,8 @@ export async function onRequestPost(context) {
   }
 
   // Tăng phiên bản mật khẩu -> mọi session/token cũ (mọi máy) lập tức bị vô hiệu
-  const currentPwver = parseInt((await env.KD_SESSIONS.get('pwver:' + email)) || '1', 10);
+  const currentPwver = parseInt(await getPwver(env, email), 10);
   await env.KD_SESSIONS.put('pwver:' + email, String(currentPwver + 1));
 
   return json({ ok: true });
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
 }
