@@ -366,7 +366,7 @@ function initAuth() {
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
-const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
+const NEED_LOGIN_TEXT = 'File zip';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
@@ -575,6 +575,8 @@ const resultsEl = $('results');
 const familiesEl = $('families');
 const fontCardTpl = $('font-card-tpl');
 const familyCardTpl = $('family-card-tpl');
+const demosEl = $('demos');
+const demoCardTpl = $('demo-card-tpl');
 
 const MAX_RESULTS = 50;
 let allFonts = [];
@@ -589,6 +591,7 @@ async function loadFonts() {
     allFonts = await res.json();
     allFonts.forEach((f) => { f._key = foldText(f.name); });
     buildFamilies();
+    buildDemos();
   } catch (err) {
     statusEl.textContent = 'Lỗi server - ' + err;
   }
@@ -713,9 +716,37 @@ function buildFamilies() {
   updateFamilies();
 }
 
+// ---- Card demo: font nào có ảnh trùng tên trong imgdemo/ (manifest có trường img) ----
+function buildDemos() {
+  demosEl.innerHTML = '';
+  allFonts.filter((f) => f.img).forEach((f) => {
+    const card = demoCardTpl.content.firstElementChild.cloneNode(true);
+    const img = card.querySelector('.demo-img');
+    img.alt = f.name;
+    img.addEventListener('error', () => { card.remove(); updateFamilies(); });
+    img.src = encodeURI(f.img);
+    card.querySelector('.demo-name').textContent = f.name;
+    card.querySelector('.demo-download').dataset.file = f.file;
+    demosEl.appendChild(card);
+  });
+  updateFamilies();
+}
+
 function updateFamilies() {
   const hide = document.activeElement === searchInput || searchInput.value.trim() !== '';
   familiesEl.hidden = hide || !familiesEl.children.length;
+  demosEl.hidden = hide || !demosEl.children.length;
+}
+
+// Tải 1 font (cần token); chưa đăng nhập -> hiện panel thông báo
+function downloadFont(file) {
+  if (!isLoggedIn()) { openNotice(); return; }
+  const a = document.createElement('a');
+  a.href = downloadUrl(file);
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 // Tải cả bộ font thành 1 file zip
@@ -788,13 +819,12 @@ function initFonts() {
     const btn = e.target.closest('.download-btn');
     if (!btn) return;
     e.preventDefault();
-    if (!isLoggedIn()) { openNotice(); return; }
-    const a = document.createElement('a');
-    a.href = downloadUrl(btn.dataset.file);
-    a.download = '';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    downloadFont(btn.dataset.file);
+  });
+
+  demosEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.demo-download');
+    if (btn) downloadFont(btn.dataset.file);
   });
 
   familiesEl.addEventListener('click', (e) => {

@@ -67,8 +67,8 @@
 
   <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="notice-card">
-      <div class="notice-title">Thông báo</div>
-      <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
+      <div class="notice-title">Font - Kem Đoàn</div>
+      <div class="notice-msg">VUI LÒNG ĐĂNG NHẬP ĐỂ TẢI FONT</div>
       <div class="notice-btn-row">
         <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
         <a class="notice-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener"><i class="ri-user-line"></i> Đăng ký</a>
@@ -84,6 +84,7 @@
     </div>
 
     <div id="families" hidden></div>
+    <div id="demos" hidden></div>
     <div id="results"></div>
     <div id="status"></div>
   </main>
@@ -105,6 +106,16 @@
         </div>
         <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
         <div class="preview-text"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="demo-card-tpl">
+    <div class="demo-card">
+      <img class="demo-img" alt="" loading="lazy">
+      <div class="family-foot">
+        <span class="demo-name"></span>
+        <button type="button" class="family-download demo-download" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
       </div>
     </div>
   </template>
