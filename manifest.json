@@ -1,5 +1,5 @@
 [
-{"name": "KD Adidas Pro", "file": "KD/KD Adidas Pro.ttf"},
+{"name": "KD Adidas Pro", "file": "KD/KD Adidas Pro.ttf", "img": "imgdemo/kdadidaspro.jpg"},
 {"name": "KD Against", "file": "KD/KD Against.ttf"},
 {"name": "KD Agilera", "file": "KD/KD Agilera.ttf"},
 {"name": "KD Arturo Heavy", "file": "KD/KD Arturo Heavy.ttf"},
@@ -54,4 +54,5 @@
 {"name": "KD Wedding Dress", "file": "KD/KD Wedding Dress.ttf"},
 {"name": "KD With Love", "file": "KD/KD With Love.ttf"},
 {"name": "KD Yon Love", "file": "KD/KD Yon Love.ttf"},
-{"name": "KD Zoika Bold", "file": "KD/KD Zoika Bold.ttf"}]
+{"name": "KD Zoika Bold", "file": "KD/KD Zoika Bold.ttf"}
+]
