@@ -101,7 +101,9 @@ const newPasswordInput = $('new-password');
 const changePassExtra = $('change-pass-extra');
 const loginBtn = $('login-btn');
 const changePassBtn = $('change-pass-btn');
-const logoutBtn = $('logout-btn');
+const authBtn = $('auth-btn');
+const authIcon = authBtn.querySelector('i');
+const noticePanel = $('notice-panel');
 const loginError = $('login-error');
 const loginIcon = $('login-icon');
 const loginTitle = document.querySelector('.login-title');
@@ -121,47 +123,70 @@ let changePassMode = false;
 let loginErrorTimer = null;
 let previewTimer = null;
 
+// ---- Trạng thái đăng nhập ----
+const isLoggedIn = () => !!getToken();
+
+// Đổi trạng thái đăng nhập -> đóng mọi preview đang mở để mở lại theo trạng thái mới
+function resetPreviews(clearCache) {
+  document.querySelectorAll('.preview-panel.open').forEach(closePanel);
+  if (clearCache) {
+    loadedPreviewFonts.forEach((family) => {
+      document.fonts.forEach((f) => { if (f.family === family) document.fonts.delete(f); });
+    });
+    loadedPreviewFonts.clear();
+  }
+}
+
+function updateAuthUI() {
+  const on = isLoggedIn();
+  authIcon.className = on ? 'ri-logout-box-line' : 'ri-user-line';
+  authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
+}
+
 // ---- Chuyển màn hình ----
 function showApp() {
-  loginPanel.hidden = true;
   brand.classList.add('search-brand');
   brand.hidden = false;
   contentEl.hidden = false;
   loadFonts();
 }
 
-function showLogin() {
-  contentEl.hidden = true;
-  brand.classList.remove('search-brand');
-  brand.hidden = false;
+function openLogin() {
+  closeNotice();
   loginPanel.hidden = false;
 }
 
+function closeLogin() {
+  loginPanel.hidden = true;
+  loginPassword.value = '';
+  loginError.textContent = '';
+  if (changePassMode) exitChangePassMode();
+}
+
+function openNotice() {
+  closeLogin();
+  noticePanel.hidden = false;
+}
+
+function closeNotice() {
+  noticePanel.hidden = true;
+}
+
+// Vào trang luôn xem được; chỉ kiểm tra token để biết đã đăng nhập hay chưa
 async function verifyAndBoot() {
-  const token = getToken();
-  if (!token) {
-    bootLoading.hidden = true;
-    showLogin();
-    return;
-  }
-
-  let data;
-  try {
-    data = await postJson('/api/verify-session', { token });
-  } catch (e) {
-    // Không kết nối được server -> vẫn cho vào app
-    bootLoading.hidden = true;
-    showApp();
-    return;
-  }
-
   bootLoading.hidden = true;
-  if (data.ok) {
-    showApp();
-  } else {
-    clearToken();
-    showLogin();
+  showApp();
+
+  const token = getToken();
+  if (!token) { updateAuthUI(); return; }
+
+  try {
+    const data = await postJson('/api/verify-session', { token });
+    if (!data.ok) clearToken();
+  } catch (e) {
+    // Không kết nối được server -> giữ nguyên token
   }
+  updateAuthUI();
 }
 
 // ---- Thông báo lỗi ----
@@ -189,7 +214,11 @@ async function doLogin() {
     const data = await postJson('/api/login', { email, password, mode: 'login' });
     if (data.ok) {
       setToken(data.token);
-      showApp();
+      loginEmail.value = '';
+      resetLoginIcon();
+      updateAuthUI();
+      resetPreviews(false);
+      closeLogin();
     } else if (data.error === 'wrong_password') {
       showLoginError('Sai mật khẩu');
     } else {
@@ -307,9 +336,28 @@ function initAuth() {
     previewTimer = setTimeout(() => previewAvatar(val), 400);
   });
 
-  logoutBtn.addEventListener('click', () => {
-    clearToken();
-    showLogin();
+  authBtn.addEventListener('click', () => {
+    if (isLoggedIn()) {
+      clearToken();
+      updateAuthUI();
+      resetPreviews(true);
+      closeLogin();
+      closeNotice();
+    } else if (loginPanel.hidden) {
+      openLogin();
+    } else {
+      closeLogin();
+    }
+  });
+
+  // Bấm ra ngoài thẻ / nhấn Esc để đóng panel
+  loginPanel.addEventListener('click', (e) => { if (e.target === loginPanel) closeLogin(); });
+  noticePanel.addEventListener('click', (e) => { if (e.target === noticePanel) closeNotice(); });
+  $('notice-login-btn').addEventListener('click', openLogin);
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    closeLogin();
+    closeNotice();
   });
 
   verifyAndBoot();
@@ -318,6 +366,7 @@ function initAuth() {
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
+const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
@@ -457,14 +506,15 @@ async function togglePreview(font, panel) {
   sizeSlider.value = DEFAULT_PREVIEW_SIZE;
   applySize();
 
+  let locked = false; // true = chưa đăng nhập / không tải được font -> chỉ hiện thông báo
   const applyText = () => {
-    previewTextEl.textContent = inputEl.value;
+    previewTextEl.textContent = locked ? NEED_LOGIN_TEXT : inputEl.value;
   };
 
   previewClearBtn.onclick = async () => {
     spinIcon(previewClearBtn);
     if (sucking.has(panel)) return;
-    const hadText = inputEl.value.length > 0;
+    const hadText = !locked && inputEl.value.length > 0;
     inputEl.value = '';
     if (hadText) await suckTextIntoTrash(panel, previewTextEl);
     if (inputEl.value.length > 0) return; // người dùng đã gõ lại trong lúc chạy hiệu ứng
@@ -477,6 +527,15 @@ async function togglePreview(font, panel) {
     applyText();
     inputEl.oninput = applyText;
   };
+
+  // Chưa đăng nhập -> không xem được
+  if (!isLoggedIn()) {
+    locked = true;
+    inputEl.oninput = applyText;
+    previewTextEl.style.fontFamily = '';
+    applyText();
+    return;
+  }
 
   if (loadedPreviewFonts.has(font.file)) {
     showFont(loadedPreviewFonts.get(font.file));
@@ -500,9 +559,11 @@ async function togglePreview(font, panel) {
     loadedPreviewFonts.set(font.file, familyName);
     showFont(familyName);
   } catch (e) {
+    locked = true;
     loadingEl.hidden = true;
+    inputEl.oninput = applyText;
     previewTextEl.style.fontFamily = '';
-    previewTextEl.textContent = 'File zip';
+    applyText();
   }
 }
 
@@ -616,7 +677,7 @@ function render(list) {
   list.forEach((font) => {
     const card = fontCardTpl.content.firstElementChild.cloneNode(true);
     card.querySelector('.font-name').textContent = font.name;
-    card.querySelector('.download-btn').href = downloadUrl(font.file);
+    card.querySelector('.download-btn').dataset.file = font.file;
     bindPreview(card, font);
     frag.appendChild(card);
   });
@@ -659,6 +720,8 @@ function updateFamilies() {
 
 // Tải cả bộ font thành 1 file zip
 async function downloadFamily(btn) {
+  if (!isLoggedIn()) { openNotice(); return; }
+
   const folder = btn.dataset.folder;
   const files = allFonts.filter((f) => familyKey(f) === folder);
   const icon = btn.querySelector('i');
@@ -718,6 +781,20 @@ function initFonts() {
     searchInput.value = chip.dataset.name;
     runSearch();
     updateFamilies();
+  });
+
+  // Tải 1 font: chưa đăng nhập -> hiện panel thông báo
+  resultsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.download-btn');
+    if (!btn) return;
+    e.preventDefault();
+    if (!isLoggedIn()) { openNotice(); return; }
+    const a = document.createElement('a');
+    a.href = downloadUrl(btn.dataset.file);
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   });
 
   familiesEl.addEventListener('click', (e) => {

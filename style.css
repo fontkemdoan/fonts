@@ -17,6 +17,7 @@
 .preview-panel,
 .font-card:has(.preview-panel.open),
 .login-card,
+.notice-card,
 .family-card,
 .dym-chip {
   color: var(--text);
@@ -326,6 +327,9 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 .download-btn {
+  border: none;
+  padding: 0;
+  cursor: pointer;
   flex-shrink: 0;
   width: 33px;
   height: 33px;
@@ -352,19 +356,20 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   font-size: 15px;
 }
 
-.login-panel {
+.login-panel,
+.notice-panel {
   position: fixed;
   inset: 0;
-  z-index: 1;
-  padding: 35px 20px 0;
+  z-index: 500;
+  padding: 35px 20px calc(90px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  background: url('img/bg.jpg') center / cover no-repeat;
 }
 
-.login-panel > * { pointer-events: auto; }
+.login-panel .login-card { margin-top: 50px; }
 
 .login-logo {
   display: flex;
@@ -552,6 +557,63 @@ transition: background-color 9999s ease-in-out 0s;
   position: relative;
 }
 
+.notice-card {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 25px;
+  padding: 18px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.notice-title {
+  align-self: flex-start;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.notice-msg {
+  margin: 28px 0 24px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.notice-btn-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.notice-btn {
+  flex: 1;
+  padding: 14px 0;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-black);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s ease;
+}
+
+.notice-btn:active { transform: scale(0.92); }
+
+.notice-btn i {
+  font-size: 17px;
+  line-height: 1;
+}
+
 .bottom-nav {
   position: fixed;
   left: 50%;
@@ -629,9 +691,10 @@ font-weight: 600;
 
 #families {
   max-width: 480px;
+  width: 100%;
   margin: 25px auto 90px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
@@ -712,6 +775,11 @@ html[data-theme="dark"] body {
   background-color: #a2c7c0;
 }
 
+html[data-theme="dark"] .login-panel,
+html[data-theme="dark"] .notice-panel {
+  background: url('img/bgd.jpg') center / cover no-repeat;
+}
+
 html[data-theme="dark"] body::before {
   background: url('img/bgd.jpg') center / cover no-repeat;
 }
@@ -725,6 +793,7 @@ html[data-theme="dark"] .font-item,
 html[data-theme="dark"] .preview-panel,
 html[data-theme="dark"] .font-card:has(.preview-panel.open),
 html[data-theme="dark"] .login-card,
+html[data-theme="dark"] .notice-card,
 html[data-theme="dark"] .family-card,
 html[data-theme="dark"] .dym-chip {
   border: 1px solid rgba(0,0,0, 0);
@@ -742,4 +811,3 @@ html[data-theme="dark"] .preview-input {
 html[data-theme="dark"] .login-icon {
   box-shadow: var(--shadow-soft-dark);
 }
-

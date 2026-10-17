@@ -26,7 +26,7 @@
     <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
     <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a>
     <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin">Zalo</a>
-    <button class="nav-btn" id="logout-btn" aria-label="Đăng xuất"><i class="ri-logout-box-line"></i></button>
+    <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập"><i class="ri-user-line"></i></button>
   </nav>
 
   <div class="boot-loading" id="boot-loading">
@@ -41,7 +41,7 @@
     </div>
   </header>
 
-  <div class="login-panel" id="login-panel" hidden>
+  <div class="login-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
     <div class="login-card">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành Viên</div>
@@ -65,6 +65,17 @@
     <div id="login-error"></div>
   </div>
 
+  <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
+    <div class="notice-card">
+      <div class="notice-title">Thông báo</div>
+      <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
+      <div class="notice-btn-row">
+        <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+        <a class="notice-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener"><i class="ri-user-line"></i> Đăng ký</a>
+      </div>
+    </div>
+  </div>
+
   <main class="content" id="content" hidden>
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
@@ -81,7 +92,7 @@
     <div class="font-card">
       <div class="font-item">
         <span class="font-name"></span>
-        <a class="download-btn" download aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></a>
+        <button type="button" class="download-btn" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
       </div>
       <div class="preview-panel">
         <div class="preview-input-wrap">
