@@ -22,7 +22,7 @@
 .demo-card,
 .dym-chip {
   color: var(--text);
-  border: var(--border);
+  border: none;
   background: rgba(255,255,255, 0.2);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
@@ -367,9 +367,9 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0, 0.2);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  background: url('img/bg.jpg') center / cover no-repeat;
 }
 
 .login-panel .login-card { margin-top: 50px; }
@@ -723,11 +723,11 @@ font-weight: 600;
 
 .family-foot {
   border-top: 1px solid rgba(255,255,255,0.4);
-  padding: 5px 14px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .family-download {
@@ -760,10 +760,10 @@ font-weight: 600;
 #demos {
   max-width: 480px;
   width: 100%;
-  margin: 12px auto 0;
+  margin: 20px auto 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .demo-card {
@@ -781,7 +781,7 @@ font-weight: 600;
 
 .demo-name {
   min-width: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -822,6 +822,10 @@ html[data-theme="dark"] .bottom-fade {
   background: linear-gradient(to bottom, transparent 0%, #a2c7c0 70%);
 }
 
+html[data-theme="dark"] .login-panel {
+  background: url('img/bgd.jpg') center / cover no-repeat;
+}
+
 html[data-theme="dark"] #search,
 html[data-theme="dark"] .font-item,
 html[data-theme="dark"] .preview-panel,
@@ -831,7 +835,6 @@ html[data-theme="dark"] .notice-card,
 html[data-theme="dark"] .family-card,
 html[data-theme="dark"] .demo-card,
 html[data-theme="dark"] .dym-chip {
-  border: 1px solid rgba(0,0,0, 0);
   background: rgba(0,0,0, 0.2);
 }
 
