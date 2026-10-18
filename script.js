@@ -129,6 +129,7 @@ const isLoggedIn = () => !!getToken();
 // Đổi trạng thái đăng nhập -> đóng mọi preview đang mở để mở lại theo trạng thái mới
 function resetPreviews(clearCache) {
   document.querySelectorAll('.preview-panel.open').forEach(closePanel);
+  document.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
   if (clearCache) {
     loadedPreviewFonts.forEach((family) => {
       document.fonts.forEach((f) => { if (f.family === family) document.fonts.delete(f); });
@@ -372,6 +373,24 @@ const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đă
 const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
 let fontSeq = 0;
 
+// Tải font (cần token) và đăng ký vào document.fonts; trả về tên font-family. Có cache.
+async function ensurePreviewFont(font) {
+  if (loadedPreviewFonts.has(font.file)) return loadedPreviewFonts.get(font.file);
+
+  const res = await fetch(downloadUrl(font.file));
+  if (!res.ok) throw new Error('fetch failed');
+
+  const objectUrl = URL.createObjectURL(await res.blob());
+  const familyName = 'kd-preview-' + fontSeq++;
+
+  const fontFace = new FontFace(familyName, `url(${objectUrl})`);
+  await fontFace.load();
+  document.fonts.add(fontFace);
+
+  loadedPreviewFonts.set(font.file, familyName);
+  return familyName;
+}
+
 // Gắn sự kiện mở/đóng preview cho 1 thẻ font
 function bindPreview(card, font) {
   const panel = card.querySelector('.preview-panel');
@@ -546,18 +565,7 @@ async function togglePreview(font, panel) {
   previewTextEl.textContent = '';
 
   try {
-    const res = await fetch(downloadUrl(font.file));
-    if (!res.ok) throw new Error('fetch failed');
-
-    const objectUrl = URL.createObjectURL(await res.blob());
-    const familyName = 'kd-preview-' + fontSeq++;
-
-    const fontFace = new FontFace(familyName, `url(${objectUrl})`);
-    await fontFace.load();
-    document.fonts.add(fontFace);
-
-    loadedPreviewFonts.set(font.file, familyName);
-    showFont(familyName);
+    showFont(await ensurePreviewFont(font));
   } catch (e) {
     locked = true;
     loadingEl.hidden = true;
@@ -727,9 +735,115 @@ function buildDemos() {
     img.src = encodeURI(f.img);
     card.querySelector('.demo-name').textContent = f.name;
     card.querySelector('.demo-download').dataset.file = f.file;
+    demoOpeners.set(card, bindDemoPanel(card, f));
     demosEl.appendChild(card);
   });
   updateFamilies();
+}
+
+// ---- Panel preview của card demo: gõ trực tiếp vào chữ preview, canh lề phải/trái/giữa ----
+const demoOpeners = new WeakMap(); // card -> hàm mở panel (nạp font + hiển thị)
+const EDITABLE_MODE = (() => {
+  const el = document.createElement('div');
+  el.contentEditable = 'plaintext-only';
+  return el.contentEditable === 'plaintext-only' ? 'plaintext-only' : 'true';
+})();
+
+function bindDemoPanel(card, font) {
+  const panel = card.querySelector('.demo-panel');
+  const wrap = panel.querySelector('.demo-text-wrap');
+  const textEl = panel.querySelector('.demo-preview-text');
+  const clearBtn = panel.querySelector('.demo-clear-btn');
+  const loadingEl = panel.querySelector('.preview-loading');
+  const slider = panel.querySelector('.preview-size-slider');
+  const sizeValue = panel.querySelector('.preview-size-value');
+  const alignBtns = panel.querySelectorAll('.demo-align-btn');
+
+  let align = 'center'; // mặc định canh giữa
+  let savedText = DEFAULT_PREVIEW_TEXT;
+  let locked = false;
+
+  const applySize = () => {
+    const v = Number(slider.value);
+    textEl.style.fontSize = v + 'px';
+    sizeValue.textContent = v + 'px';
+    slider.style.setProperty('--pct', (v - 1) / 99);
+  };
+  const applyAlign = () => {
+    textEl.style.textAlign = align;
+    alignBtns.forEach((b) => b.classList.toggle('active', b.dataset.align === align));
+  };
+
+  slider.value = DEFAULT_PREVIEW_SIZE;
+  applySize();
+  applyAlign();
+  slider.addEventListener('input', applySize);
+  alignBtns.forEach((b) => b.addEventListener('click', () => { align = b.dataset.align; applyAlign(); }));
+
+  textEl.addEventListener('input', () => {
+    if (!textEl.textContent) textEl.replaceChildren(); // để placeholder hiện lại
+    savedText = textEl.textContent;
+  });
+  // Dán chỉ lấy chữ thuần (không mang định dạng)
+  textEl.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    document.execCommand('insertText', false, text);
+  });
+
+  // Xóa nhanh: chữ bị "hút" vào thùng rác (dùng chung hiệu ứng với ô preview ở search)
+  clearBtn.addEventListener('click', async () => {
+    spinIcon(clearBtn);
+    if (locked || sucking.has(wrap)) return;
+    const hadText = textEl.textContent.length > 0;
+    savedText = '';
+    if (hadText) {
+      textEl.setAttribute('contenteditable', 'false');
+      await suckTextIntoTrash(wrap, textEl);
+    }
+    textEl.textContent = '';
+    textEl.setAttribute('contenteditable', EDITABLE_MODE);
+  });
+
+  const showFont = (family) => {
+    locked = false;
+    loadingEl.hidden = true;
+    clearBtn.hidden = false;
+    textEl.style.fontFamily = `"${family}", sans-serif`;
+    textEl.textContent = savedText;
+    textEl.setAttribute('contenteditable', EDITABLE_MODE);
+  };
+  const showLocked = () => {
+    locked = true;
+    loadingEl.hidden = true;
+    clearBtn.hidden = true;
+    textEl.style.fontFamily = '';
+    textEl.textContent = NEED_LOGIN_TEXT;
+    textEl.setAttribute('contenteditable', 'false');
+  };
+
+  return async () => {
+    if (!isLoggedIn()) { showLocked(); return; }
+    if (loadedPreviewFonts.has(font.file)) { showFont(loadedPreviewFonts.get(font.file)); return; }
+
+    loadingEl.hidden = false;
+    clearBtn.hidden = true;
+    textEl.setAttribute('contenteditable', 'false');
+    textEl.textContent = '';
+    try {
+      showFont(await ensurePreviewFont(font));
+    } catch (e) {
+      showLocked();
+    }
+  };
+}
+
+function toggleDemo(card) {
+  const wasOpen = card.classList.contains('open');
+  demosEl.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
+  if (wasOpen) return;
+  card.classList.add('open');
+  demoOpeners.get(card)();
 }
 
 function updateFamilies() {
@@ -824,7 +938,10 @@ function initFonts() {
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');
-    if (btn) downloadFont(btn.dataset.file);
+    if (btn) { downloadFont(btn.dataset.file); return; }
+    if (e.target.closest('.demo-panel')) return; // bấm trong panel: không đóng
+    const card = e.target.closest('.demo-card');
+    if (card) toggleDemo(card);
   });
 
   familiesEl.addEventListener('click', (e) => {

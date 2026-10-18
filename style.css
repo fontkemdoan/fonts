@@ -721,13 +721,18 @@ font-weight: 600;
   justify-content: center;
 }
 
+.demo-foot,
 .family-foot {
-  border-top: 1px solid rgba(255,255,255,0.4);
   padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: 17px;
+  
+}
+
+.family-foot {
+  border-top: 1px solid rgba(255,255,255,0.4);
 }
 
 .family-download {
@@ -767,6 +772,7 @@ font-weight: 600;
 }
 
 .demo-card {
+  
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -777,13 +783,91 @@ font-weight: 600;
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 16px;
 }
 
 .demo-name {
   min-width: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+ .demo-foot {
+  border: none;
+ }
+
+.demo-card { cursor: pointer; }
+
+.demo-panel {
+  display: none;
+  padding: 0 14px 14px;
+  cursor: default;
+}
+
+.demo-card.open .demo-panel { display: block; }
+
+.demo-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-align {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.demo-align-btn {
+  width: 33px;
+  height: 33px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  cursor: pointer;
+  color: var(--text);
+  background: rgba(0,0,0, 0.2);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.demo-align-btn i { line-height: 1; }
+
+.demo-align-btn:active { transform: scale(0.9); }
+
+.demo-align-btn.active {
+  background: var(--bg);
+  color: var(--text-black);
+}
+
+/* Chữ preview gõ trực tiếp */
+.demo-text-wrap { position: relative; }
+
+.demo-clear-btn {
+  right: 0;
+  top: 15px;
+  transform: none;
+  width: 30px;
+  height: 30px;
+}
+
+.demo-preview-text {
+  padding-left: 34px;
+  padding-right: 34px;
+  outline: none;
+  white-space: pre-wrap;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.demo-preview-text:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.6;
 }
 
 .demo-download {
@@ -848,4 +932,8 @@ html[data-theme="dark"] .preview-input {
 
 html[data-theme="dark"] .login-icon {
   box-shadow: var(--shadow-soft-dark);
+}
+
+html[data-theme="dark"] .demo-align-btn:not(.active) {
+  background: rgba(255,255,255, 0.2);
 }
