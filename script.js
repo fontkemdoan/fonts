@@ -365,9 +365,9 @@ function initAuth() {
 }
 
 // ================= Xem trước font =================
-const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
+const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt...';
 const DEFAULT_PREVIEW_SIZE = 30;
-const NEED_LOGIN_TEXT = 'File zip';
+const NEED_LOGIN_TEXT = 'Đăng nhập để xem preview';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
