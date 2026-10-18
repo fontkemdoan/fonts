@@ -891,17 +891,16 @@ font-weight: 600;
   flex-direction: column;
 }
 
-/* Nút xóa nằm dưới chữ, góc phải card, thẳng hàng với nút download */
 .demo-clear-btn {
   position: static;
   align-self: flex-end;
   transform: none;
-  margin-top: 4px;
-  width: 30px;
-  height: 30px;
+  margin-top: 6px;
+  width: 33px;
+  height: 33px;
 }
 
-.demo-clear-btn i { font-size: 17px; }
+.demo-clear-btn i { font-size: 20px; }
 
 .demo-preview-text {
   outline: none;
