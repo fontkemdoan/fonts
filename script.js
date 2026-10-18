@@ -586,6 +586,7 @@ const familyCardTpl = $('family-card-tpl');
 const demosEl = $('demos');
 const demoCardTpl = $('demo-card-tpl');
 const demosMoreBtn = $('demos-more');
+const demoVariantTpl = $('demo-variant-tpl');
 
 const MAX_RESULTS = 50;
 let allFonts = [];
@@ -726,32 +727,50 @@ function buildFamilies() {
 }
 
 // ---- Card demo: font nào có ảnh trùng tên trong imgdemo/ (manifest có trường img) ----
+// Các font cùng 1 bộ (cùng ảnh, ví dụ Regular + Bold) gom chung 1 card, mỗi font 1 dòng preview.
 const DEMO_PAGE_SIZE = 24; // mỗi lần hiện 24 card, bấm "Xem tiếp font" để hiện thêm
-let demoList = [];         // toàn bộ font có ảnh demo
-let demoShown = 0;         // số font đã đưa ra màn hình
+let demoList = [];         // toàn bộ card demo: [{ title, fonts: [font...] }]
+let demoShown = 0;         // số card đã đưa ra màn hình
+const demoGroups = new WeakMap(); // card -> group
 
-function createDemoCard(f) {
+function buildDemoGroups() {
+  const map = new Map();
+  allFonts.filter((f) => f.img).forEach((f) => {
+    const key = f.img + '|' + familyKey(f);
+    if (!map.has(key)) map.set(key, { fonts: [] });
+    map.get(key).fonts.push(f);
+  });
+
+  const isRegular = (f) => !f.style || /^regular$/i.test(f.style);
+  return [...map.values()].map((g) => {
+    g.fonts.sort((a, b) => isRegular(b) - isRegular(a)); // Regular lên đầu, còn lại giữ thứ tự cũ
+    g.title = g.fonts.length > 1 ? (g.fonts[0].group || g.fonts[0].name) : g.fonts[0].name;
+    return g;
+  });
+}
+
+function createDemoCard(g) {
   const card = demoCardTpl.content.firstElementChild.cloneNode(true);
   const img = card.querySelector('.demo-img');
-  img.alt = f.name;
+  img.alt = g.title;
   img.addEventListener('error', () => { card.remove(); updateFamilies(); });
-  img.src = encodeURI(f.img);
-  card.querySelector('.demo-name').textContent = f.name;
-  card.querySelector('.demo-download').dataset.file = f.file;
-  demoOpeners.set(card, bindDemoPanel(card, f));
+  img.src = encodeURI(g.fonts[0].img);
+  card.querySelector('.demo-name').textContent = g.title;
+  demoGroups.set(card, g);
+  demoOpeners.set(card, bindDemoPanel(card, g));
   return card;
 }
 
 function showMoreDemos() {
   const next = demoList.slice(demoShown, demoShown + DEMO_PAGE_SIZE);
-  next.forEach((f) => demosEl.appendChild(createDemoCard(f)));
+  next.forEach((g) => demosEl.appendChild(createDemoCard(g)));
   demoShown += next.length;
   updateFamilies();
 }
 
 function buildDemos() {
   demosEl.innerHTML = '';
-  demoList = allFonts.filter((f) => f.img);
+  demoList = buildDemoGroups();
   demoShown = 0;
   showMoreDemos();
 }
@@ -764,28 +783,41 @@ const EDITABLE_MODE = (() => {
   return el.contentEditable === 'plaintext-only' ? 'plaintext-only' : 'true';
 })();
 
-function bindDemoPanel(card, font) {
+function bindDemoPanel(card, group) {
   const panel = card.querySelector('.demo-panel');
-  const wrap = panel.querySelector('.demo-text-wrap');
-  const textEl = panel.querySelector('.demo-preview-text');
+  const variantsEl = panel.querySelector('.demo-variants');
   const clearBtn = panel.querySelector('.demo-clear-btn');
   const loadingEl = panel.querySelector('.preview-loading');
   const slider = panel.querySelector('.preview-size-slider');
   const sizeValue = panel.querySelector('.preview-size-value');
   const alignBtns = panel.querySelectorAll('.demo-align-btn');
+  const multi = group.fonts.length > 1;
 
   let align = 'center'; // mặc định canh giữa
   let savedText = DEFAULT_PREVIEW_TEXT;
-  let locked = false;
+
+  // Mỗi font của bộ = 1 dòng preview (bộ nhiều font thì có nhãn Regular/Bold...)
+  const variants = group.fonts.map((font) => {
+    const el = demoVariantTpl.content.firstElementChild.cloneNode(true);
+    const label = el.querySelector('.demo-variant-label');
+    if (multi) label.textContent = font.style || 'Regular'; else label.remove();
+    variantsEl.appendChild(el);
+    return {
+      font,
+      locked: false,
+      wrap: el.querySelector('.demo-text-wrap'),
+      textEl: el.querySelector('.demo-preview-text')
+    };
+  });
 
   const applySize = () => {
     const v = Number(slider.value);
-    textEl.style.fontSize = v + 'px';
+    variants.forEach((x) => { x.textEl.style.fontSize = v + 'px'; });
     sizeValue.textContent = v + 'px';
     slider.style.setProperty('--pct', (v - 1) / 99);
   };
   const applyAlign = () => {
-    textEl.style.textAlign = align;
+    variants.forEach((x) => { x.textEl.style.textAlign = align; });
     alignBtns.forEach((b) => b.classList.toggle('active', b.dataset.align === align));
   };
 
@@ -795,61 +827,83 @@ function bindDemoPanel(card, font) {
   slider.addEventListener('input', applySize);
   alignBtns.forEach((b) => b.addEventListener('click', () => { align = b.dataset.align; applyAlign(); }));
 
-  textEl.addEventListener('input', () => {
-    if (!textEl.textContent) textEl.replaceChildren(); // để placeholder hiện lại
-    savedText = textEl.textContent;
-  });
-  // Dán chỉ lấy chữ thuần (không mang định dạng)
-  textEl.addEventListener('paste', (e) => {
-    e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text');
-    document.execCommand('insertText', false, text);
+  variants.forEach((v) => {
+    // Gõ ở dòng nào thì các dòng còn lại đổi theo
+    v.textEl.addEventListener('input', () => {
+      if (!v.textEl.textContent) v.textEl.replaceChildren(); // để placeholder hiện lại
+      savedText = v.textEl.textContent;
+      variants.forEach((o) => { if (o !== v && !o.locked) o.textEl.textContent = savedText; });
+    });
+    // Dán chỉ lấy chữ thuần (không mang định dạng)
+    v.textEl.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      document.execCommand('insertText', false, text);
+    });
   });
 
-  // Xóa nhanh: chữ bị "hút" vào thùng rác (dùng chung hiệu ứng với ô preview ở search)
+  // Xóa nhanh: chữ ở mọi dòng cùng bị "hút" vào thùng rác (dùng chung hiệu ứng với ô preview ở search)
   clearBtn.addEventListener('click', async () => {
     spinIcon(clearBtn);
-    if (locked || sucking.has(wrap)) return;
-    const hadText = textEl.textContent.length > 0;
+    const active = variants.filter((v) => !v.locked);
+    if (!active.length || active.some((v) => sucking.has(v.wrap))) return;
+    const hadText = savedText.length > 0;
     savedText = '';
     if (hadText) {
-      textEl.setAttribute('contenteditable', 'false');
-      await suckTextIntoTrash(wrap, textEl);
+      active.forEach((v) => v.textEl.setAttribute('contenteditable', 'false'));
+      await Promise.all(active.map((v) => suckTextIntoTrash(v.wrap, v.textEl)));
     }
-    textEl.textContent = '';
-    textEl.setAttribute('contenteditable', EDITABLE_MODE);
+    active.forEach((v) => {
+      v.textEl.textContent = '';
+      v.textEl.setAttribute('contenteditable', EDITABLE_MODE);
+    });
   });
 
-  const showFont = (family) => {
-    locked = false;
-    loadingEl.hidden = true;
-    clearBtn.hidden = false;
-    textEl.style.fontFamily = `"${family}", sans-serif`;
-    textEl.textContent = savedText;
-    textEl.setAttribute('contenteditable', EDITABLE_MODE);
+  const showFont = (v, family) => {
+    v.locked = false;
+    v.textEl.style.fontFamily = `"${family}", sans-serif`;
+    v.textEl.textContent = savedText;
+    v.textEl.setAttribute('contenteditable', EDITABLE_MODE);
   };
-  const showLocked = () => {
-    locked = true;
-    loadingEl.hidden = true;
-    clearBtn.hidden = true;
-    textEl.style.fontFamily = '';
-    textEl.textContent = NEED_LOGIN_TEXT;
-    textEl.setAttribute('contenteditable', 'false');
+  const showLocked = (v) => {
+    v.locked = true;
+    v.textEl.style.fontFamily = '';
+    v.textEl.textContent = NEED_LOGIN_TEXT;
+    v.textEl.setAttribute('contenteditable', 'false');
   };
 
   return async () => {
-    if (!isLoggedIn()) { showLocked(); return; }
-    if (loadedPreviewFonts.has(font.file)) { showFont(loadedPreviewFonts.get(font.file)); return; }
-
-    loadingEl.hidden = false;
-    clearBtn.hidden = true;
-    textEl.setAttribute('contenteditable', 'false');
-    textEl.textContent = '';
-    try {
-      showFont(await ensurePreviewFont(font));
-    } catch (e) {
-      showLocked();
+    if (!isLoggedIn()) {
+      variants.forEach(showLocked);
+      loadingEl.hidden = true;
+      clearBtn.hidden = true;
+      return;
     }
+
+    const pending = [];
+    variants.forEach((v) => {
+      if (loadedPreviewFonts.has(v.font.file)) showFont(v, loadedPreviewFonts.get(v.font.file));
+      else pending.push(v);
+    });
+
+    if (pending.length) {
+      loadingEl.hidden = false;
+      clearBtn.hidden = true;
+      pending.forEach((v) => {
+        v.textEl.setAttribute('contenteditable', 'false');
+        v.textEl.textContent = '';
+      });
+      await Promise.all(pending.map(async (v) => {
+        try {
+          showFont(v, await ensurePreviewFont(v.font));
+        } catch (e) {
+          showLocked(v);
+        }
+      }));
+    }
+
+    loadingEl.hidden = true;
+    clearBtn.hidden = variants.every((v) => v.locked);
   };
 }
 
@@ -879,12 +933,10 @@ function downloadFont(file) {
   a.remove();
 }
 
-// Tải cả bộ font thành 1 file zip
-async function downloadFamily(btn) {
+// Tải nhiều font thành 1 file zip (dùng cho cả bộ family và card demo nhiều font)
+async function downloadZip(btn, files, zipName) {
   if (!isLoggedIn()) { openNotice(); return; }
 
-  const folder = btn.dataset.folder;
-  const files = allFonts.filter((f) => familyKey(f) === folder);
   const icon = btn.querySelector('i');
 
   btn.dataset.busy = '1';
@@ -912,7 +964,7 @@ async function downloadFamily(btn) {
     if (ok === 0) {
       alert('Tải không thành công');
     } else {
-      saveBlob(await zip.generateAsync({ type: 'blob', compression: 'STORE' }), folder + '.zip');
+      saveBlob(await zip.generateAsync({ type: 'blob', compression: 'STORE' }), zipName + '.zip');
     }
   } catch (_) {
     alert('Tải không thành công');
@@ -921,6 +973,12 @@ async function downloadFamily(btn) {
     icon.className = 'ri-download-cloud-2-line';
     delete btn.dataset.busy;
   }
+}
+
+// Tải cả bộ font (family) thành 1 file zip
+function downloadFamily(btn) {
+  const folder = btn.dataset.folder;
+  return downloadZip(btn, allFonts.filter((f) => familyKey(f) === folder), folder);
 }
 
 // ---- Sự kiện ----
@@ -956,7 +1014,12 @@ function initFonts() {
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');
-    if (btn) { downloadFont(btn.dataset.file); return; }
+    if (btn) {
+      const g = demoGroups.get(btn.closest('.demo-card'));
+      if (g.fonts.length === 1) downloadFont(g.fonts[0].file); // 1 font: tải thẳng
+      else if (!btn.dataset.busy) downloadZip(btn, g.fonts, g.title.replace(/[\\/:*?"<>|]+/g, '_')); // nhiều font: gói zip
+      return;
+    }
     if (e.target.closest('.demo-panel')) return; // bấm trong panel: không đóng
     const card = e.target.closest('.demo-card');
     if (card) toggleDemo(card);

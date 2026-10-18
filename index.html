@@ -1,1 +1,161 @@
-dmdmdm meetjtttttt quáaaaaa
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<script>
+  try {
+    const t = localStorage.getItem('kd_theme');
+    if (t === 'dark' || t === 'light') {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+  } catch (e) {}
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kem Đoàn</title>
+<link rel="icon" href="img/kemdoan.jpg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="bottom-fade"></div>
+
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn" id="theme-toggle" aria-label="sáng/tối"><i class="ri-sun-line"></i></button>
+    <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger"><i class="ri-messenger-line"></i></a>
+    <a class="nav-btn" href="#" target="_blank" rel="noopener" aria-label="Home"><i class="ri-home-3-line"></i></a>
+    <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin">Zalo</a>
+    <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập"><i class="ri-user-line"></i></button>
+  </nav>
+
+  <div class="boot-loading" id="boot-loading">
+    <i class="ri-loader-4-line kd-spinner"></i>
+  </div>
+
+  <header class="login-logo" id="brand" hidden>
+    <img src="img/kemdoanwhite.png" alt="logo" class="brand-logo-img">
+    <div class="login-logo-text">
+      <div class="login-logo-name">KEM ĐOÀN</div>
+      <div class="login-logo-slogan">Font Việt hóa</div>
+    </div>
+  </header>
+
+  <div class="login-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
+    <div class="login-card">
+      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
+      <div class="login-title">Thành Viên</div>
+      <div class="login-input-wrap">
+        <i class="ri-user-line login-input-icon"></i>
+        <input type="email" id="login-email" placeholder="abcd@gmail.com" autocapitalize="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="login-input-wrap">
+        <i class="ri-lock-line login-input-icon"></i>
+        <input type="password" id="login-password" placeholder="Mật khẩu">
+      </div>
+      <div class="login-input-wrap" id="change-pass-extra" hidden>
+        <i class="ri-lock-line login-input-icon"></i>
+        <input type="password" id="new-password" placeholder="Mật khẩu mới">
+      </div>
+      <div class="login-btn-row">
+        <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
+        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+      </div>
+    </div>
+    <div id="login-error"></div>
+  </div>
+
+  <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
+    <div class="notice-card">
+      <div class="notice-title">Thông báo</div>
+      <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
+      <div class="notice-btn-row">
+        <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+        <a class="notice-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener"><i class="ri-user-line"></i> Đăng ký</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="content" id="content" hidden>
+    <div class="search-wrap">
+      <i class="ri-search-line search-icon"></i>
+      <input type="text" id="search" placeholder="Nhập tên font..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="clear-btn"><i class="ri-close-line"></i></button>
+    </div>
+
+    <div id="families" hidden></div>
+    <div id="demos" hidden></div>
+    <button type="button" id="demos-more" class="demos-more" hidden>Xem thêm <i class="ri-arrow-down-s-line"></i></button>
+    <div id="results"></div>
+    <div id="status"></div>
+  </main>
+
+  <template id="font-card-tpl">
+    <div class="font-card">
+      <div class="font-item">
+        <span class="font-name"></span>
+        <button type="button" class="download-btn" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
+      </div>
+      <div class="preview-panel">
+        <div class="preview-input-wrap">
+          <input type="text" class="preview-input" placeholder="Nhập chữ để xem..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button class="preview-clear-btn" aria-label="Xóa"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="preview-size-row">
+          <input type="range" class="preview-size-slider" min="1" max="100" step="1" aria-label="Cỡ chữ">
+          <span class="preview-size-value"></span>
+        </div>
+        <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
+        <div class="preview-text"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="demo-card-tpl">
+    <div class="demo-card">
+      <img class="demo-img" alt="" loading="lazy">
+      <div class="demo-foot">
+        <span class="demo-name"></span>
+        <button type="button" class="family-download demo-download" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-panel-row">
+          <input type="range" class="preview-size-slider" min="1" max="100" step="1" aria-label="Cỡ chữ">
+          <span class="preview-size-value"></span>
+          <div class="demo-align">
+             <button type="button" class="demo-align-btn" data-align="left" aria-label="Canh trái"><i class="ri-align-left"></i></button>
+             <button type="button" class="demo-align-btn" data-align="center" aria-label="Canh giữa"><i class="ri-align-center"></i></button>
+             <button type="button" class="demo-align-btn" data-align="right" aria-label="Canh phải"><i class="ri-align-right"></i></button>
+           
+          </div>
+        </div>
+        <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
+        <div class="demo-variants"></div>
+        <button type="button" class="preview-clear-btn demo-clear-btn" aria-label="Xóa" hidden><i class="ri-close-line"></i></button>
+      </div>
+    </div>
+  </template>
+
+  <!-- 1 dòng preview của 1 font trong card demo (bộ có nhiều font thì có nhiều dòng) -->
+  <template id="demo-variant-tpl">
+    <div class="demo-variant">
+      <div class="demo-variant-label"></div>
+      <div class="demo-text-wrap">
+        <div class="preview-text demo-preview-text" spellcheck="false" autocapitalize="off" autocorrect="off" data-placeholder="nhập nội dung..."></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="family-card-tpl">
+    <div class="family-card">
+      <div class="family-name"></div>
+      <div class="family-foot">
+        <span class="family-count"></span>
+        <a class="family-download" href="#" aria-label="Tải bộ font"><i class="ri-download-cloud-2-line"></i></a>
+      </div>
+    </div>
+  </template>
+
+<script src="script.js"></script>
+</body>
+</html>

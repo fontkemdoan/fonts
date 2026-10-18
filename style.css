@@ -327,25 +327,28 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   gap: 8px;
 }
 
-.download-btn {
+.download-btn,
+.family-download {
   border: none;
   padding: 0;
   cursor: pointer;
   flex-shrink: 0;
-  width: 33px;
-  height: 33px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--bg);
-  color: var(--text-black);
+  background: rgba(0,0,0, 0.2);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-size: 17px;
+  font-size: 16px;
+  font-weight: 400;
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.download-btn:active {
+.download-btn:active,
+.family-download:active {
   background: rgba(0,0,0, 0.2);
   color: var(--text);
 }
@@ -369,10 +372,20 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   justify-content: center;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+}
+
+.login-panel {
   background: url('img/bg.jpg') center / cover no-repeat;
 }
 
 .login-panel .login-card { margin-top: 50px; }
+
+.login-logo-slogan,
+.login-logo-name,
+.login-logo-text,
+.brand-logo-img {
+  z-index: 1000;
+}
 
 .login-logo {
   display: flex;
@@ -534,7 +547,13 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 #login-btn:active,
-#change-pass-btn:active {
+#change-pass-btn:active,
+.notice-btn:active,
+.download-btn:active,
+.family-download:active,
+.demo-align-btn:active,
+.demos-more:active,
+.nav-btn:active {
   transform: scale(0.92);
 }
 
@@ -571,6 +590,7 @@ transition: background-color 9999s ease-in-out 0s;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  background: rgba(0,0,0, 0.5);
 }
 
 .notice-title {
@@ -582,7 +602,6 @@ transition: background-color 9999s ease-in-out 0s;
   border-radius: 50px;
   background: var(--bg);
   border: 2px solid #fff;
-  box-shadow: var(--shadow-soft);
   color: var(--text-black);
   white-space: nowrap;
   font-size: 15px;
@@ -621,8 +640,6 @@ transition: background-color 9999s ease-in-out 0s;
   gap: 6px;
   transition: transform 0.15s ease;
 }
-
-.notice-btn:active { transform: scale(0.92); }
 
 .notice-btn i {
   font-size: 17px;
@@ -673,7 +690,6 @@ transition: background-color 9999s ease-in-out 0s;
 
 .nav-btn:active {
   color: #e87563;
-  transform: scale(0.9);
 }
 
 .nav-text {
@@ -740,33 +756,11 @@ font-weight: 600;
   align-items: center;
   justify-content: space-between;
   font-size: 17px;
-  
+  font-weight: 600;
 }
 
 .family-foot {
   border-top: 1px solid rgba(255,255,255,0.4);
-}
-
-.family-download {
-  height: 30px;
-  width: 30px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  font-size: 17px;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.family-download:hover {
-  background: rgba(0,0,0, 0.3);
-}
-
-.family-download:active {
-  transform: scale(0.94);
 }
 
 .family-download .dl-count {
@@ -794,8 +788,6 @@ font-weight: 600;
   transition: transform 0.15s ease;
 }
 
-.demos-more:active { transform: scale(0.96); }
-
 .demos-more i {
   font-size: 18px;
   line-height: 1;
@@ -811,7 +803,6 @@ font-weight: 600;
 }
 
 .demo-card {
-  
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -877,8 +868,6 @@ font-weight: 600;
 
 .demo-align-btn i { line-height: 1; }
 
-.demo-align-btn:active { transform: scale(0.9); }
-
 .demo-align-btn.active {
   background: var(--bg);
   color: var(--text-black);
@@ -891,11 +880,21 @@ font-weight: 600;
   flex-direction: column;
 }
 
+.demo-variant-label {
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Có nhãn (Regular/Bold...) thì chữ sát nhãn hơn */
+.demo-variant-label + .demo-text-wrap .demo-preview-text { margin-top: 4px; }
+
 .demo-clear-btn {
   position: static;
   align-self: flex-end;
   transform: none;
-  margin-top: 6px;
+  margin: 6px 0 0 auto;
   width: 33px;
   height: 33px;
 }
@@ -913,13 +912,6 @@ font-weight: 600;
 .demo-preview-text:empty::before {
   content: attr(data-placeholder);
   opacity: 0.6;
-}
-
-.demo-download {
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
 }
 
 .did-you-mean {
@@ -948,14 +940,10 @@ html[data-theme="dark"] body::before {
 }
 
 html[data-theme="dark"] .bottom-fade {
-  background: linear-gradient(to bottom, transparent 0%, #a2c7c0 70%);
+  background: linear-gradient(to bottom, transparent 0%, #a2c7c0 50%);
 }
 
 html[data-theme="dark"] .login-panel {
-  background: url('img/bgd.jpg') center / cover no-repeat;
-}
-
-html[data-theme="dark"] .notice-panel {
   background: url('img/bgd.jpg') center / cover no-repeat;
 }
 
@@ -964,7 +952,6 @@ html[data-theme="dark"] .font-item,
 html[data-theme="dark"] .preview-panel,
 html[data-theme="dark"] .font-card:has(.preview-panel.open),
 html[data-theme="dark"] .login-card,
-html[data-theme="dark"] .notice-card,
 html[data-theme="dark"] .family-card,
 html[data-theme="dark"] .demo-card,
 html[data-theme="dark"] .dym-chip {
@@ -977,10 +964,6 @@ html[data-theme="dark"] .family-foot {
 
 html[data-theme="dark"] .preview-input {
   background: rgba(255,255,255, 0.2);
-}
-
-html[data-theme="dark"] .notice-title {
-  box-shadow: var(--shadow-soft-dark);
 }
 
 html[data-theme="dark"] .login-icon {
