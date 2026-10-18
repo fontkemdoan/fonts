@@ -366,7 +366,7 @@ function initAuth() {
 
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt...';
-const DEFAULT_PREVIEW_SIZE = 40;
+const DEFAULT_PREVIEW_SIZE = 33;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem preview';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
@@ -585,6 +585,7 @@ const fontCardTpl = $('font-card-tpl');
 const familyCardTpl = $('family-card-tpl');
 const demosEl = $('demos');
 const demoCardTpl = $('demo-card-tpl');
+const demosMoreBtn = $('demos-more');
 
 const MAX_RESULTS = 50;
 let allFonts = [];
@@ -725,20 +726,34 @@ function buildFamilies() {
 }
 
 // ---- Card demo: font nào có ảnh trùng tên trong imgdemo/ (manifest có trường img) ----
+const DEMO_PAGE_SIZE = 24; // mỗi lần hiện 24 card, bấm "Xem tiếp font" để hiện thêm
+let demoList = [];         // toàn bộ font có ảnh demo
+let demoShown = 0;         // số font đã đưa ra màn hình
+
+function createDemoCard(f) {
+  const card = demoCardTpl.content.firstElementChild.cloneNode(true);
+  const img = card.querySelector('.demo-img');
+  img.alt = f.name;
+  img.addEventListener('error', () => { card.remove(); updateFamilies(); });
+  img.src = encodeURI(f.img);
+  card.querySelector('.demo-name').textContent = f.name;
+  card.querySelector('.demo-download').dataset.file = f.file;
+  demoOpeners.set(card, bindDemoPanel(card, f));
+  return card;
+}
+
+function showMoreDemos() {
+  const next = demoList.slice(demoShown, demoShown + DEMO_PAGE_SIZE);
+  next.forEach((f) => demosEl.appendChild(createDemoCard(f)));
+  demoShown += next.length;
+  updateFamilies();
+}
+
 function buildDemos() {
   demosEl.innerHTML = '';
-  allFonts.filter((f) => f.img).forEach((f) => {
-    const card = demoCardTpl.content.firstElementChild.cloneNode(true);
-    const img = card.querySelector('.demo-img');
-    img.alt = f.name;
-    img.addEventListener('error', () => { card.remove(); updateFamilies(); });
-    img.src = encodeURI(f.img);
-    card.querySelector('.demo-name').textContent = f.name;
-    card.querySelector('.demo-download').dataset.file = f.file;
-    demoOpeners.set(card, bindDemoPanel(card, f));
-    demosEl.appendChild(card);
-  });
-  updateFamilies();
+  demoList = allFonts.filter((f) => f.img);
+  demoShown = 0;
+  showMoreDemos();
 }
 
 // ---- Panel preview của card demo: gõ trực tiếp vào chữ preview, canh lề phải/trái/giữa ----
@@ -850,6 +865,7 @@ function updateFamilies() {
   const hide = document.activeElement === searchInput || searchInput.value.trim() !== '';
   familiesEl.hidden = hide || !familiesEl.children.length;
   demosEl.hidden = hide || !demosEl.children.length;
+  demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length; // hết font thì ẩn nút
 }
 
 // Tải 1 font (cần token); chưa đăng nhập -> hiện panel thông báo
@@ -935,6 +951,8 @@ function initFonts() {
     e.preventDefault();
     downloadFont(btn.dataset.file);
   });
+
+  demosMoreBtn.addEventListener('click', showMoreDemos);
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');

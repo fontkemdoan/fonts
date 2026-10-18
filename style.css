@@ -165,7 +165,7 @@ body::before {
 
 .font-item.expanded .font-name {
   font-weight: 800;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .font-name {
@@ -367,8 +367,8 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   background: url('img/bg.jpg') center / cover no-repeat;
 }
 
@@ -560,28 +560,40 @@ transition: background-color 9999s ease-in-out 0s;
   position: relative;
 }
 
+.notice-panel .notice-card { margin-top: 30px; }
+
 .notice-card {
+  position: relative;
   width: 100%;
   max-width: 480px;
   border-radius: 25px;
-  padding: 18px 24px 26px;
+  padding: 20px 24px 26px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
 .notice-title {
-  align-self: flex-start;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: var(--bg);
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-soft);
+  color: var(--text-black);
+  white-space: nowrap;
   font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
 }
 
 .notice-msg {
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 18px;
   line-height: 1.4;
 }
 
@@ -762,6 +774,33 @@ font-weight: 600;
   font-style: normal;
 }
 
+.demos-more {
+  width: 100%;
+  max-width: 480px;
+  margin: 20px auto 0;
+  padding: 14px 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-black);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s ease;
+}
+
+.demos-more:active { transform: scale(0.96); }
+
+.demos-more i {
+  font-size: 18px;
+  line-height: 1;
+}
+
 #demos {
   max-width: 480px;
   width: 100%;
@@ -789,8 +828,9 @@ font-weight: 600;
 .demo-name {
   min-width: 0;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 800;
   overflow-wrap: anywhere;
+  letter-spacing: 0.4px;
 }
 
  .demo-foot {
@@ -845,19 +885,25 @@ font-weight: 600;
 }
 
 /* Chữ preview gõ trực tiếp */
-.demo-text-wrap { position: relative; }
+.demo-text-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
 
+/* Nút xóa nằm dưới chữ, góc phải card, thẳng hàng với nút download */
 .demo-clear-btn {
-  right: 0;
-  top: 15px;
+  position: static;
+  align-self: flex-end;
   transform: none;
+  margin-top: 4px;
   width: 30px;
   height: 30px;
 }
 
+.demo-clear-btn i { font-size: 17px; }
+
 .demo-preview-text {
-  padding-left: 34px;
-  padding-right: 34px;
   outline: none;
   white-space: pre-wrap;
   cursor: text;
@@ -910,6 +956,10 @@ html[data-theme="dark"] .login-panel {
   background: url('img/bgd.jpg') center / cover no-repeat;
 }
 
+html[data-theme="dark"] .notice-panel {
+  background: url('img/bgd.jpg') center / cover no-repeat;
+}
+
 html[data-theme="dark"] #search,
 html[data-theme="dark"] .font-item,
 html[data-theme="dark"] .preview-panel,
@@ -928,6 +978,10 @@ html[data-theme="dark"] .family-foot {
 
 html[data-theme="dark"] .preview-input {
   background: rgba(255,255,255, 0.2);
+}
+
+html[data-theme="dark"] .notice-title {
+  box-shadow: var(--shadow-soft-dark);
 }
 
 html[data-theme="dark"] .login-icon {
