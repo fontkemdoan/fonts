@@ -366,7 +366,7 @@ function initAuth() {
 
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông Chữ\nTiếng Việt...';
-const DEFAULT_PREVIEW_SIZE = 30;
+const DEFAULT_PREVIEW_SIZE = 40;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem preview';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
