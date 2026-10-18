@@ -365,7 +365,7 @@ function initAuth() {
 }
 
 // ================= Xem trước font =================
-const DEFAULT_PREVIEW_TEXT = 'nhập nội dung...';
+const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 33;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem preview';
 
