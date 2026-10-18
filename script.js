@@ -367,7 +367,7 @@ function initAuth() {
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 33;
-const NEED_LOGIN_TEXT = 'Đăng nhập để xem preview';
+const NEED_LOGIN_TEXT = 'Đăng nhập \n để xem kiểu chữ';
 
 const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // panel đang chạy hiệu ứng xóa chữ
@@ -733,6 +733,27 @@ let demoList = [];         // toàn bộ card demo: [{ title, fonts: [font...] }
 let demoShown = 0;         // số card đã đưa ra màn hình
 const demoGroups = new WeakMap(); // card -> group
 
+// Thứ tự hiện trong card: Thin, Thin Italic, ExtraLight, ..., Regular, Italic, Medium, ..., Black, Black Italic
+const WEIGHT_ORDER = [
+  ['hairline', 'thin'],
+  ['extralight', 'ultralight'],
+  ['light'],
+  ['', 'regular', 'normal', 'book'],
+  ['medium'],
+  ['semibold', 'demibold'],
+  ['bold'],
+  ['extrabold', 'ultrabold'],
+  ['black', 'heavy']
+];
+
+function styleRank(style) {
+  const s = String(style || '').toLowerCase().replace(/[\s_-]+/g, '');
+  const italic = /italic|oblique/.test(s);
+  const weight = s.replace(/italic|oblique/g, '');
+  const i = WEIGHT_ORDER.findIndex((names) => names.includes(weight));
+  return (i < 0 ? 99 : i) * 2 + (italic ? 1 : 0); // chưa nhận ra kiểu chữ -> xuống cuối, giữ thứ tự cũ
+}
+
 function buildDemoGroups() {
   const map = new Map();
   allFonts.filter((f) => f.img).forEach((f) => {
@@ -741,9 +762,8 @@ function buildDemoGroups() {
     map.get(key).fonts.push(f);
   });
 
-  const isRegular = (f) => !f.style || /^regular$/i.test(f.style);
   return [...map.values()].map((g) => {
-    g.fonts.sort((a, b) => isRegular(b) - isRegular(a)); // Regular lên đầu, còn lại giữ thứ tự cũ
+    g.fonts.sort((a, b) => styleRank(a.style) - styleRank(b.style)); // xếp theo độ đậm: Thin ... Black
     g.title = g.fonts.length > 1 ? (g.fonts[0].group || g.fonts[0].name) : g.fonts[0].name;
     return g;
   });
