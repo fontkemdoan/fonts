@@ -360,7 +360,7 @@ function initAuth() {
 
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
-const DEFAULT_PREVIEW_SIZE = 40;
+const DEFAULT_PREVIEW_SIZE = 33;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
 const NEED_LOGIN_SIZE = 25; // size riêng cho chữ "Đăng nhập để xem"
 
