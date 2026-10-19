@@ -15,6 +15,8 @@
 {"name": "KD Flourishing Script", "file": "KD/KD Flourishing Script.ttf"},
 {"name": "KD Forge Sans", "file": "KD/KD Forge Sans.ttf", "img": "imgdemo/kdforgesans.jpg", "group": "KD Forge Sans", "style": ""},
 {"name": "KD Goken Bold", "file": "KD/KD Goken Bold.ttf", "img": "imgdemo/kdgoken.jpg", "group": "KD Goken", "style": "Bold"},
+{"name": "KD Handscript", "file": "KD/KD Handscript.txt", "img": "imgdemo/kdhandscript.jpg", "group": "KD Handscript", "style": ""},
+{"name": "KD Handwritten", "file": "KD/KD Handwritten.txt", "img": "imgdemo/kdhandwritten.jpg", "group": "KD Handwritten", "style": ""},
 {"name": "KD Holy River", "file": "KD/KD Holy River.ttf", "img": "imgdemo/kdholyriver.jpg", "group": "KD Holy River", "style": ""},
 {"name": "KD HongKong Bold", "file": "KD/KD HongKong Bold.ttf", "img": "imgdemo/kdhongkong.jpg", "group": "KD HongKong", "style": "Bold"},
 {"name": "KD HongKong Medium", "file": "KD/KD HongKong Medium.ttf", "img": "imgdemo/kdhongkong.jpg", "group": "KD HongKong", "style": "Medium"},
