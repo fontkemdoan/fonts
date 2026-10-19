@@ -362,7 +362,7 @@ function initAuth() {
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 33;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
-const NEED_LOGIN_SIZE = 25; // size riêng cho chữ "Đăng nhập để xem"
+const NEED_LOGIN_SIZE = 22; // size riêng cho chữ "Đăng nhập để xem"
 
 const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
@@ -898,7 +898,7 @@ function onDemoDownload(g, btn) {
 // ---- Font free: chưa đăng nhập phải chờ 60s mới tải được, và chỉ chờ được 1 font tại một thời điểm ----
 // Chỉ đếm khi đang ở trang: chuyển tab / thu nhỏ / ra khỏi app thì tạm dừng. Tải lại trang (F5) thì hủy hẳn.
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác. Hoặc đăng ký tài khoản để tải không giới hạn`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký tài khoản để tải không giới hạn.`;
 
 let freeWait = null;   // { left: ms còn lại, key: khóa card đang chờ, last: lần cập nhật cuối (0 = đang tạm dừng) }
 let freeTimer = 0;

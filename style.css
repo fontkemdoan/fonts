@@ -501,9 +501,10 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .notice-msg {
+  white-space: pre-line;
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.3;
   font-weight: 600;
   color: var(--text-black);
