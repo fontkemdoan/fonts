@@ -673,7 +673,7 @@ function createDemoCard(g) {
   img.src = encodeURI(g.fonts[0].img);
   if (g.free) {
     const badge = document.createElement('span');
-    badge.className = 'demo-variant-label demo-free-badge'; // cùng kiểu nhãn Regular/Bold, đè lên góc trái ảnh
+    badge.className = 'demo-free-badge'; // nhãn đè lên góc trái ảnh, CSS riêng (.demo-free-badge)
     badge.textContent = 'Free';
     img.after(badge);
   }
@@ -918,50 +918,35 @@ function onDemoDownload(g, btn) {
 }
 
 // ---- Font free: chưa đăng nhập phải chờ 60s mới tải được, và chỉ chờ được 1 font tại một thời điểm ----
+// Chỉ đếm khi đang ở trang: chuyển tab / thu nhỏ / ra khỏi app thì tạm dừng. Tải lại trang (F5) thì hủy hẳn.
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_KEY = 'kd_free_wait'; // lưu {until, key} để tải lại trang vẫn đếm tiếp
 const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác. Hoặc đăng ký tài khoản để tải không giới hạn`;
 
-let freeWait = null;   // { until: thời điểm hết giờ (ms), key: khóa card đang chờ }
+let freeWait = null;   // { left: ms còn lại, key: khóa card đang chờ, last: lần cập nhật cuối (0 = đang tạm dừng) }
 let freeTimer = 0;
 
-function readFreeWait() {
-  try {
-    const w = JSON.parse(localStorage.getItem(FREE_WAIT_KEY));
-    if (w && w.until > Date.now()) return w;
-    localStorage.removeItem(FREE_WAIT_KEY); // đã hết giờ
-  } catch (e) {}
-  return null;
-}
-
-function writeFreeWait(w) {
-  try {
-    if (w) localStorage.setItem(FREE_WAIT_KEY, JSON.stringify(w));
-    else localStorage.removeItem(FREE_WAIT_KEY);
-  } catch (e) {}
-}
-
-// Hiện / bỏ số giây đếm ngược ngay trong icon download của card
-function setCountdown(card, left) {
+// Hiện / bỏ số giây đếm ngược (vd "45s") ngay trong icon download của card
+function setCountdown(card, sec) {
   const btn = card.querySelector('.demo-download');
   if (btn.dataset.busy) return;
   const icon = btn.querySelector('i');
-  if (left > 0) {
-    icon.className = 'dl-count';
-    icon.textContent = left;
-    btn.dataset.counting = '1';
-  } else if (btn.dataset.counting) {
+  if (sec === null) {
+    if (!btn.dataset.counting) return;
     icon.className = 'ri-download-cloud-2-line';
     icon.textContent = '';
     delete btn.dataset.counting;
+  } else {
+    icon.className = 'dl-count';
+    icon.textContent = sec + 's';
+    btn.dataset.counting = '1';
   }
 }
 
 function paintFreeWait() {
   if (!freeWait) return;
-  const left = Math.max(0, Math.ceil((freeWait.until - Date.now()) / 1000));
+  const sec = Math.max(0, Math.ceil(freeWait.left / 1000));
   demosEl.querySelectorAll('.demo-card').forEach((card) => {
-    if (demoGroups.get(card).key === freeWait.key) setCountdown(card, left);
+    if (demoGroups.get(card).key === freeWait.key) setCountdown(card, sec);
   });
 }
 
@@ -970,9 +955,8 @@ function stopFreeWait() {
   freeTimer = 0;
   const key = freeWait && freeWait.key;
   freeWait = null;
-  writeFreeWait(null);
   demosEl.querySelectorAll('.demo-card').forEach((card) => {
-    if (demoGroups.get(card).key === key) setCountdown(card, 0);
+    if (demoGroups.get(card).key === key) setCountdown(card, null);
   });
   return key;
 }
@@ -983,9 +967,15 @@ function cancelFreeWait() {
 
 function tickFreeWait() {
   if (!freeWait) return;
-  if (freeWait.until > Date.now()) { paintFreeWait(); return; }
 
-  // Hết giờ: tải font
+  const now = Date.now();
+  const visible = document.visibilityState === 'visible';
+  if (freeWait.last) freeWait.left -= now - freeWait.last; // chỉ cộng thời gian đã trôi khi đang ở trang
+  freeWait.last = visible ? now : 0;                        // ẩn trang: tạm dừng
+
+  if (freeWait.left > 0 || !visible) { paintFreeWait(); return; }
+
+  // Hết giờ (và đang ở trang): tải font
   const key = stopFreeWait();
   const g = demoAll.find((x) => x.key === key);
   if (!g) return;
@@ -998,21 +988,14 @@ function tickFreeWait() {
   startDownload(g, btn);
 }
 
-function runFreeWait() {
+function onFreeDownload(g, btn) {
+  if (isLoggedIn()) { startDownload(g, btn); return; } // đã đăng nhập: tải ngay, không phải chờ
+  if (freeWait) { openNotice(FREE_WAIT_MSG); return; }  // đang chờ 1 font free rồi
+
+  freeWait = { left: FREE_WAIT_SEC * 1000, key: g.key, last: Date.now() };
   clearInterval(freeTimer);
   freeTimer = setInterval(tickFreeWait, 250);
   paintFreeWait();
-}
-
-function onFreeDownload(g, btn) {
-  if (isLoggedIn()) { startDownload(g, btn); return; } // đã đăng nhập: tải ngay, không phải chờ
-
-  const w = readFreeWait() || freeWait;
-  if (w && w.until > Date.now()) { openNotice(FREE_WAIT_MSG); return; } // đang chờ 1 font free rồi
-
-  freeWait = { until: Date.now() + FREE_WAIT_SEC * 1000, key: g.key };
-  writeFreeWait(freeWait);
-  runFreeWait();
 }
 
 // ---- Sự kiện ----
@@ -1033,6 +1016,8 @@ function initFonts() {
     searchInput.value = chip.dataset.name;
     runSearch();
   });
+
+  document.addEventListener('visibilitychange', tickFreeWait); // ẩn/hiện trang: dừng/đếm tiếp ngay
 
   demosMoreBtn.addEventListener('click', showMoreDemos);
 
@@ -1055,8 +1040,6 @@ function initFonts() {
 // ================= Khởi động =================
 initTheme();
 initFonts();
-freeWait = readFreeWait();
-if (freeWait) runFreeWait();
 initAuth(); // xác thực xong sẽ tự gọi loadFonts()
 
 })();

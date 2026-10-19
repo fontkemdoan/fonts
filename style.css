@@ -798,8 +798,6 @@ font-weight: 600;
   font-weight: 600;
 }
 
-
-
 /* Có nhãn (Regular/Bold...) thì chữ sát nhãn hơn */
 .demo-variant-label + .demo-text-wrap .demo-preview-text {
   margin: 10px;
@@ -845,15 +843,21 @@ font-weight: 600;
   cursor: pointer;
 }
 
-/* Nhãn Free đè lên góc trái ảnh demo (kiểu chữ/nền lấy từ .demo-variant-label) */
+/* Nhãn Free đè lên góc trái ảnh demo - CSS riêng, không dùng chung với nhãn khác */
 .demo-card { position: relative; }
 
 .demo-free-badge {
   position: absolute;
-  top: 24px;
-  left: 24px;
-  margin: 0;
+  top: 14px;
+  left: 14px;
   z-index: 1;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-black);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 /* Dark */
