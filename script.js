@@ -12,6 +12,11 @@ const clearToken = () => localStorage.removeItem('kd_session_token');
 const downloadUrl = (file) =>
   '/api/download?file=' + encodeURIComponent(file) + '&token=' + encodeURIComponent(getToken());
 
+// Font free nằm công khai trong thư mục freefonts/ của site (không cần token)
+const freeUrl = (file) => 'freefonts/' + String(file).split('/').map(encodeURIComponent).join('/');
+const fontSrc = (f) => (f.free ? freeUrl(f.file) : downloadUrl(f.file));
+const fontKey = (f) => (f.free ? 'free:' : '') + f.file; // khóa riêng để font free không trùng font trả phí
+
 async function postJson(url, body) {
   const res = await fetch(url, {
     method: 'POST',
@@ -128,6 +133,7 @@ const isLoggedIn = () => !!getToken();
 
 // Đổi trạng thái đăng nhập -> đóng mọi preview đang mở để mở lại theo trạng thái mới
 function resetPreviews(clearCache) {
+  cancelFreeWait(); // đăng nhập/đăng xuất thì bỏ đếm ngược font free
   document.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
   if (clearCache) {
     loadedPreviewFonts.forEach((family) => {
@@ -163,8 +169,12 @@ function closeLogin() {
   if (changePassMode) exitChangePassMode();
 }
 
-function openNotice() {
+const noticeMsg = noticePanel.querySelector('.notice-msg');
+const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
+
+function openNotice(msg) {
   closeLogin();
+  noticeMsg.textContent = msg || NOTICE_DEFAULT_MSG;
   noticePanel.hidden = false;
 }
 
@@ -368,15 +378,15 @@ const DEFAULT_PREVIEW_TEXT = 'Phông Chữ Tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
 
-const loadedPreviewFonts = new Map(); // font.file -> tên font-family đã đăng ký
+const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
 let fontSeq = 0;
 
 // Tải font (cần token) và đăng ký vào document.fonts; trả về tên font-family. Có cache.
 async function ensurePreviewFont(font) {
-  if (loadedPreviewFonts.has(font.file)) return loadedPreviewFonts.get(font.file);
+  if (loadedPreviewFonts.has(fontKey(font))) return loadedPreviewFonts.get(fontKey(font));
 
-  const res = await fetch(downloadUrl(font.file));
+  const res = await fetch(fontSrc(font));
   if (!res.ok) throw new Error('fetch failed');
 
   const objectUrl = URL.createObjectURL(await res.blob());
@@ -386,7 +396,7 @@ async function ensurePreviewFont(font) {
   await fontFace.load();
   document.fonts.add(fontFace);
 
-  loadedPreviewFonts.set(font.file, familyName);
+  loadedPreviewFonts.set(fontKey(font), familyName);
   return familyName;
 }
 
@@ -489,6 +499,8 @@ const demoVariantTpl = $('demo-variant-tpl');
 let allFonts = [];
 
 const familyKey = (f) => String(f.file).split('/')[0];
+// Thư mục "chứa" font: font free và font trả phí không bao giờ gom chung 1 card
+const groupDir = (f) => (f.free ? '@free/' + String(f.file).split('/').slice(0, -1).join('/') : familyKey(f));
 
 // ---- Tải danh sách font ----
 async function loadFonts() {
@@ -591,7 +603,7 @@ function runSearch() {
 // ---- Danh sách bộ font (hiện khi chưa tìm kiếm) ----
 function buildFamilies() {
   const counts = new Map();
-  allFonts.forEach((f) => {
+  allFonts.filter((f) => !f.free).forEach((f) => {
     const k = familyKey(f);
     counts.set(k, (counts.get(k) || 0) + 1);
   });
@@ -640,8 +652,8 @@ function styleRank(style) {
 function buildDemoGroups() {
   const map = new Map();
   allFonts.filter((f) => f.img).forEach((f) => {
-    const key = f.img + '|' + familyKey(f);
-    if (!map.has(key)) map.set(key, { fonts: [] });
+    const key = f.img + '|' + groupDir(f);
+    if (!map.has(key)) map.set(key, { key, free: !!f.free, fonts: [] });
     map.get(key).fonts.push(f);
   });
 
@@ -659,6 +671,12 @@ function createDemoCard(g) {
   img.alt = g.title;
   img.addEventListener('error', () => { card.remove(); updateView(); });
   img.src = encodeURI(g.fonts[0].img);
+  if (g.free) {
+    const badge = document.createElement('span');
+    badge.className = 'demo-variant-label demo-free-badge'; // cùng kiểu nhãn Regular/Bold, đè lên góc trái ảnh
+    badge.textContent = 'Free';
+    img.after(badge);
+  }
   card.querySelector('.demo-name').textContent = g.title;
   demoGroups.set(card, g);
   demoOpeners.set(card, bindDemoPanel(card, g));
@@ -669,6 +687,7 @@ function showMoreDemos() {
   const next = demoList.slice(demoShown, demoShown + DEMO_PAGE_SIZE);
   next.forEach((g) => demosEl.appendChild(createDemoCard(g)));
   demoShown += next.length;
+  paintFreeWait(); // card vừa dựng ra có thể đang đếm ngược font free
   updateView();
 }
 
@@ -783,16 +802,10 @@ function bindDemoPanel(card, group) {
   };
 
   return async () => {
-    if (!isLoggedIn()) {
-      variants.forEach(showLocked);
-      loadingEl.hidden = true;
-      clearBtn.hidden = true;
-      return;
-    }
-
     const pending = [];
     variants.forEach((v) => {
-      if (loadedPreviewFonts.has(v.font.file)) showFont(v, loadedPreviewFonts.get(v.font.file));
+      if (!isLoggedIn() && !v.font.free) showLocked(v); // font trả phí: phải đăng nhập mới xem
+      else if (loadedPreviewFonts.has(fontKey(v.font))) showFont(v, loadedPreviewFonts.get(fontKey(v.font)));
       else pending.push(v);
     });
 
@@ -833,11 +846,11 @@ function updateView() {
   demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length; // hết font thì ẩn nút
 }
 
-// Tải 1 font (cần token); chưa đăng nhập -> hiện panel thông báo
-function downloadFont(file) {
-  if (!isLoggedIn()) { openNotice(); return; }
+// Tải 1 font; font trả phí cần đăng nhập, chưa đăng nhập -> hiện panel thông báo
+function downloadFont(font) {
+  if (!font.free && !isLoggedIn()) { openNotice(); return; }
   const a = document.createElement('a');
-  a.href = downloadUrl(file);
+  a.href = fontSrc(font);
   a.download = '';
   document.body.appendChild(a);
   a.click();
@@ -846,8 +859,6 @@ function downloadFont(file) {
 
 // Tải nhiều font thành 1 file zip (dùng cho cả bộ family và card demo nhiều font)
 async function downloadZip(btn, files, zipName) {
-  if (!isLoggedIn()) { openNotice(); return; }
-
   const icon = btn.querySelector('i');
 
   btn.dataset.busy = '1';
@@ -863,7 +874,7 @@ async function downloadZip(btn, files, zipName) {
       while (i < files.length) {
         const f = files[i++];
         try {
-          const res = await fetch(downloadUrl(f.file));
+          const res = await fetch(fontSrc(f));
           if (!res.ok) continue;
           zip.file(f.file.split('/').pop(), await res.blob());
           icon.textContent = ++ok;
@@ -888,8 +899,120 @@ async function downloadZip(btn, files, zipName) {
 
 // Tải cả bộ font (family) thành 1 file zip
 function downloadFamily(btn) {
+  if (!isLoggedIn()) { openNotice(); return; }
   const folder = btn.dataset.folder;
-  return downloadZip(btn, allFonts.filter((f) => familyKey(f) === folder), folder);
+  return downloadZip(btn, allFonts.filter((f) => !f.free && familyKey(f) === folder), folder);
+}
+
+// ---- Tải font ở card demo ----
+function startDownload(g, btn) {
+  if (g.fonts.length === 1) { downloadFont(g.fonts[0]); return; } // 1 font: tải thẳng
+  if (btn.dataset.busy) return;
+  downloadZip(btn, g.fonts, g.title.replace(/[\\/:*?"<>|]+/g, '_')); // nhiều font: gói zip
+}
+
+function onDemoDownload(g, btn) {
+  if (g.free) { onFreeDownload(g, btn); return; }
+  if (!isLoggedIn()) { openNotice(); return; }
+  startDownload(g, btn);
+}
+
+// ---- Font free: chưa đăng nhập phải chờ 60s mới tải được, và chỉ chờ được 1 font tại một thời điểm ----
+const FREE_WAIT_SEC = 60;
+const FREE_WAIT_KEY = 'kd_free_wait'; // lưu {until, key} để tải lại trang vẫn đếm tiếp
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác. Hoặc đăng ký tài khoản để tải không giới hạn`;
+
+let freeWait = null;   // { until: thời điểm hết giờ (ms), key: khóa card đang chờ }
+let freeTimer = 0;
+
+function readFreeWait() {
+  try {
+    const w = JSON.parse(localStorage.getItem(FREE_WAIT_KEY));
+    if (w && w.until > Date.now()) return w;
+    localStorage.removeItem(FREE_WAIT_KEY); // đã hết giờ
+  } catch (e) {}
+  return null;
+}
+
+function writeFreeWait(w) {
+  try {
+    if (w) localStorage.setItem(FREE_WAIT_KEY, JSON.stringify(w));
+    else localStorage.removeItem(FREE_WAIT_KEY);
+  } catch (e) {}
+}
+
+// Hiện / bỏ số giây đếm ngược ngay trong icon download của card
+function setCountdown(card, left) {
+  const btn = card.querySelector('.demo-download');
+  if (btn.dataset.busy) return;
+  const icon = btn.querySelector('i');
+  if (left > 0) {
+    icon.className = 'dl-count';
+    icon.textContent = left;
+    btn.dataset.counting = '1';
+  } else if (btn.dataset.counting) {
+    icon.className = 'ri-download-cloud-2-line';
+    icon.textContent = '';
+    delete btn.dataset.counting;
+  }
+}
+
+function paintFreeWait() {
+  if (!freeWait) return;
+  const left = Math.max(0, Math.ceil((freeWait.until - Date.now()) / 1000));
+  demosEl.querySelectorAll('.demo-card').forEach((card) => {
+    if (demoGroups.get(card).key === freeWait.key) setCountdown(card, left);
+  });
+}
+
+function stopFreeWait() {
+  clearInterval(freeTimer);
+  freeTimer = 0;
+  const key = freeWait && freeWait.key;
+  freeWait = null;
+  writeFreeWait(null);
+  demosEl.querySelectorAll('.demo-card').forEach((card) => {
+    if (demoGroups.get(card).key === key) setCountdown(card, 0);
+  });
+  return key;
+}
+
+function cancelFreeWait() {
+  if (freeWait) stopFreeWait();
+}
+
+function tickFreeWait() {
+  if (!freeWait) return;
+  if (freeWait.until > Date.now()) { paintFreeWait(); return; }
+
+  // Hết giờ: tải font
+  const key = stopFreeWait();
+  const g = demoAll.find((x) => x.key === key);
+  if (!g) return;
+  const card = [...demosEl.children].find((c) => demoGroups.get(c) === g);
+  let btn = card && card.querySelector('.demo-download');
+  if (!btn) { // card không còn trên màn hình (vd đang tìm kiếm font khác): dùng nút tạm để chạy tải zip
+    btn = document.createElement('button');
+    btn.innerHTML = '<i></i>';
+  }
+  startDownload(g, btn);
+}
+
+function runFreeWait() {
+  clearInterval(freeTimer);
+  freeTimer = setInterval(tickFreeWait, 250);
+  paintFreeWait();
+}
+
+function onFreeDownload(g, btn) {
+  if (isLoggedIn()) { startDownload(g, btn); return; } // đã đăng nhập: tải ngay, không phải chờ
+
+  const w = readFreeWait() || freeWait;
+  if (w && w.until > Date.now()) { openNotice(FREE_WAIT_MSG); return; } // đang chờ 1 font free rồi
+
+  freeWait = { until: Date.now() + FREE_WAIT_SEC * 1000, key: g.key };
+  writeFreeWait(freeWait);
+  runFreeWait();
 }
 
 // ---- Sự kiện ----
@@ -915,12 +1038,7 @@ function initFonts() {
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');
-    if (btn) {
-      const g = demoGroups.get(btn.closest('.demo-card'));
-      if (g.fonts.length === 1) downloadFont(g.fonts[0].file); // 1 font: tải thẳng
-      else if (!btn.dataset.busy) downloadZip(btn, g.fonts, g.title.replace(/[\\/:*?"<>|]+/g, '_')); // nhiều font: gói zip
-      return;
-    }
+    if (btn) { onDemoDownload(demoGroups.get(btn.closest('.demo-card')), btn); return; }
     if (e.target.closest('.demo-panel')) return; // bấm trong panel: không đóng
     const card = e.target.closest('.demo-card');
     if (card) toggleDemo(card);
@@ -937,6 +1055,8 @@ function initFonts() {
 // ================= Khởi động =================
 initTheme();
 initFonts();
+freeWait = readFreeWait();
+if (freeWait) runFreeWait();
 initAuth(); // xác thực xong sẽ tự gọi loadFonts()
 
 })();
