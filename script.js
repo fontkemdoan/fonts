@@ -76,25 +76,6 @@ function loadJSZip() {
   return jszipPromise;
 }
 
-// ================= Giao diện sáng/tối =================
-function initTheme() {
-  const root = document.documentElement;
-  const btn = document.getElementById('theme-toggle');
-  const icon = btn.querySelector('i');
-
-  const sync = () => {
-    icon.className = root.getAttribute('data-theme') === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
-  };
-  sync();
-
-  btn.addEventListener('click', () => {
-    const theme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', theme);
-    try { localStorage.setItem('kd_theme', theme); } catch (e) {}
-    sync();
-  });
-}
-
 // ================= Đăng nhập / đổi mật khẩu =================
 const loginPanel = $('login-panel');
 const brand = $('brand');
@@ -159,6 +140,8 @@ function showApp() {
 
 function openLogin() {
   closeNotice();
+  closeMenu();
+  closeFinder();
   loginPanel.hidden = false;
 }
 
@@ -174,6 +157,8 @@ const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
 
 function openNotice(msg) {
   closeLogin();
+  closeMenu();
+  closeFinder();
   noticeMsg.textContent = msg || NOTICE_DEFAULT_MSG;
   noticePanel.hidden = false;
 }
@@ -374,9 +359,10 @@ function initAuth() {
 }
 
 // ================= Xem trước font =================
-const DEFAULT_PREVIEW_TEXT = 'Phông Tiếng Việt';
-const DEFAULT_PREVIEW_SIZE = 30;
+const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
+const DEFAULT_PREVIEW_SIZE = 40;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
+const NEED_LOGIN_SIZE = 25; // size riêng cho chữ "Đăng nhập để xem"
 
 const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
@@ -489,14 +475,28 @@ function suckTextIntoTrash(panel, textEl) {
 const searchInput = $('search');
 const clearBtn = $('clear-btn');
 const statusEl = $('status');
-const familiesEl = $('families');
-const familyCardTpl = $('family-card-tpl');
 const demosEl = $('demos');
 const demoCardTpl = $('demo-card-tpl');
 const demosMoreBtn = $('demos-more');
 const demoVariantTpl = $('demo-variant-tpl');
 
 let allFonts = [];
+let activeFilter = 'all'; // bộ lọc đang chọn ở menu: all | free | wed | hand
+
+// Tag của font trong manifest: chấp nhận "wed", "wed,hand", "wed hand" hoặc ["wed","hand"] (trường tag hoặc tags)
+const tagsOf = (f) => {
+  const t = f.tags ?? f.tag ?? [];
+  return (Array.isArray(t) ? t : String(t).split(/[\s,]+/)).map((s) => String(s).toLowerCase()).filter(Boolean);
+};
+const hasTag = (g, tag) => g.fonts.some((f) => tagsOf(f).includes(tag));
+
+const FILTERS = {
+  all: () => true,
+  free: (g) => g.free,
+  wed: (g) => hasTag(g, 'wed'),
+  hand: (g) => hasTag(g, 'hand')
+};
+const filteredGroups = () => demoAll.filter(FILTERS[activeFilter] || FILTERS.all);
 
 const familyKey = (f) => String(f.file).split('/')[0];
 // Thư mục "chứa" font: font free và font trả phí không bao giờ gom chung 1 card
@@ -509,7 +509,6 @@ async function loadFonts() {
     const res = await fetch('manifest.json');
     allFonts = await res.json();
     allFonts.forEach((f) => { f._key = foldText(f.name); });
-    buildFamilies();
     buildDemos();
   } catch (err) {
     statusEl.textContent = 'Lỗi server - ' + err;
@@ -550,11 +549,12 @@ function fuzzyScore(q, name) {
 
 function suggestFonts(raw, max = 2) {
   const q = foldText(raw);
-  if (q.length < 3 || !demoAll.length) return [];
+  const pool = filteredGroups();
+  if (q.length < 3 || !pool.length) return [];
   const maxDist = Math.max(1, Math.round(q.length / 3));
   const seen = new Set();
   const scored = [];
-  demoAll.flatMap((g) => g.fonts).forEach((f) => {
+  pool.flatMap((g) => g.fonts).forEach((f) => {
     if (seen.has(f.name)) return;
     seen.add(f.name);
     const d = fuzzyScore(q, f._key);
@@ -567,7 +567,7 @@ function suggestFonts(raw, max = 2) {
 // ---- Hiển thị kết quả ----
 function showNotFound() {
   statusEl.innerHTML =
-    '<b>KHÔNG TÌM THẤY FONT</b><br><br><i>Gợi ý: Chỉ cần nhập tên font<br>Ví dụ Kemdoan Regular → Kemdoan</i>';
+    '<b>KHÔNG TÌM THẤY FONT</b>';
 
   const sugg = suggestFonts(searchInput.value);
   if (!sugg.length) return;
@@ -589,33 +589,18 @@ function showNotFound() {
 // Tìm kiếm: lọc card demo theo tên bộ / tên từng font trong bộ
 function runSearch() {
   const q = foldText(searchInput.value);
-  demoList = q ? demoAll.filter((g) => g.keys.some((k) => k.includes(q))) : demoAll;
+  const base = filteredGroups(); // lọc theo menu (Tất cả / Free / Cưới / Viết tay) rồi mới tìm theo tên
+  demoList = q ? base.filter((g) => g.keys.some((k) => k.includes(q))) : base;
 
   // Kết quả không đổi (vd gõ thêm chữ mà vẫn ra đúng các card cũ) thì giữ nguyên, khỏi dựng lại
   const same = demoRendered && demoRendered.length === demoList.length && demoRendered.every((g, i) => g === demoList[i]);
   if (!same) renderDemos();
 
   statusEl.textContent = '';
-  if (q && !demoList.length) showNotFound();
-  updateView();
-}
-
-// ---- Danh sách bộ font (hiện khi chưa tìm kiếm) ----
-function buildFamilies() {
-  const counts = new Map();
-  allFonts.filter((f) => !f.free).forEach((f) => {
-    const k = familyKey(f);
-    counts.set(k, (counts.get(k) || 0) + 1);
-  });
-
-  familiesEl.innerHTML = '';
-  [...counts].sort(([a], [b]) => a.localeCompare(b)).forEach(([name, count]) => {
-    const card = familyCardTpl.content.firstElementChild.cloneNode(true);
-    card.querySelector('.family-name').textContent = name;
-    card.querySelector('.family-count').textContent = count + ' Font';
-    card.querySelector('.family-download').dataset.folder = name;
-    familiesEl.appendChild(card);
-  });
+  if (!demoList.length) {
+    if (q) showNotFound();
+    else if (activeFilter !== 'all') statusEl.innerHTML = '<b>CHƯA CÓ FONT TRONG MỤC NÀY</b>';
+  }
   updateView();
 }
 
@@ -741,7 +726,7 @@ function bindDemoPanel(card, group) {
 
   const applySize = () => {
     const v = Number(slider.value);
-    variants.forEach((x) => { x.textEl.style.fontSize = v + 'px'; });
+    variants.forEach((x) => { x.textEl.style.fontSize = (x.locked ? NEED_LOGIN_SIZE : v) + 'px'; });
     sizeValue.textContent = v + 'px';
     slider.style.setProperty('--pct', (v - 1) / 99);
   };
@@ -790,12 +775,14 @@ function bindDemoPanel(card, group) {
 
   const showFont = (v, family) => {
     v.locked = false;
+    v.textEl.style.fontSize = Number(slider.value) + 'px';
     v.textEl.style.fontFamily = `"${family}", sans-serif`;
     v.textEl.textContent = savedText;
     v.textEl.setAttribute('contenteditable', EDITABLE_MODE);
   };
   const showLocked = (v) => {
     v.locked = true;
+    v.textEl.style.fontSize = NEED_LOGIN_SIZE + 'px';
     v.textEl.style.fontFamily = '';
     v.textEl.textContent = NEED_LOGIN_TEXT;
     v.textEl.setAttribute('contenteditable', 'false');
@@ -838,10 +825,8 @@ function toggleDemo(card) {
   demoOpeners.get(card)();
 }
 
-// Đang tìm kiếm thì ẩn các bộ font (family); card demo luôn hiện (đã được lọc theo ô tìm kiếm)
+// Card demo luôn hiện (đã được lọc theo ô tìm kiếm)
 function updateView() {
-  const searching = document.activeElement === searchInput || searchInput.value.trim() !== '';
-  familiesEl.hidden = searching || !familiesEl.children.length;
   demosEl.hidden = !demosEl.children.length;
   demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length; // hết font thì ẩn nút
 }
@@ -857,7 +842,7 @@ function downloadFont(font) {
   a.remove();
 }
 
-// Tải nhiều font thành 1 file zip (dùng cho cả bộ family và card demo nhiều font)
+// Tải nhiều font thành 1 file zip (dùng cho card demo nhiều font)
 async function downloadZip(btn, files, zipName) {
   const icon = btn.querySelector('i');
 
@@ -895,13 +880,6 @@ async function downloadZip(btn, files, zipName) {
     icon.className = 'ri-download-cloud-2-line';
     delete btn.dataset.busy;
   }
-}
-
-// Tải cả bộ font (family) thành 1 file zip
-function downloadFamily(btn) {
-  if (!isLoggedIn()) { openNotice(); return; }
-  const folder = btn.dataset.folder;
-  return downloadZip(btn, allFonts.filter((f) => !f.free && familyKey(f) === folder), folder);
 }
 
 // ---- Tải font ở card demo ----
@@ -998,6 +976,84 @@ function onFreeDownload(g, btn) {
   paintFreeWait();
 }
 
+// ================= Menu (bottom-nav) & popup KD Font Finder =================
+const menuBtn = $('menu-btn');
+const menuIcon = menuBtn.querySelector('i');
+const menuPanel = $('menu-panel');
+const menuBackdrop = $('menu-backdrop');
+const finderPanel = $('finder-panel');
+const finderVideo = $('finder-video');
+
+const isMenuOpen = () => menuPanel.classList.contains('open');
+
+function openMenu() {
+  closeLogin();
+  closeNotice();
+  closeFinder();
+  menuPanel.classList.add('open');
+  menuBackdrop.classList.add('open');
+  menuBtn.setAttribute('aria-expanded', 'true');
+  menuIcon.className = 'ri-close-line';
+}
+
+function closeMenu() {
+  if (!isMenuOpen()) return;
+  menuPanel.classList.remove('open');
+  menuBackdrop.classList.remove('open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  menuIcon.className = 'ri-menu-2-line';
+}
+
+function openFinder() {
+  closeMenu();
+  closeLogin();
+  closeNotice();
+  finderPanel.hidden = false;
+}
+
+function closeFinder() {
+  finderPanel.hidden = true;
+  finderVideo.pause(); // đóng popup thì dừng video
+}
+
+// Chọn mục lọc: Tất cả / Free / Cưới / Viết tay
+function setFilter(name) {
+  if (!FILTERS[name]) return;
+  activeFilter = name;
+  menuPanel.querySelectorAll('[data-filter]').forEach((b) => {
+    const on = b.dataset.filter === name;
+    b.classList.toggle('active', on);
+    if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  });
+  if (allFonts.length) runSearch(); // chưa tải xong manifest thì buildDemos() sẽ tự lọc theo mục đang chọn
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+}
+
+function initMenu() {
+  menuBtn.addEventListener('click', () => { if (isMenuOpen()) closeMenu(); else openMenu(); });
+
+  menuPanel.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (!item) return;
+    if (item.dataset.action === 'finder') { openFinder(); return; }
+    setFilter(item.dataset.filter);
+    closeMenu();
+  });
+
+  // Bấm ra ngoài menu thì đóng
+  document.addEventListener('click', (e) => {
+    if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
+  });
+
+  finderPanel.addEventListener('click', (e) => { if (e.target === finderPanel) closeFinder(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    closeMenu();
+    closeFinder();
+  });
+}
+
 // ---- Sự kiện ----
 function initFonts() {
   searchInput.addEventListener('input', runSearch);
@@ -1028,18 +1084,10 @@ function initFonts() {
     const card = e.target.closest('.demo-card');
     if (card) toggleDemo(card);
   });
-
-  familiesEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('.family-download');
-    if (!btn) return;
-    e.preventDefault();
-    if (!btn.dataset.busy) downloadFamily(btn);
-  });
 }
 
 // ================= Khởi động =================
-initTheme();
 initFonts();
+initMenu();
 initAuth(); // xác thực xong sẽ tự gọi loadFonts()
-
 })();
