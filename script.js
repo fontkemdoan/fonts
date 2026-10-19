@@ -360,7 +360,7 @@ function initAuth() {
 
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
-const DEFAULT_PREVIEW_SIZE = 33;
+const DEFAULT_PREVIEW_SIZE = 30;
 const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
 const NEED_LOGIN_SIZE = 22; // size riêng cho chữ "Đăng nhập để xem"
 
@@ -549,7 +549,7 @@ function fuzzyScore(q, name) {
 
 function suggestFonts(raw, max = 2) {
   const q = foldText(raw);
-  const pool = filteredGroups();
+  const pool = demoAll; // gợi ý trên toàn bộ font, không phụ thuộc mục đang chọn
   if (q.length < 3 || !pool.length) return [];
   const maxDist = Math.max(1, Math.round(q.length / 3));
   const seen = new Set();
@@ -589,8 +589,8 @@ function showNotFound() {
 // Tìm kiếm: lọc card demo theo tên bộ / tên từng font trong bộ
 function runSearch() {
   const q = foldText(searchInput.value);
-  const base = filteredGroups(); // lọc theo menu (Tất cả / Free / Cưới / Viết tay) rồi mới tìm theo tên
-  demoList = q ? base.filter((g) => g.keys.some((k) => k.includes(q))) : base;
+  // Có từ khóa: tìm trên TẤT CẢ font, bất kể đang ở mục nào. Ô tìm kiếm trống: hiện theo mục đang chọn.
+  demoList = q ? demoAll.filter((g) => g.keys.some((k) => k.includes(q))) : filteredGroups();
 
   // Kết quả không đổi (vd gõ thêm chữ mà vẫn ra đúng các card cũ) thì giữ nguyên, khỏi dựng lại
   const same = demoRendered && demoRendered.length === demoList.length && demoRendered.every((g, i) => g === demoList[i]);
@@ -1025,6 +1025,7 @@ function setFilter(name) {
     b.classList.toggle('active', on);
     if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
   });
+  searchInput.value = ''; // chọn mục thì xóa chữ đang tìm, để hiện đúng danh sách của mục
   if (allFonts.length) runSearch(); // chưa tải xong manifest thì buildDemos() sẽ tự lọc theo mục đang chọn
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
