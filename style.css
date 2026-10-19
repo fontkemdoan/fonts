@@ -16,7 +16,6 @@
 #search,
 .login-card,
 .notice-card,
-.family-card,
 .demo-card,
 .dym-chip {
   color: var(--text);
@@ -237,7 +236,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   gap: 8px;
 }
 
-.family-download {
+.demo-download {
   border: none;
   padding: 0;
   cursor: pointer;
@@ -256,7 +255,7 @@ background: linear-gradient(#fff, #fff) 0 0 / calc(10px + (100% - 20px) * var(--
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.family-download:active {
+.demo-download:active {
   background: rgba(0,0,0, 0.2);
   color: var(--text);
 }
@@ -457,7 +456,7 @@ transition: background-color 9999s ease-in-out 0s;
 #login-btn:active,
 #change-pass-btn:active,
 .notice-btn:active,
-.family-download:active,
+.demo-download:active,
 .demo-align-btn:active,
 .demos-more:active,
 .nav-btn:active {
@@ -592,7 +591,7 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .nav-btn i,
-.family-download i {
+.demo-download i {
   line-height: 1;
 }
 
@@ -628,37 +627,7 @@ font-weight: 600;
   line-height: 1;
 }
 
-#families {
-  max-width: 480px;
-  width: 100%;
-  margin: 25px auto 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.family-card {
-  border-radius: 16px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.family-name {
-  padding: 12px 8px;
-  text-align: center;
-  font-size: 25px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  overflow-wrap: anywhere;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.demo-foot,
-.family-foot {
+.demo-foot {
   padding: 10px 14px;
   display: flex;
   align-items: center;
@@ -667,11 +636,7 @@ font-weight: 600;
   font-weight: 600;
 }
 
-.family-foot {
-  border-top: 1px solid rgba(255,255,255,0.4);
-}
-
-.family-download .dl-count {
+.demo-download .dl-count {
   font-size: 13px;
   font-style: normal;
 }
@@ -879,17 +844,12 @@ html[data-theme="dark"] .login-panel {
 
 html[data-theme="dark"] #search,
 html[data-theme="dark"] .login-card,
-html[data-theme="dark"] .family-card,
 html[data-theme="dark"] .demo-card,
 html[data-theme="dark"] .dym-chip {
   background: rgba(0,0,0, 0.2);
 }
 
-html[data-theme="dark"] .family-foot {
-  border-top: 1px solid rgba(255,255,255,0.25);
-}
-
-html[data-theme="dark"] .login-icon {
+html[data-theme="dark"] html[data-theme="dark"] .login-icon {
   box-shadow: var(--shadow-soft-dark);
 }
 
