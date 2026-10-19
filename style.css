@@ -845,6 +845,17 @@ font-weight: 600;
   cursor: pointer;
 }
 
+/* Nhãn Free đè lên góc trái ảnh demo (kiểu chữ/nền lấy từ .demo-variant-label) */
+.demo-card { position: relative; }
+
+.demo-free-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  margin: 0;
+  z-index: 1;
+}
+
 /* Dark */
 html[data-theme="dark"] body {
   background-color: #a2c7c0;
