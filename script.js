@@ -192,7 +192,7 @@ async function verifyAndBoot() {
 function showLoginError(msg) {
   loginError.textContent = msg;
   clearTimeout(loginErrorTimer);
-  loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 2000);
+  loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
 }
 
 // ---- Đăng nhập ----
@@ -328,7 +328,7 @@ async function onGoogleCredential(resp) {
       resetPreviews(false);
       closeLogin();
     } else if (data.error === 'not_registered') {
-      showLoginError('Email này chưa đăng ký');
+      showLoginError('Email chưa được đăng ký');
     } else {
       showLoginError('Đăng nhập Google thất bại');
     }
