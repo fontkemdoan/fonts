@@ -4,6 +4,9 @@
 const OWNER = 'fontkemdoan';
 const REPO = 'fontsdata';
 
+// OAuth Client ID (công khai, không phải secret). Có thể ghi đè bằng env.GOOGLE_CLIENT_ID.
+export const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
+
 export function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
