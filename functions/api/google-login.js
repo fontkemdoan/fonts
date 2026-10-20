@@ -1,4 +1,4 @@
-import { json, contentsUrl, githubHeaders, normEmail, findUser, getPwver, GOOGLE_CLIENT_ID } from '../_lib.js';
+import { json, contentsUrl, githubHeaders, normEmail, findUser, createSession, GOOGLE_CLIENT_ID } from '../_lib.js';
 
 // Nhận ID token (credential) từ Google Identity Services, xác minh phía server,
 // rồi so email Google với emails.json. Trùng mới cấp session token.
@@ -51,9 +51,7 @@ export async function onRequestPost({ request, env }) {
   const match = findUser(list, email);
   if (!match) return json({ ok: false, error: 'not_registered' });
 
-  const pwver = await getPwver(env, email);
-  const token = crypto.randomUUID();
-  await env.KD_SESSIONS.put('session:' + token, JSON.stringify({ email, pwver }));
+  const token = await createSession(env, email);
 
   return json({ ok: true, avatar: match.avatar || null, name: match.name || null, token });
 }
