@@ -89,6 +89,7 @@ const loginBtn = $('login-btn');
 const changePassBtn = $('change-pass-btn');
 const authBtn = $('auth-btn');
 const authIcon = authBtn.querySelector('i');
+const authLabel = $('auth-label'); // chữ cạnh icon (chỉ hiện ở desktop)
 const noticePanel = $('notice-panel');
 const loginError = $('login-error');
 const loginIcon = $('login-icon');
@@ -128,6 +129,8 @@ function updateAuthUI() {
   const on = isLoggedIn();
   authIcon.className = on ? 'ri-logout-box-line' : 'ri-user-line';
   authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
+  authBtn.title = on ? 'Đăng xuất' : 'Đăng nhập';
+  authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
 }
 
 // ---- Chuyển màn hình ----
@@ -473,6 +476,7 @@ function suckTextIntoTrash(panel, textEl) {
 
 // ================= Danh sách bộ font, card demo, tìm kiếm, tải bộ font =================
 const searchInput = $('search');
+const searchWrap = searchInput.closest('.search-wrap');
 const clearBtn = $('clear-btn');
 const statusEl = $('status');
 const demosEl = $('demos');
@@ -589,6 +593,7 @@ function showNotFound() {
 // Tìm kiếm: lọc card demo theo tên bộ / tên từng font trong bộ
 function runSearch() {
   const q = foldText(searchInput.value);
+  searchWrap.classList.toggle('has-value', !!searchInput.value); // desktop nửa màn hình: chấm báo đang có chữ tìm
   // Có từ khóa: tìm trên TẤT CẢ font, bất kể đang ở mục nào. Ô tìm kiếm trống: hiện theo mục đang chọn.
   demoList = q ? demoAll.filter((g) => g.keys.some((k) => k.includes(q))) : filteredGroups();
 
@@ -1030,7 +1035,23 @@ function setFilter(name) {
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
 
+// Desktop (>= 768px): ô tìm kiếm nằm trong sidebar; mobile: nằm đầu danh sách như cũ
+const desktopMQ = window.matchMedia('(min-width: 768px)');
+const dockSearch = $('dock-search');
+
+function placeSearch() {
+  if (desktopMQ.matches) {
+    if (searchWrap.parentElement !== dockSearch) dockSearch.appendChild(searchWrap);
+  } else if (searchWrap.parentElement !== contentEl) {
+    contentEl.insertBefore(searchWrap, contentEl.firstChild);
+  }
+  closeMenu(); // đổi layout thì đóng menu popup của mobile
+}
+
 function initMenu() {
+  placeSearch();
+  desktopMQ.addEventListener('change', placeSearch);
+
   menuBtn.addEventListener('click', () => { if (isMenuOpen()) closeMenu(); else openMenu(); });
 
   menuPanel.addEventListener('click', (e) => {
