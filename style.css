@@ -10,7 +10,6 @@
   --bg: #f4f5f8;
   --text: #fff;
   --text-black: #555;
-  --bg: #f0f0f0;
   --card: #fff;
   --border: 1px solid #555;
   --shadow-soft: 0 4px 10px rgba(0,0,0, 0.1);
@@ -26,8 +25,8 @@
   color: var(--text-black);
   border: none;
   background: var(--card);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   box-shadow: var(--shadow-card);
 }
 
@@ -272,8 +271,9 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255, 0.2);
 }
 
 .login-panel .login-card { margin-top: 50px; }
@@ -598,8 +598,8 @@ font-weight: 600;
   inset: 0;
   z-index: 1000;
   background: rgba(244, 245, 248, 0.35);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
@@ -988,7 +988,7 @@ font-weight: 600;
 
 .demo-preview-text:empty::before {
   content: attr(data-placeholder);
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 .did-you-mean {
@@ -1292,4 +1292,32 @@ font-weight: 600;
 /* Màn hình thấp: thu nhỏ chiều cao mỗi dòng để sidebar vừa khít */
 @media (min-width: 768px) and (max-height: 700px) {
   :root { --row-h: 38px; }
+}
+
+/* ---- Đăng nhập bằng Google ---- */
+.login-or {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  font-size: 13px;
+  color: var(--text-black);
+  opacity: .7;
+}
+.login-or::before,
+.login-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: .35;
+}
+.login-or[hidden],
+.google-btn-wrap[hidden] { display: none; }
+.google-btn-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
 }

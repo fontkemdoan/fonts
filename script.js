@@ -146,6 +146,7 @@ function openLogin() {
   closeMenu();
   closeFinder();
   loginPanel.hidden = false;
+  renderGoogleBtn();
 }
 
 function closeLogin() {
@@ -308,6 +309,65 @@ async function previewAvatar(email) {
   }
 }
 
+// ---- Đăng nhập bằng Google ----
+const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
+const googleBtnEl = $('google-btn');
+const googleOrEl = $('google-or');
+let googleReady = false;
+
+async function onGoogleCredential(resp) {
+  if (!resp || !resp.credential) return;
+  loginError.textContent = '';
+  try {
+    const data = await postJson('/api/google-login', { credential: resp.credential });
+    if (data.ok) {
+      setToken(data.token);
+      loginEmail.value = '';
+      resetLoginIcon();
+      updateAuthUI();
+      resetPreviews(false);
+      closeLogin();
+    } else if (data.error === 'not_registered') {
+      showLoginError('Email này chưa đăng ký');
+    } else {
+      showLoginError('Đăng nhập Google thất bại');
+    }
+  } catch (e) {
+    showLoginError('Lỗi kết nối, hãy thử lại sau');
+  }
+}
+
+function initGoogle() {
+  if (googleReady || !(window.google && google.accounts && google.accounts.id)) return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: onGoogleCredential,
+    ux_mode: 'popup',
+    auto_select: false
+  });
+  googleReady = true;
+}
+
+let googleRenderedWidth = 0;
+function renderGoogleBtn() {
+  initGoogle();
+  const hide = !googleReady;
+  googleBtnEl.hidden = hide;
+  googleOrEl.hidden = hide;
+  if (hide) return;
+  const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 60) || 240));
+  if (w === googleRenderedWidth) return;
+  googleRenderedWidth = w;
+  googleBtnEl.innerHTML = '';
+  google.accounts.id.renderButton(googleBtnEl, {
+    type: 'standard', theme: 'outline', size: 'large',
+    text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
+  });
+}
+
+// Thư viện Google tải async: khi xong thì khởi tạo (nếu panel đang mở thì vẽ nút luôn)
+window.onGoogleLibraryLoad = () => { initGoogle(); if (!loginPanel.hidden) renderGoogleBtn(); };
+
 // ---- Khởi tạo ----
 function initAuth() {
   loginBtn.addEventListener('click', () => {
@@ -358,14 +418,15 @@ function initAuth() {
     closeNotice();
   });
 
+  initGoogle();
   verifyAndBoot();
 }
 
 // ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 30;
-const NEED_LOGIN_TEXT = 'Đăng nhập để xem';
-const NEED_LOGIN_SIZE = 22; // size riêng cho chữ "Đăng nhập để xem"
+const NEED_LOGIN_TEXT = 'Vui lòng đk vip để xem glyph';
+const NEED_LOGIN_SIZE = 22; // size riêng cho chữ "dành cho tk vip"
 
 const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
