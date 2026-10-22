@@ -1025,10 +1025,22 @@ font-weight: 600;
 
 .demo-preview-text {
   outline: none;
-  white-space: pre-wrap;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
   cursor: text;
   -webkit-user-select: text;
   user-select: text;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg) transparent;
+}
+
+.demo-preview-text::-webkit-scrollbar { height: 6px; }
+.demo-preview-text::-webkit-scrollbar-track { background: transparent; }
+.demo-preview-text::-webkit-scrollbar-thumb {
+  background: var(--bg);
+  border-radius: 999px;
 }
 
 .demo-preview-text:empty::before {
