@@ -884,15 +884,15 @@ font-weight: 600;
 
 .demos-more {
   width: 100%;
-  max-width: 400px;
-  margin: 30px auto 0;
+  max-width: 200px;
+  margin: 25px auto 0;
   padding: 14px 0;
   border: none;
   border-radius: 999px;
   background: var(--card);
   color: var(--text-black);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -911,10 +911,10 @@ font-weight: 600;
 #demos {
   max-width: 400px;
   width: 100%;
-  margin: 30px auto 0;
+  margin: 25px auto 0;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 25px;
 }
 
 .demo-card {
@@ -1254,7 +1254,7 @@ font-weight: 600;
     margin: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 30px;
+    gap: 25px;
     align-items: start; /* mở 1 card không kéo giãn các card cùng hàng */
   }
 
