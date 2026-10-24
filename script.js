@@ -1,3 +1,4 @@
+// @ts-nocheck
 (() => {
 'use strict';
 
@@ -435,7 +436,7 @@ function initAuth() {
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 40;
 const NEED_LOGIN_TEXT = 'Vui lòng đăng nhập để xem';
-const NEED_LOGIN_SIZE = 22; // size riêng cho chữ "dành cho tk vip"
+const NEED_LOGIN_SIZE = 20; // size riêng cho chữ "dành cho tk vip"
 
 const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
 const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
