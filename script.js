@@ -709,6 +709,12 @@ function styleRank(style) {
   return (i < 0 ? 99 : i) * 2 + (italic ? 1 : 0); // chưa nhận ra kiểu chữ -> xuống cuối, giữ thứ tự cũ
 }
 
+// Giá hiển thị trên nhãn: manifest ghi "price": 50000 -> "50.000đ"; ghi chuỗi ("50K", "Liên hệ") -> hiện nguyên chuỗi
+const priceLabel = (p) => {
+  if (p === undefined || p === null || p === '') return '';
+  return typeof p === 'number' ? p.toLocaleString('vi-VN') + 'đ' : String(p).trim();
+};
+
 function buildDemoGroups() {
   const map = new Map();
   allFonts.filter((f) => f.img).forEach((f) => {
@@ -719,6 +725,7 @@ function buildDemoGroups() {
 
   return [...map.values()].map((g) => {
     g.fonts.sort((a, b) => styleRank(a.style) - styleRank(b.style)); // xếp theo độ đậm: Thin ... Black
+    g.price = g.free ? '' : priceLabel(g.fonts.map((f) => f.price).find((p) => priceLabel(p))); // 1 card = 1 giá (lấy của font đầu tiên có ghi giá)
     g.title = g.fonts.length > 1 ? (g.fonts[0].group || g.fonts[0].name) : g.fonts[0].name;
     g.keys = [foldText(g.title), ...g.fonts.map((f) => f._key)]; // chuỗi dùng để tìm kiếm
     return g;
@@ -737,7 +744,14 @@ function createDemoCard(g) {
     badge.textContent = 'Free';
     img.after(badge);
   }
-  card.querySelector('.demo-name').textContent = g.title;
+  const nameEl = card.querySelector('.demo-name');
+  nameEl.textContent = g.title;
+  if (g.price) {
+    const price = document.createElement('span');
+    price.className = 'demo-price-badge'; // nhãn giá nằm ngay sau tên font, CSS riêng (.demo-price-badge)
+    price.textContent = g.price;
+    nameEl.after(price);
+  }
   demoGroups.set(card, g);
   demoOpeners.set(card, bindDemoPanel(card, g));
   return card;
