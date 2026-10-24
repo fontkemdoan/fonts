@@ -11,29 +11,32 @@
 </head>
 <body>
 
-  <div class="bottom-fade"></div>
-
   <div class="menu-backdrop" id="menu-backdrop"></div>
 
   <div class="dock" id="dock">
 
     <div class="dock-search" id="dock-search"></div>
 
-      <div class="menu-panel" id="menu-panel" aria-label="Danh mục font">
-      <button type="button" class="menu-item active" data-filter="all" title="Trang chủ" aria-current="true"><i class="ri-home-3-line"></i><span>Trang chủ</span></button>
-      <button type="button" class="menu-item" data-filter="free" title="Font free"><i class="ri-gift-line"></i><span>Font free</span></button>
-      <button type="button" class="menu-item" data-filter="wed" title="Font cưới"><i class="ri-heart-3-line"></i><span>Font cưới</span></button>
-      <button type="button" class="menu-item" data-filter="hand" title="Font viết tay"><i class="ri-pen-nib-line"></i><span>Font viết tay</span></button>
-      <button type="button" class="menu-item" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
-      <button type="button" class="menu-item" data-action="folder" title="10K font khác"> <i class="ri-folder-2-line"></i><span>10K font khác</span></button>
-    </div>
+    <button type="button" class="nav-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu-panel"><i class="ri-menu-2-line"></i></button>
 
-    <nav class="bottom-nav" id="bottom-nav">
-      <button type="button" class="nav-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu-panel"><i class="ri-menu-2-line"></i></button>
+    <div class="menu-panel" id="menu-panel" aria-label="Menu">
+      <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
+      <div class="menu-divider"><span>Ứng dụng</span></div>
+      <button type="button" class="menu-item" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
+      <button type="button" class="menu-item" data-action="folder" title="10K font khác"><i class="ri-folder-2-line"></i><span>10K font khác</span></button>
+      
+      <div class="menu-divider"><span>Liên hệ</span></div>
       <a class="nav-btn" href="https://www.m.me/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger" title="Messenger"><i class="ri-messenger-line"></i><span class="nav-label">Messenger</span></a>
       <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><i class="ri-facebook-fill"></i><span class="nav-label">Facebook</span></a>
       <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin" title="Zalo"><span class="nav-zalo-text">Zalo</span><i class="ri-chat-3-line nav-zalo-icon"></i><span class="nav-label">Zalo</span></a>
-      <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
+      
+    </div>
+
+    <nav class="bottom-nav" id="bottom-nav">
+      <button type="button" class="menu-item active" data-filter="all" title="Trang chủ" aria-current="true"><i class="ri-home-3-line"></i><span>Trang chủ</span></button>
+      <button type="button" class="menu-item" data-filter="free" title="Font free"><i class="ri-gift-line"></i><span>Font Free</span></button>
+      <button type="button" class="menu-item" data-filter="wed" title="Font cưới"><i class="ri-heart-3-line"></i><span>Font Cưới</span></button>
+      <button type="button" class="menu-item" data-filter="hand" title="Font viết tay"><i class="ri-pen-nib-line"></i><span>Font Viết tay</span></button>
     </nav>
 
     <div class="dock-footer">&copy;<span> Kem Đoàn</span></div>

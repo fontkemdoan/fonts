@@ -141,7 +141,15 @@ function showApp() {
   loadFonts();
 }
 
+// Click vừa mở panel thì không được đóng panel ngay (xem handler 'bấm bất cứ đâu' ở initMenu)
+let panelJustOpened = false;
+function markPanelOpened() {
+  panelJustOpened = true;
+  setTimeout(() => { panelJustOpened = false; }, 0);
+}
+
 function openLogin() {
+  markPanelOpened();
   closeNotice();
   closeMenu();
   closeFinder();
@@ -160,6 +168,7 @@ const noticeMsg = noticePanel.querySelector('.notice-msg');
 const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
 
 function openNotice(msg) {
+  markPanelOpened();
   closeLogin();
   closeMenu();
   closeFinder();
@@ -1071,6 +1080,7 @@ function closeMenu() {
 }
 
 function openFinder() {
+  markPanelOpened();
   closeMenu();
   closeLogin();
   closeNotice();
@@ -1086,7 +1096,7 @@ function closeFinder() {
 function setFilter(name) {
   if (!FILTERS[name]) return;
   activeFilter = name;
-  menuPanel.querySelectorAll('[data-filter]').forEach((b) => {
+  document.querySelectorAll('[data-filter]').forEach((b) => {
     const on = b.dataset.filter === name;
     b.classList.toggle('active', on);
     if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
@@ -1115,10 +1125,18 @@ function initMenu() {
 
   menuBtn.addEventListener('click', () => { if (isMenuOpen()) closeMenu(); else openMenu(); });
 
+  // Menu popup (góc trên trái): Messenger, Facebook, Zalo, Đăng nhập, KD Font Finder, 10K font khác
   menuPanel.addEventListener('click', (e) => {
-    const item = e.target.closest('.menu-item');
+    const item = e.target.closest('.menu-item, .nav-btn');
     if (!item) return;
     if (item.dataset.action === 'finder') { openFinder(); return; }
+    closeMenu();
+  });
+
+  // Thanh dưới (mobile): Trang chủ, Font free, Font cưới, Font viết tay
+  $('bottom-nav').addEventListener('click', (e) => {
+    const item = e.target.closest('[data-filter]');
+    if (!item) return;
     setFilter(item.dataset.filter);
     closeMenu();
   });
@@ -1129,6 +1147,22 @@ function initMenu() {
   });
 
   finderPanel.addEventListener('click', (e) => { if (e.target === finderPanel) closeFinder(); });
+
+  // Panel đăng nhập / thông báo / KD Font Finder đang mở: bấm bất cứ vùng nào
+  // ngoài thẻ (kể cả thanh dưới, nút menu, sidebar) đều đóng panel.
+  // Bấm trong thẻ thì giữ nguyên để còn nhập liệu, xem video, bấm nút.
+  document.addEventListener('click', (e) => {
+    if (panelJustOpened) return;
+    const path = e.composedPath();
+    [[loginPanel, '.login-card', closeLogin],
+     [noticePanel, '.notice-card', closeNotice],
+     [finderPanel, '.notice-card', closeFinder]].forEach(([panel, cardSel, close]) => {
+      if (panel.hidden) return;
+      const card = panel.querySelector(cardSel);
+      if (card && path.includes(card)) return;
+      close();
+    });
+  });
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
