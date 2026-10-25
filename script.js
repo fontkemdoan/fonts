@@ -132,6 +132,9 @@ function updateAuthUI() {
   authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
   authBtn.title = on ? 'Đăng xuất' : 'Đăng nhập';
   authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
+  const regBtn = $('register-btn');
+  if (regBtn) regBtn.hidden = on; // đã đăng nhập thì ẩn mục Đăng ký
+  if (on) closeRegister();
 }
 
 // ---- Chuyển màn hình ----
@@ -151,6 +154,7 @@ function markPanelOpened() {
 
 function openLogin() {
   markPanelOpened();
+  closeRegister();
   closeNotice();
   closeMenu();
   closeFinder();
@@ -170,6 +174,7 @@ const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
 
 function openNotice(msg) {
   markPanelOpened();
+  closeRegister();
   closeLogin();
   closeMenu();
   closeFinder();
@@ -1066,6 +1071,117 @@ function onFreeDownload(g, btn) {
   paintFreeWait();
 }
 
+// ================= Đăng ký tài khoản VIP (gửi về bot Telegram qua /api/register) =================
+const registerPanel = $('register-panel');
+const regEmail = $('reg-email');
+const regContact = $('reg-contact');
+const regPhoto = $('reg-photo');
+const regPhotoName = $('reg-photo-name');
+const regFileBox = regPhoto && regPhoto.closest('.reg-file');
+const regSubmit = $('register-submit');
+const regHint = $('register-hint');
+const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
+const REG_PHOTO_TEXT = regPhotoName ? regPhotoName.textContent : '';
+const REG_MAX_SIDE = 1600; // thu nhỏ ảnh chuyển khoản cho nhẹ khi gửi
+let regHintTimer = null;
+let regBusy = false;
+
+function showRegHint(msg, ms = 4000) {
+  regHint.textContent = msg;
+  clearTimeout(regHintTimer);
+  regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
+}
+
+function openRegister() {
+  if (!registerPanel) return;
+  markPanelOpened();
+  closeMenu();
+  closeLogin();
+  closeNotice();
+  closeFinder();
+  registerPanel.hidden = false;
+}
+
+function closeRegister() {
+  if (!registerPanel) return;
+  registerPanel.hidden = true;
+  regHint.textContent = '';
+}
+
+function resetRegisterForm() {
+  regEmail.value = '';
+  regContact.value = '';
+  regPhoto.value = '';
+  regPhotoName.textContent = REG_PHOTO_TEXT;
+  regFileBox.classList.remove('has-file');
+}
+
+// Thu nhỏ ảnh bằng canvas; lỗi thì dùng ảnh gốc
+async function shrinkImage(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, REG_MAX_SIDE / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.85));
+    return blob || file;
+  } catch (_) {
+    return file;
+  }
+}
+
+async function doRegister() {
+  if (regBusy) return;
+  const email = regEmail.value.trim().toLowerCase();
+  const contact = regContact.value.trim();
+  const photo = regPhoto.files[0];
+
+  if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ'); return; }
+  if (!contact) { showRegHint('Vui lòng nhập thông tin liên hệ'); return; }
+  if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản'); return; }
+  if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh'); return; }
+
+  regBusy = true;
+  regSubmit.disabled = true;
+  regSubmit.innerHTML = SPINNER;
+
+  try {
+    const img = await shrinkImage(photo);
+    const fd = new FormData();
+    fd.append('email', email);
+    fd.append('contact', contact);
+    fd.append('photo', img, 'chuyen-khoan.jpg');
+
+    const res = await fetch('/api/register', { method: 'POST', body: fd });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) {
+      resetRegisterForm();
+      showRegHint('Đăng ký tài khoản thành công, vui lòng đăng nhập sau 10 phút.', 8000);
+    } else {
+      showRegHint('Gửi đăng ký thất bại, hãy thử lại sau');
+    }
+  } catch (e) {
+    showRegHint('Lỗi kết nối, hãy thử lại sau');
+  } finally {
+    regBusy = false;
+    regSubmit.disabled = false;
+    regSubmit.innerHTML = REG_LABEL;
+  }
+}
+
+if (registerPanel && regPhoto && regSubmit) {
+  regPhoto.addEventListener('change', () => {
+    const f = regPhoto.files[0];
+    regPhotoName.textContent = f ? f.name : REG_PHOTO_TEXT;
+    regFileBox.classList.toggle('has-file', !!f);
+  });
+  regSubmit.addEventListener('click', doRegister);
+  registerPanel.addEventListener('click', (e) => { if (e.target === registerPanel) closeRegister(); });
+}
+
 // ================= Menu (bottom-nav) & popup KD Font Finder =================
 const menuBtn = $('menu-btn');
 const menuIcon = menuBtn.querySelector('i');
@@ -1078,6 +1194,7 @@ const isMenuOpen = () => menuPanel.classList.contains('open');
 
 function openMenu() {
   closeLogin();
+  closeRegister();
   closeNotice();
   closeFinder();
   menuPanel.classList.add('open');
@@ -1097,6 +1214,7 @@ function closeMenu() {
 function openFinder() {
   markPanelOpened();
   closeMenu();
+  closeRegister();
   closeLogin();
   closeNotice();
   finderPanel.hidden = false;
@@ -1145,6 +1263,7 @@ function initMenu() {
     const item = e.target.closest('.menu-item, .nav-btn');
     if (!item) return;
     if (item.dataset.action === 'finder') { openFinder(); return; }
+    if (item.dataset.action === 'register') { openRegister(); return; }
     closeMenu();
   });
 
@@ -1171,8 +1290,9 @@ function initMenu() {
     const path = e.composedPath();
     [[loginPanel, '.login-card', closeLogin],
      [noticePanel, '.notice-card', closeNotice],
-     [finderPanel, '.notice-card', closeFinder]].forEach(([panel, cardSel, close]) => {
-      if (panel.hidden) return;
+     [finderPanel, '.notice-card', closeFinder],
+     [registerPanel, '.register-card', closeRegister]].forEach(([panel, cardSel, close]) => {
+      if (!panel || panel.hidden) return;
       const card = panel.querySelector(cardSel);
       if (card && path.includes(card)) return;
       close();
@@ -1183,6 +1303,7 @@ function initMenu() {
     if (e.key !== 'Escape') return;
     closeMenu();
     closeFinder();
+    closeRegister();
   });
 }
 

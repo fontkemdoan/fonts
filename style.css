@@ -13,11 +13,10 @@
   --text-black: #555;
   --card: #fff;
   --border: 1px solid #999;
-  --shadow-soft: 0 4px 10px rgba(0,0,0, 0.1);
+  --shadow-soft: 0 4px 10px rgba(0,0,0, 0.2);
   --shadow-card: 0 6px 20px rgba(0,0,0, 0.1);
 }
 
-#search,
 .login-card,
 .notice-card,
 .demo-card,
@@ -87,6 +86,10 @@ textarea {
   font-size: 15px;
   border-radius: 999px;
   outline: none;
+  color: var(--text-black);
+  border: none;
+  background: var(--card);
+  
 }
 
 #search::placeholder {
@@ -504,12 +507,13 @@ transition: background-color 9999s ease-in-out 0s;
   transform: translateX(-50%);
   padding: 6px 16px;
   border-radius: 50px;
-  background: var(--bg);
+  background: var(--text-black);
   border: none;
-  color: var(--text-black);
+  color: var(--text);
   white-space: nowrap;
   font-size: 16px;
   letter-spacing: 0.3px;
+  box-shadow: var(--shadow-soft);
 }
 
 .notice-msg {
@@ -698,12 +702,6 @@ font-weight: 500;
   background: var(--text-black);
   color: var(--text);
 }
-
-
-
-
-
-
 
 @media (prefers-reduced-motion: reduce) {
   .menu-backdrop,
@@ -1506,4 +1504,207 @@ font-weight: 500;
 
   .menu-panel .nav-zalo-text { display: none; }
   .menu-panel .nav-zalo-icon { display: block; }
+}
+
+/* ======================================================================
+   PANEL ĐĂNG KÝ VIP
+   Mobile: 1 cột (form -> QR -> thông tin). Desktop: trái = form, phải = QR + chủ tài khoản.
+   ====================================================================== */
+#register-panel .notice-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+}
+#register-panel .notice-title i { font-size: 18px; line-height: 1; display: block; }
+
+.register-card {
+  max-height: calc(100% - 30px);
+  padding: 40px 20px 20px;
+}
+
+.register-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reg-form,
+.reg-bank {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.reg-form .login-input-wrap:first-child { margin-top: 0; }
+
+#reg-email,
+#reg-contact {
+  width: 100%;
+  padding: 14px 14px 14px 50px;
+  font-size: 15px;
+  border: var(--border);
+  border-radius: 999px;
+  outline: none;
+  background: none;
+  color: var(--text-black);
+}
+
+#reg-email::placeholder,
+#reg-contact::placeholder { color: #999; }
+
+#reg-email:-webkit-autofill,
+#reg-email:-webkit-autofill:focus,
+#reg-contact:-webkit-autofill,
+#reg-contact:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-black);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Ô up ảnh chuyển khoản */
+.reg-file {
+  margin-top: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed #999;
+  border-radius: 999px;
+  color: #999;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.reg-file:active { transform: scale(0.97); }
+.reg-file i { font-size: 17px; line-height: 1; flex-shrink: 0; color: var(--text-black); }
+.reg-file span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reg-file.has-file { color: var(--text-black); border-style: solid; }
+
+/* QR + thông tin chủ tài khoản */
+.reg-qr {
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--text);
+}
+
+.reg-qr img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.reg-qr-dl {
+  align-self: center;
+  margin-top: 12px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: var(--text-black);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+
+.reg-qr-dl:active { transform: scale(0.92); }
+.reg-qr-dl i { font-size: 17px; line-height: 1; }
+
+.reg-info {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reg-info li {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 15px;
+  color: var(--text-black);
+}
+
+.reg-info li i { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.reg-info li span { min-width: 0; overflow-wrap: anywhere; }
+
+/* Mobile: .reg-left "tan" đi để thứ tự thành form -> QR/thông tin -> nút Đăng ký (nút cuộn theo nội dung) */
+.reg-left { display: contents; }
+.reg-bank { order: 1; }
+.register-actions {
+  order: 2;
+  margin-top: 0;
+}
+.register-actions .notice-btn:disabled { cursor: default; }
+
+/* Hint kết quả (cùng kiểu với thông báo lỗi đăng nhập) */
+#register-hint {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 15px;
+  padding: 10px 16px;
+  flex-shrink: 0; /* không bị flex ép nhỏ lại -> chữ không tràn ra ngoài nền */
+  border-radius: 999px;
+  background: var(--text);
+  box-shadow: var(--shadow-soft);
+  color: var(--text-black);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+#register-hint:empty { margin: 0; padding: 0; background: none; box-shadow: none; }
+
+/* Card tự co lại (phần bên trong cuộn) để nhường chỗ cho hint */
+.register-card { min-height: 0; flex-shrink: 1; }
+
+@media (min-width: 768px) {
+  .register-card {
+    max-width: 760px;
+    padding: 50px 28px 24px;
+  }
+
+  .register-scroll {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 32px;
+  }
+
+  /* PC: nút Đăng ký nằm ngay dưới form ở cột trái */
+  .reg-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .reg-bank { order: 0; flex: 1; min-width: 0; }
+  .register-actions {
+    order: 0;
+    margin-top: 20px;
+  }
+  #register-hint { max-width: 760px; }
+}
+
+/* Sidebar desktop: "Đăng ký" nằm ngay dưới "Đăng nhập", chữ © vẫn ở đáy */
+@media (min-width: 768px) {
+  .menu-panel #register-btn { order: 14; }
+  .dock-footer { order: 15; }
 }

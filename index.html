@@ -26,12 +26,12 @@
       <button type="button" class="menu-item" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
       <button type="button" class="menu-item" data-action="folder" title="10K font khác"><i class="ri-folder-2-line"></i><span>10K Font vh khác</span></button>
       <div class="menu-divider"><span>Liên hệ</span></div>
-      <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Fanpage" title="Fanpage"><i class="ri-facebook-fill"></i><span class="nav-label">Fanpage</span></a>
+      <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Fanpage" title="Fanpage"><i class="ri-facebook-line"></i><span class="nav-label">Fanpage</span></a>
       <a class="nav-btn" href="https://www.m.me/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger" title="Messenger"><i class="ri-messenger-line"></i><span class="nav-label">Messenger</span></a>
       <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin" title="Zalo"><span class="nav-zalo-text">Zalo</span><i class="ri-chat-3-line nav-zalo-icon"></i><span class="nav-label">Zalo</span></a>
-      <div class="menu-divider"><span>Đăng nhập</span></div>
+      <div class="menu-divider"><span>Tài khoản</span></div>
       <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
-      
+      <button type="button" class="nav-btn" id="register-btn" data-action="register" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></button>
       
     </div>
 
@@ -83,9 +83,51 @@
     <div id="login-error"></div>
   </div>
 
+  <div class="notice-panel" id="register-panel" role="dialog" aria-modal="true" aria-label="Đăng ký tài khoản VIP" hidden>
+    <div class="notice-card register-card">
+      <div class="notice-title"><i class="ri-vip-crown-2-line"></i> Đăng ký tài khoản VIP</div>
+
+      <div class="register-scroll">
+        <div class="reg-left">
+        <div class="reg-form">
+          <div class="login-input-wrap">
+            <i class="ri-mail-line login-input-icon"></i>
+            <input type="email" id="reg-email" placeholder="Gmail" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+          </div>
+          <div class="login-input-wrap">
+            <i class="ri-phone-line login-input-icon"></i>
+            <input type="text" id="reg-contact" placeholder="Thông tin liên hệ (Zalo, Fb...)" autocomplete="off" maxlength="200">
+          </div>
+          <label class="reg-file" for="reg-photo">
+            <i class="ri-image-add-line"></i>
+            <span id="reg-photo-name">Tải lên ảnh chuyển khoản</span>
+            <input type="file" id="reg-photo" accept="image/*" hidden>
+          </label>
+        </div>
+          <div class="notice-btn-row register-actions">
+            <button type="button" class="notice-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
+          </div>
+        </div>
+
+        <div class="reg-bank">
+          <div class="reg-qr"><img src="img/qr.png" alt="QR chuyển khoản"></div>
+          <a class="reg-qr-dl" href="img/qr.png" download="qr.png"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+          <br>
+          <center> <span>Giá gói: 300.000 vnd</span></center>
+          <ul class="reg-info">
+            <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
+            <li><i class="ri-bank-card-line"></i><span>1017381370</span></li>
+            <li><i class="ri-bank-line"></i><span>Vietcombank</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="register-hint"></div>
+  </div>
+
   <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="notice-card">
-      <div class="notice-title">Thông báo</div>
+      <div class="notice-title"> <i class="ri-megaphone-line"></i> Thông báo</div>
       <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
       <div class="notice-btn-row">
         <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
@@ -125,12 +167,11 @@
               <div>Gói tải font VIP giá 300k.</div>
             </li>
           </ul>
+          <div class="notice-btn-row finder-actions">
+            <a class="notice-btn" href=" https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
+            <a class="notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
+          </div>
         </div>
-      </div>
-
-      <div class="notice-btn-row finder-actions">
-        <a class="notice-btn" href=" https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
-        <a class="notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
       </div>
     </div>
   </div>
