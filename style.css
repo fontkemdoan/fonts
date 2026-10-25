@@ -9,7 +9,6 @@
 :root {
   --bg: #efefef;
   --text: #fff;
-  --bgicon: #e9e9e9;
   --text-black: #555;
   --card: #fff;
   --border: 1px solid #999;
@@ -151,13 +150,6 @@ textarea {
   pointer-events: none;
   opacity: 0;
   transform: scale(0);
-}
-
-.preview-clear-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .preview-size-slider {
@@ -603,8 +595,8 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .nav-text {
-font-size: 15px;
-font-weight: 500;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 #menu-btn[aria-expanded="true"] { color: #fff; }
@@ -842,7 +834,6 @@ font-weight: 500;
 
 .finder-actions { margin-top: 20px; }
 
-
 @keyframes kd-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -856,6 +847,7 @@ font-weight: 500;
 }
 
 .demo-foot {
+  border: none;
   padding: 10px 14px;
   display: flex;
   align-items: center;
@@ -905,17 +897,19 @@ font-weight: 500;
 }
 
 .demo-card {
+  position: relative;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .demo-img {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 16px;;
+  border-radius: 16px;
 }
 
 .demo-name {
@@ -925,12 +919,6 @@ font-weight: 500;
   overflow-wrap: anywhere;
   letter-spacing: 0.3px;
 }
-
- .demo-foot {
-  border: none;
- }
-
-.demo-card { cursor: pointer; }
 
 .demo-panel {
   display: none;
@@ -1052,8 +1040,6 @@ font-weight: 500;
 }
 
 /* Nhãn Free đè lên góc trái ảnh demo - CSS riêng, không dùng chung với nhãn khác */
-.demo-card { position: relative; }
-
 .demo-free-badge {
   position: absolute;
   top: 14px;
@@ -1121,7 +1107,6 @@ font-weight: 500;
 .dock { display: contents; }
 .dock-search { display: none; }
 .nav-label,
-.nav-desktop-only,
 .nav-zalo-icon,
 .dock-footer { display: none; }
 
@@ -1157,10 +1142,8 @@ font-weight: 500;
     flex-shrink: 0;
   }
 
-
   .menu-backdrop,
-  #menu-btn,
-  .nav-mobile-only { display: none; }
+  #menu-btn { display: none; }
 
   /* Menu + nav: không còn khung riêng, các mục nằm thẳng trong sidebar.
      Thứ tự giữ nguyên: Trang chủ, Free, Cưới, Viết tay, KD Font Finder, 10K font,
@@ -1186,7 +1169,6 @@ font-weight: 500;
   .menu-panel a[href*="zalo.me"]      { order: 11; }
   .menu-panel .menu-divider:nth-of-type(3) { order: 12; }
   .menu-panel #auth-btn               { order: 13; }
-  .dock-footer { order: 13; }
 
   /* Mỗi mục: icon + chữ cạnh bên */
   .menu-item,
@@ -1204,6 +1186,7 @@ font-weight: 500;
   }
 
   .dock-footer {
+    order: 15;
     display: block;
     margin-top: auto; /* đẩy xuống đáy menu */
     padding: 12px 0 6px;
@@ -1219,7 +1202,6 @@ font-weight: 500;
   transform: scale(0.92);
 }
 
-  .nav-desktop-only { display: flex; }
   .nav-zalo-text { display: none; }
   .nav-zalo-icon { display: block; }
 
@@ -1276,10 +1258,6 @@ font-weight: 500;
     gap: 25px;
     align-items: start; /* mở 1 card không kéo giãn các card cùng hàng */
   }
-
-  /* Popup đăng nhập / thông báo: không còn nav dưới nên bỏ chừa 90px */
-  .login-panel,
-  .notice-panel { padding: 35px 20px 90px; } /* chừa chỗ cho nút đóng ở đáy */
 }
 
 /* ---- Màn hình rộng: sidebar đầy đủ chữ, 3 card ---- */
@@ -1399,7 +1377,6 @@ font-weight: 500;
   min-height: 44px;
 }
 
-
 /* ======================================================================
    MOBILE (< 768px): thanh dưới = Trang chủ / Free / Cưới / Viết tay
    (mục đang chọn hiện thêm tên), nút menu fixed góc trên phải mở popup:
@@ -1516,7 +1493,9 @@ font-weight: 500;
 #register-panel .notice-title i { font-size: 18px; line-height: 1; display: block; }
 
 .register-card {
-  max-height: calc(100% - 90px);
+  max-height: calc(100% - 90px); /* chừa chỗ cho hint dưới card */
+  min-height: 0;
+  flex-shrink: 1; /* card tự co lại (phần bên trong cuộn) để nhường chỗ cho hint */
   padding: 40px 20px 20px;
 }
 
@@ -1673,12 +1652,8 @@ font-weight: 500;
 
 #register-hint:empty { display: none; }
 
-/* Card tự co lại (phần bên trong cuộn) để nhường chỗ cho hint */
-.register-card { min-height: 0; flex-shrink: 1; }
-
 @media (min-width: 768px) {
   .register-card {
-    max-height: calc(100% - 90px); /* chừa chỗ cho hint dưới card */
     max-width: 860px;
     padding: 50px 28px 24px;
   }
@@ -1717,7 +1692,6 @@ font-weight: 500;
 /* Sidebar desktop: "Đăng ký" nằm ngay dưới "Đăng nhập", chữ © vẫn ở đáy */
 @media (min-width: 768px) {
   .menu-panel #register-btn { order: 14; }
-  .dock-footer { order: 15; }
 }
 
 /* Nút đóng popup: icon trắng 36px, nền trong suốt, giữa màn hình, cách đáy 20px */

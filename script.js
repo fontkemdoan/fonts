@@ -47,17 +47,24 @@ function spinIcon(btn) {
   icon.classList.add('spin-360');
 }
 
-// ---- Lưu blob thành file tải về ----
-function saveBlob(blob, name) {
-  const url = URL.createObjectURL(blob);
+// ---- Tải file bằng thẻ <a> tạm ----
+function clickDownloadLink(href, name = '') {
   const a = document.createElement('a');
-  a.href = url;
+  a.href = href;
   a.download = name;
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+// ---- Lưu blob thành file tải về ----
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  clickDownloadLink(url, name);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
+
+const DL_ICON = 'ri-download-cloud-2-line';
 
 // ---- JSZip chỉ tải khi cần (lúc bấm tải cả bộ font) ----
 const JSZIP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
@@ -91,6 +98,7 @@ const changePassBtn = $('change-pass-btn');
 const authBtn = $('auth-btn');
 const authIcon = authBtn.querySelector('i');
 const authLabel = $('auth-label'); // chữ cạnh icon (chỉ hiện ở desktop)
+const registerBtn = $('register-btn');
 const noticePanel = $('notice-panel');
 const loginError = $('login-error');
 const loginIcon = $('login-icon');
@@ -132,8 +140,7 @@ function updateAuthUI() {
   authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
   authBtn.title = on ? 'Đăng xuất' : 'Đăng nhập';
   authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
-  const regBtn = $('register-btn');
-  if (regBtn) regBtn.hidden = on; // đã đăng nhập thì ẩn mục Đăng ký
+  registerBtn.hidden = on; // đã đăng nhập thì ẩn mục Đăng ký
   if (on) closeRegister();
 }
 
@@ -145,6 +152,15 @@ function showApp() {
   loadFonts();
 }
 
+// Đóng mọi panel/menu, trừ panel `keep` (panel sắp mở)
+function closeAllPanels(keep) {
+  if (keep !== 'login') closeLogin();
+  if (keep !== 'register') closeRegister();
+  if (keep !== 'notice') closeNotice();
+  if (keep !== 'finder') closeFinder();
+  if (keep !== 'menu') closeMenu();
+}
+
 // Click vừa mở panel thì không được đóng panel ngay (xem handler 'bấm bất cứ đâu' ở initMenu)
 let panelJustOpened = false;
 function markPanelOpened() {
@@ -154,10 +170,7 @@ function markPanelOpened() {
 
 function openLogin() {
   markPanelOpened();
-  closeRegister();
-  closeNotice();
-  closeMenu();
-  closeFinder();
+  closeAllPanels('login');
   loginPanel.hidden = false;
   renderGoogleBtn();
 }
@@ -174,10 +187,7 @@ const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
 
 function openNotice(msg) {
   markPanelOpened();
-  closeRegister();
-  closeLogin();
-  closeMenu();
-  closeFinder();
+  closeAllPanels('notice');
   noticeMsg.textContent = msg || NOTICE_DEFAULT_MSG;
   noticePanel.hidden = false;
 }
@@ -210,6 +220,16 @@ function showLoginError(msg) {
   loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
 }
 
+// ---- Đăng nhập thành công (mật khẩu hoặc Google) ----
+function onLoginSuccess(token) {
+  setToken(token);
+  loginEmail.value = '';
+  resetLoginIcon();
+  updateAuthUI();
+  resetPreviews(false);
+  closeLogin();
+}
+
 // ---- Đăng nhập ----
 async function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
@@ -227,12 +247,7 @@ async function doLogin() {
   try {
     const data = await postJson('/api/login', { email, password, mode: 'login' });
     if (data.ok) {
-      setToken(data.token);
-      loginEmail.value = '';
-      resetLoginIcon();
-      updateAuthUI();
-      resetPreviews(false);
-      closeLogin();
+      onLoginSuccess(data.token);
     } else if (data.error === 'wrong_password') {
       showLoginError('Sai mật khẩu');
     } else {
@@ -336,12 +351,7 @@ async function onGoogleCredential(resp) {
   try {
     const data = await postJson('/api/google-login', { credential: resp.credential });
     if (data.ok) {
-      setToken(data.token);
-      loginEmail.value = '';
-      resetLoginIcon();
-      updateAuthUI();
-      resetPreviews(false);
-      closeLogin();
+      onLoginSuccess(data.token);
     } else if (data.error === 'not_registered') {
       showLoginError('Tài khoản chưa được đăng ký');
     } else {
@@ -423,17 +433,9 @@ function initAuth() {
     }
   });
 
-  // Bấm ra ngoài thẻ / nhấn Esc để đóng panel
-  loginPanel.addEventListener('click', (e) => { if (e.target === loginPanel) closeLogin(); });
-  noticePanel.addEventListener('click', (e) => { if (e.target === noticePanel) closeNotice(); });
+  // Bấm ra ngoài thẻ / nhấn Esc để đóng panel: xem initMenu
   $('notice-login-btn').addEventListener('click', openLogin);
-  const noticeRegisterBtn = $('notice-register-btn');
-  if (noticeRegisterBtn) noticeRegisterBtn.addEventListener('click', openRegister); // Đăng ký trong popup thông báo -> mở popup đăng ký
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    closeLogin();
-    closeNotice();
-  });
+  $('notice-register-btn').addEventListener('click', openRegister); // Đăng ký trong popup thông báo -> mở popup đăng ký
 
   initGoogle();
   verifyAndBoot();
@@ -853,7 +855,7 @@ function bindDemoPanel(card, group) {
     });
   });
 
-  // Xóa nhanh: chữ ở mọi dòng cùng bị "hút" vào thùng rác (dùng chung hiệu ứng với ô preview ở search)
+  // Xóa nhanh: chữ ở mọi dòng cùng bị "hút" vào thùng rác
   clearBtn.addEventListener('click', async () => {
     spinIcon(clearBtn);
     const active = variants.filter((v) => !v.locked);
@@ -931,12 +933,7 @@ function updateView() {
 // Tải 1 font; font trả phí cần đăng nhập, chưa đăng nhập -> hiện panel thông báo
 function downloadFont(font) {
   if (!font.free && !isLoggedIn()) { openNotice(); return; }
-  const a = document.createElement('a');
-  a.href = fontSrc(font);
-  a.download = '';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  clickDownloadLink(fontSrc(font));
 }
 
 // Tải nhiều font thành 1 file zip (dùng cho card demo nhiều font)
@@ -974,7 +971,7 @@ async function downloadZip(btn, files, zipName) {
     alert('Tải không thành công');
   } finally {
     icon.textContent = '';
-    icon.className = 'ri-download-cloud-2-line';
+    icon.className = DL_ICON;
     delete btn.dataset.busy;
   }
 }
@@ -1007,7 +1004,7 @@ function setCountdown(card, sec) {
   const icon = btn.querySelector('i');
   if (sec === null) {
     if (!btn.dataset.counting) return;
-    icon.className = 'ri-download-cloud-2-line';
+    icon.className = DL_ICON;
     icon.textContent = '';
     delete btn.dataset.counting;
   } else {
@@ -1079,11 +1076,11 @@ const regEmail = $('reg-email');
 const regContact = $('reg-contact');
 const regPhoto = $('reg-photo');
 const regPhotoName = $('reg-photo-name');
-const regFileBox = regPhoto && regPhoto.closest('.reg-file');
+const regFileBox = regPhoto.closest('.reg-file');
 const regSubmit = $('register-submit');
 const regHint = $('register-hint');
 const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
-const REG_PHOTO_TEXT = regPhotoName ? regPhotoName.textContent : '';
+const REG_PHOTO_TEXT = regPhotoName.textContent;
 const REG_MAX_SIDE = 1600; // thu nhỏ ảnh chuyển khoản cho nhẹ khi gửi
 let regHintTimer = null;
 let regBusy = false;
@@ -1095,17 +1092,12 @@ function showRegHint(msg, ms = 4000) {
 }
 
 function openRegister() {
-  if (!registerPanel) return;
   markPanelOpened();
-  closeMenu();
-  closeLogin();
-  closeNotice();
-  closeFinder();
+  closeAllPanels('register');
   registerPanel.hidden = false;
 }
 
 function closeRegister() {
-  if (!registerPanel) return;
   registerPanel.hidden = true;
   regHint.textContent = '';
 }
@@ -1174,15 +1166,12 @@ async function doRegister() {
   }
 }
 
-if (registerPanel && regPhoto && regSubmit) {
-  regPhoto.addEventListener('change', () => {
-    const f = regPhoto.files[0];
-    regPhotoName.textContent = f ? f.name : REG_PHOTO_TEXT;
-    regFileBox.classList.toggle('has-file', !!f);
-  });
-  regSubmit.addEventListener('click', doRegister);
-  registerPanel.addEventListener('click', (e) => { if (e.target === registerPanel) closeRegister(); });
-}
+regPhoto.addEventListener('change', () => {
+  const f = regPhoto.files[0];
+  regPhotoName.textContent = f ? f.name : REG_PHOTO_TEXT;
+  regFileBox.classList.toggle('has-file', !!f);
+});
+regSubmit.addEventListener('click', doRegister);
 
 // ================= Menu (bottom-nav) & popup KD Font Finder =================
 const menuBtn = $('menu-btn');
@@ -1195,10 +1184,7 @@ const finderVideo = $('finder-video');
 const isMenuOpen = () => menuPanel.classList.contains('open');
 
 function openMenu() {
-  closeLogin();
-  closeRegister();
-  closeNotice();
-  closeFinder();
+  closeAllPanels('menu');
   menuPanel.classList.add('open');
   menuBackdrop.classList.add('open');
   menuBtn.setAttribute('aria-expanded', 'true');
@@ -1215,10 +1201,7 @@ function closeMenu() {
 
 function openFinder() {
   markPanelOpened();
-  closeMenu();
-  closeRegister();
-  closeLogin();
-  closeNotice();
+  closeAllPanels('finder');
   finderPanel.hidden = false;
 }
 
@@ -1277,24 +1260,18 @@ function initMenu() {
     closeMenu();
   });
 
-  // Bấm ra ngoài menu thì đóng
-  document.addEventListener('click', (e) => {
-    if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
-  });
-
-  finderPanel.addEventListener('click', (e) => { if (e.target === finderPanel) closeFinder(); });
-
-  // Panel đăng nhập / thông báo / KD Font Finder đang mở: bấm bất cứ vùng nào
-  // ngoài thẻ (kể cả thanh dưới, nút menu, sidebar) đều đóng panel.
+  // Bấm ra ngoài menu thì đóng. Panel đăng nhập / thông báo / KD Font Finder / đăng ký đang mở:
+  // bấm bất cứ vùng nào ngoài thẻ (kể cả thanh dưới, nút menu, sidebar) đều đóng panel.
   // Bấm trong thẻ thì giữ nguyên để còn nhập liệu, xem video, bấm nút.
   document.addEventListener('click', (e) => {
+    if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
     if (panelJustOpened) return;
     const path = e.composedPath();
     [[loginPanel, '.login-card', closeLogin],
      [noticePanel, '.notice-card', closeNotice],
      [finderPanel, '.notice-card', closeFinder],
      [registerPanel, '.register-card', closeRegister]].forEach(([panel, cardSel, close]) => {
-      if (!panel || panel.hidden) return;
+      if (panel.hidden) return;
       const card = panel.querySelector(cardSel);
       if (card && path.includes(card)) return;
       close();
@@ -1302,18 +1279,13 @@ function initMenu() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    closeMenu();
-    closeFinder();
-    closeRegister();
+    if (e.key === 'Escape') closeAllPanels();
   });
 }
 
 // ---- Sự kiện ----
 function initFonts() {
   searchInput.addEventListener('input', runSearch);
-  searchInput.addEventListener('focus', updateView);
-  searchInput.addEventListener('blur', () => setTimeout(updateView, 0));
 
   clearBtn.addEventListener('click', () => {
     spinIcon(clearBtn);
@@ -1343,19 +1315,12 @@ function initFonts() {
 
 // ================= Nút đóng popup (giữa, cách đáy 20px) =================
 const popupClose = $('popup-close');
-if (popupClose) {
-  const popups = [loginPanel, noticePanel, finderPanel, registerPanel].filter(Boolean);
-  const syncPopupClose = () => { popupClose.hidden = popups.every((p) => p.hidden); };
-  const popupObserver = new MutationObserver(syncPopupClose);
-  popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
-  popupClose.addEventListener('click', () => {
-    closeLogin();
-    closeNotice();
-    closeFinder();
-    closeRegister();
-  });
-  syncPopupClose();
-}
+const popups = [loginPanel, noticePanel, finderPanel, registerPanel];
+const syncPopupClose = () => { popupClose.hidden = popups.every((p) => p.hidden); };
+const popupObserver = new MutationObserver(syncPopupClose);
+popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
+popupClose.addEventListener('click', () => closeAllPanels());
+syncPopupClose();
 
 // ================= Khởi động =================
 initFonts();

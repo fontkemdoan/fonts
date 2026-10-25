@@ -7,15 +7,14 @@
 <link rel="icon" href="img/kemdoan.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" crossorigin="anonymous"
-  href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="menu-backdrop" id="menu-backdrop"></div>
 
-  <div class="dock" id="dock">
+  <div class="dock">
 
     <div class="dock-search" id="dock-search"></div>
 
@@ -32,7 +31,6 @@
       <div class="menu-divider"><span>Tài khoản</span></div>
       <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
       <button type="button" class="nav-btn" id="register-btn" data-action="register" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></button>
-      
     </div>
 
     <nav class="bottom-nav" id="bottom-nav">
@@ -113,7 +111,7 @@
           <div class="reg-qr-col">
             <div class="reg-qr"><img src="img/qr.jpg" alt="QR chuyển khoản"></div>
             <a class="reg-qr-dl" href="img/qrfull.jpg" download="qrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
-         </div>
+          </div>
           <ul class="reg-info">
             <li><i class="ri-price-tag-line"></i><span>300.000 vnđ</span></li>
             <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
@@ -128,7 +126,7 @@
 
   <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="notice-card">
-      <div class="notice-title"> <i class="ri-megaphone-line"></i> Thông báo</div>
+      <div class="notice-title"><i class="ri-megaphone-line"></i> Thông báo</div>
       <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
       <div class="notice-btn-row">
         <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
@@ -169,7 +167,7 @@
             </li>
           </ul>
           <div class="notice-btn-row finder-actions">
-            <a class="notice-btn" href=" https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
+            <a class="notice-btn" href="https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
             <a class="notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
           </div>
         </div>
@@ -201,10 +199,9 @@
           <input type="range" class="preview-size-slider" min="1" max="100" step="1" aria-label="Cỡ chữ">
           <span class="preview-size-value"></span>
           <div class="demo-align">
-             <button type="button" class="demo-align-btn" data-align="left" aria-label="Canh trái"><i class="ri-align-left"></i></button>
-             <button type="button" class="demo-align-btn" data-align="center" aria-label="Canh giữa"><i class="ri-align-center"></i></button>
-             <button type="button" class="demo-align-btn" data-align="right" aria-label="Canh phải"><i class="ri-align-right"></i></button>
-           
+            <button type="button" class="demo-align-btn" data-align="left" aria-label="Canh trái"><i class="ri-align-left"></i></button>
+            <button type="button" class="demo-align-btn" data-align="center" aria-label="Canh giữa"><i class="ri-align-center"></i></button>
+            <button type="button" class="demo-align-btn" data-align="right" aria-label="Canh phải"><i class="ri-align-right"></i></button>
           </div>
         </div>
         <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
@@ -214,7 +211,7 @@
     </div>
   </template>
 
-    <template id="demo-variant-tpl">
+  <template id="demo-variant-tpl">
     <div class="demo-variant">
       <div class="demo-variant-label"></div>
       <div class="demo-text-wrap">
