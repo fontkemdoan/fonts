@@ -1279,7 +1279,7 @@ font-weight: 500;
 
   /* Popup đăng nhập / thông báo: không còn nav dưới nên bỏ chừa 90px */
   .login-panel,
-  .notice-panel { padding: 35px 20px; }
+  .notice-panel { padding: 35px 20px 90px; } /* chừa chỗ cho nút đóng ở đáy */
 }
 
 /* ---- Màn hình rộng: sidebar đầy đủ chữ, 3 card ---- */
@@ -1424,7 +1424,7 @@ font-weight: 500;
     -webkit-backdrop-filter: blur(25px);
     backdrop-filter: blur(25px);
     box-shadow: var(--shadow-card);
-    z-index: 1001;
+    z-index: 1000;
   }
 
   /* Thanh dưới: icon, mục đang chọn là viên thuốc trắng có thêm tên */
@@ -1516,7 +1516,7 @@ font-weight: 500;
 #register-panel .notice-title i { font-size: 18px; line-height: 1; display: block; }
 
 .register-card {
-  max-height: calc(100% - 30px);
+  max-height: calc(100% - 90px);
   padding: 40px 20px 20px;
 }
 
@@ -1528,6 +1528,8 @@ font-weight: 500;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-right: -12px;
+  padding-right: 12px;
 }
 
 .reg-form,
@@ -1645,6 +1647,7 @@ font-weight: 500;
 /* Mobile: .reg-left "tan" đi để thứ tự thành form -> QR/thông tin -> nút Đăng ký (nút cuộn theo nội dung) */
 .reg-left { display: contents; }
 .reg-bank { order: 1; }
+.reg-qr-col { display: flex; flex-direction: column; align-items: stretch; }
 .register-actions {
   order: 2;
   margin-top: 0;
@@ -1676,7 +1679,7 @@ font-weight: 500;
 @media (min-width: 768px) {
   .register-card {
     max-height: calc(100% - 90px); /* chừa chỗ cho hint dưới card */
-    max-width: 760px;
+    max-width: 860px;
     padding: 50px 28px 24px;
   }
 
@@ -1690,11 +1693,21 @@ font-weight: 500;
   .reg-left {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* cột trái bắt đầu từ phía trên */
     flex: 1;
     min-width: 0;
   }
-  .reg-bank { order: 0; flex: 1; min-width: 0; }
+  /* PC: thông tin chủ tài khoản nằm bên phải QR */
+  .reg-bank {
+    order: 0;
+    flex: 1.7;
+    min-width: 0;
+    flex-direction: row;
+    align-items: flex-start; /* QR và thông tin cùng bắt đầu từ phía trên, ngang hàng cột trái */
+    gap: 20px;
+  }
+  .reg-qr-col { flex: 0 0 190px; }
+  .reg-info { flex: 1; min-width: 0; margin-top: 0; }
   .register-actions {
     order: 0;
     margin-top: 20px;
@@ -1706,3 +1719,30 @@ font-weight: 500;
   .menu-panel #register-btn { order: 14; }
   .dock-footer { order: 15; }
 }
+
+/* Nút đóng popup: icon trắng 36px, nền trong suốt, giữa màn hình, cách đáy 20px */
+.popup-close {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1001;
+  transition: transform 0.18s ease;
+}
+
+.popup-close:active { transform: translateX(-50%) scale(0.92); }
+.popup-close i { display: block; line-height: 1; }
+

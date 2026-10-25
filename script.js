@@ -343,7 +343,7 @@ async function onGoogleCredential(resp) {
       resetPreviews(false);
       closeLogin();
     } else if (data.error === 'not_registered') {
-      showLoginError('Email chưa được đăng ký');
+      showLoginError('Tài khoản chưa được đăng ký');
     } else {
       showLoginError('Đăng nhập Google thất bại');
     }
@@ -1337,6 +1337,22 @@ function initFonts() {
     const card = e.target.closest('.demo-card');
     if (card) toggleDemo(card);
   });
+}
+
+// ================= Nút đóng popup (giữa, cách đáy 20px) =================
+const popupClose = $('popup-close');
+if (popupClose) {
+  const popups = [loginPanel, noticePanel, finderPanel, registerPanel].filter(Boolean);
+  const syncPopupClose = () => { popupClose.hidden = popups.every((p) => p.hidden); };
+  const popupObserver = new MutationObserver(syncPopupClose);
+  popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
+  popupClose.addEventListener('click', () => {
+    closeLogin();
+    closeNotice();
+    closeFinder();
+    closeRegister();
+  });
+  syncPopupClose();
 }
 
 // ================= Khởi động =================

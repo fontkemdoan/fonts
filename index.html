@@ -110,11 +110,12 @@
         </div>
 
         <div class="reg-bank">
-          <div class="reg-qr"><img src="img/qr.png" alt="QR chuyển khoản"></div>
-          <a class="reg-qr-dl" href="img/qr.png" download="qr.png"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
-          <br>
-          <center> <span>Giá gói: 300.000 vnd</span></center>
+          <div class="reg-qr-col">
+            <div class="reg-qr"><img src="img/qr.png" alt="QR chuyển khoản"></div>
+            <a class="reg-qr-dl" href="img/qr.png" download="qr.png"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+         </div>
           <ul class="reg-info">
+            <li><i class="ri-price-tag-line"></i><span>300.000 vnđ</span></li>
             <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
             <li><i class="ri-bank-card-line"></i><span>1017381370</span></li>
             <li><i class="ri-bank-line"></i><span>Vietcombank</span></li>
@@ -221,6 +222,8 @@
       </div>
     </div>
   </template>
+
+<button type="button" class="popup-close" id="popup-close" aria-label="Đóng" title="Đóng" hidden><i class="ri-close-line"></i></button>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="script.js"></script>
