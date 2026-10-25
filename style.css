@@ -1201,7 +1201,13 @@ transition: background-color 9999s ease-in-out 0s;
   }
 
   @media (hover: hover) {
-    .nav-btn:hover { background: var(--bg); }
+    .menu-item:not(.active):hover,
+    .menu-item:not(.active):active,
+    .nav-btn:hover,
+    .nav-btn:active {
+      background: var(--text-black);
+      color: var(--text);
+    }
   }
 
   .nav-btn:focus-visible {
