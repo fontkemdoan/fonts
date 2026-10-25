@@ -427,6 +427,8 @@ function initAuth() {
   loginPanel.addEventListener('click', (e) => { if (e.target === loginPanel) closeLogin(); });
   noticePanel.addEventListener('click', (e) => { if (e.target === noticePanel) closeNotice(); });
   $('notice-login-btn').addEventListener('click', openLogin);
+  const noticeRegisterBtn = $('notice-register-btn');
+  if (noticeRegisterBtn) noticeRegisterBtn.addEventListener('click', openRegister); // Đăng ký trong popup thông báo -> mở popup đăng ký
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     closeLogin();
