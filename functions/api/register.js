@@ -1,11 +1,3 @@
-// POST /api/register  (multipart: email, contact, photo)
-// Gửi thông tin đăng ký + ảnh chuyển khoản về bot Telegram.
-// Token bot KHÔNG để trong code web. Đặt 2 biến môi trường trên server:
-//   TG_BOT_TOKEN = token bot (lấy từ @BotFather)
-//   TG_CHAT_ID   = chat id nhận tin (nhắn bot 1 tin rồi mở https://api.telegram.org/bot<TOKEN>/getUpdates để lấy)
-// Viết theo chuẩn Web (Request/Response) nên chạy được trên Cloudflare Pages Functions;
-// host khác (Vercel, Node...) chỉ cần đổi phần chữ ký hàm.
-
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 
@@ -28,7 +20,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const time = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-  const caption = `ĐĂNG KÝ VIP MỚI\nGmail: ${email}\nLiên hệ: ${contact}\nThời gian: ${time}`;
+  const caption = `ĐĂNG KÝ TÀI KHOẢN VIP\nGmail: ${email}\nLiên hệ: ${contact}\nThời gian: ${time}`;
 
   const tg = new FormData();
   tg.append('chat_id', env.TG_CHAT_ID);
