@@ -1159,9 +1159,9 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký tài khoản thành công, vui lòng đăng nhập sau 10 phút.', 8000);
+      showRegHint('Đăng ký tài khoản thành công, vui lòng đăng nhập sau 5 phút.', 3000);
     } else {
-      showRegHint('Gửi đăng ký thất bại, hãy thử lại sau');
+      showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
   } catch (e) {
     showRegHint('Lỗi kết nối, hãy thử lại sau');
