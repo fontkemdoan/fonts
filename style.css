@@ -690,6 +690,7 @@ transition: background-color 9999s ease-in-out 0s;
 .menu-item.active {
   background: var(--text-black);
   color: var(--text);
+  border-radius: 10px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -716,7 +717,7 @@ transition: background-color 9999s ease-in-out 0s;
 .finder-video {
   display: block;
   width: 100%;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--bg);
 }
 
@@ -979,7 +980,6 @@ transition: background-color 9999s ease-in-out 0s;
   color: var(--text-black);
   background: var(--bg);
   font-size: 12px;
-  font-weight: 500;
 }
 
 /* Có nhãn (Regular/Bold...) thì chữ sát nhãn hơn */
@@ -1558,7 +1558,7 @@ transition: background-color 9999s ease-in-out 0s;
   transition: transform 0.15s ease;
 }
 
-.reg-file:active { transform: scale(0.97); }
+.reg-file:active { transform: scale(0.92); }
 .reg-file i { font-size: 17px; line-height: 1; flex-shrink: 0; color: var(--text-black); }
 .reg-file span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reg-file.has-file { color: var(--text-black); border-style: solid; }
@@ -1578,7 +1578,8 @@ transition: background-color 9999s ease-in-out 0s;
   width: 100%;
   height: auto;
   border-radius: 10px;
-  box-shadow: var(--shadow-card);
+  padding: 6px;
+  box-shadow: var(--shadow-soft);
 }
 
 .reg-qr-dl {
