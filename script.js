@@ -1080,6 +1080,7 @@ const regFileBox = regPhoto.closest('.reg-file');
 const regSubmit = $('register-submit');
 const regHint = $('register-hint');
 const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
+const REG_BUSY_LABEL = SPINNER + ' Đang xử lý...';
 const REG_PHOTO_TEXT = regPhotoName.textContent;
 const REG_MAX_SIDE = 1600; // thu nhỏ ảnh chuyển khoản cho nhẹ khi gửi
 let regHintTimer = null;
@@ -1140,7 +1141,7 @@ async function doRegister() {
 
   regBusy = true;
   regSubmit.disabled = true;
-  regSubmit.innerHTML = SPINNER;
+  regSubmit.innerHTML = REG_BUSY_LABEL;
 
   try {
     const img = await shrinkImage(photo);
@@ -1153,7 +1154,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký tài khoản thành công, vui lòng đăng nhập sau 5 phút.', 3000);
+      showRegHint('Đăng ký tài khoản thành công.\nVui lòng đăng nhập sau 3p phút.', 3000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
