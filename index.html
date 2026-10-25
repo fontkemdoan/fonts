@@ -93,7 +93,8 @@
         <div class="reg-form">
           <div class="login-input-wrap">
             <i class="ri-mail-line login-input-icon"></i>
-            <input type="email" id="reg-email" placeholder="Gmail" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <span class="req" aria-hidden="true">*</span>
+            <input type="email" id="reg-email" placeholder="Gmail" aria-required="true" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
           </div>
           <div class="login-input-wrap">
             <i class="ri-phone-line login-input-icon"></i>
@@ -101,8 +102,9 @@
           </div>
           <label class="reg-file" for="reg-photo">
             <i class="ri-image-add-line"></i>
+            <span class="req" aria-hidden="true">*</span>
             <span id="reg-photo-name">Tải lên ảnh chuyển khoản</span>
-            <input type="file" id="reg-photo" accept="image/*" hidden>
+            <input type="file" id="reg-photo" accept="image/*" aria-required="true" hidden>
           </label>
         </div>
           <div class="notice-btn-row register-actions">

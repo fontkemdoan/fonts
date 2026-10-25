@@ -1,11 +1,8 @@
-// @ts-nocheck
 (() => {
 'use strict';
 
 const $ = (id) => document.getElementById(id);
 
-// ================= Tiện ích =================
-// ---- Session token ----
 const getToken = () => localStorage.getItem('kd_session_token') || '';
 const setToken = (t) => localStorage.setItem('kd_session_token', t);
 const clearToken = () => localStorage.removeItem('kd_session_token');
@@ -13,10 +10,9 @@ const clearToken = () => localStorage.removeItem('kd_session_token');
 const downloadUrl = (file) =>
   '/api/download?file=' + encodeURIComponent(file) + '&token=' + encodeURIComponent(getToken());
 
-// Font free nằm công khai trong thư mục freefonts/ của site (không cần token)
 const freeUrl = (file) => 'freefonts/' + String(file).split('/').map(encodeURIComponent).join('/');
 const fontSrc = (f) => (f.free ? freeUrl(f.file) : downloadUrl(f.file));
-const fontKey = (f) => (f.free ? 'free:' : '') + f.file; // khóa riêng để font free không trùng font trả phí
+const fontKey = (f) => (f.free ? 'free:' : '') + f.file;
 
 async function postJson(url, body) {
   const res = await fetch(url, {
@@ -27,7 +23,6 @@ async function postJson(url, body) {
   return res.json();
 }
 
-// ---- Chuẩn hóa chuỗi để tìm kiếm: bỏ dấu, bỏ ký tự đặc biệt, chữ thường ----
 function foldText(str) {
   return String(str).toLowerCase()
     .replace(/đ/g, 'd')
@@ -35,7 +30,6 @@ function foldText(str) {
     .replace(/[^a-z0-9]+/g, '');
 }
 
-// ---- Hiệu ứng ----
 const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -47,7 +41,6 @@ function spinIcon(btn) {
   icon.classList.add('spin-360');
 }
 
-// ---- Tải file bằng thẻ <a> tạm ----
 function clickDownloadLink(href, name = '') {
   const a = document.createElement('a');
   a.href = href;
@@ -57,7 +50,6 @@ function clickDownloadLink(href, name = '') {
   a.remove();
 }
 
-// ---- Lưu blob thành file tải về ----
 function saveBlob(blob, name) {
   const url = URL.createObjectURL(blob);
   clickDownloadLink(url, name);
@@ -66,7 +58,6 @@ function saveBlob(blob, name) {
 
 const DL_ICON = 'ri-download-cloud-2-line';
 
-// ---- JSZip chỉ tải khi cần (lúc bấm tải cả bộ font) ----
 const JSZIP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
 let jszipPromise = null;
 
@@ -84,7 +75,6 @@ function loadJSZip() {
   return jszipPromise;
 }
 
-// ================= Đăng nhập / đổi mật khẩu =================
 const loginPanel = $('login-panel');
 const brand = $('brand');
 const contentEl = $('content');
@@ -97,7 +87,7 @@ const loginBtn = $('login-btn');
 const changePassBtn = $('change-pass-btn');
 const authBtn = $('auth-btn');
 const authIcon = authBtn.querySelector('i');
-const authLabel = $('auth-label'); // chữ cạnh icon (chỉ hiện ở desktop)
+const authLabel = $('auth-label');
 const registerBtn = $('register-btn');
 const noticePanel = $('notice-panel');
 const loginError = $('login-error');
@@ -119,12 +109,10 @@ let changePassMode = false;
 let loginErrorTimer = null;
 let previewTimer = null;
 
-// ---- Trạng thái đăng nhập ----
 const isLoggedIn = () => !!getToken();
 
-// Đổi trạng thái đăng nhập -> đóng mọi preview đang mở để mở lại theo trạng thái mới
 function resetPreviews(clearCache) {
-  cancelFreeWait(); // đăng nhập/đăng xuất thì bỏ đếm ngược font free
+  cancelFreeWait();
   document.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
   if (clearCache) {
     loadedPreviewFonts.forEach((family) => {
@@ -140,11 +128,10 @@ function updateAuthUI() {
   authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
   authBtn.title = on ? 'Đăng xuất' : 'Đăng nhập';
   authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
-  registerBtn.hidden = on; // đã đăng nhập thì ẩn mục Đăng ký
+  registerBtn.hidden = on;
   if (on) closeRegister();
 }
 
-// ---- Chuyển màn hình ----
 function showApp() {
   brand.classList.add('search-brand');
   brand.hidden = false;
@@ -152,7 +139,6 @@ function showApp() {
   loadFonts();
 }
 
-// Đóng mọi panel/menu, trừ panel `keep` (panel sắp mở)
 function closeAllPanels(keep) {
   if (keep !== 'login') closeLogin();
   if (keep !== 'register') closeRegister();
@@ -161,7 +147,6 @@ function closeAllPanels(keep) {
   if (keep !== 'menu') closeMenu();
 }
 
-// Click vừa mở panel thì không được đóng panel ngay (xem handler 'bấm bất cứ đâu' ở initMenu)
 let panelJustOpened = false;
 function markPanelOpened() {
   panelJustOpened = true;
@@ -196,7 +181,6 @@ function closeNotice() {
   noticePanel.hidden = true;
 }
 
-// Vào trang luôn xem được; chỉ kiểm tra token để biết đã đăng nhập hay chưa
 async function verifyAndBoot() {
   bootLoading.hidden = true;
   showApp();
@@ -208,19 +192,17 @@ async function verifyAndBoot() {
     const data = await postJson('/api/verify-session', { token });
     if (!data.ok) clearToken();
   } catch (e) {
-    // Không kết nối được server -> giữ nguyên token
+
   }
   updateAuthUI();
 }
 
-// ---- Thông báo lỗi ----
 function showLoginError(msg) {
   loginError.textContent = msg;
   clearTimeout(loginErrorTimer);
   loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
 }
 
-// ---- Đăng nhập thành công (mật khẩu hoặc Google) ----
 function onLoginSuccess(token) {
   setToken(token);
   loginEmail.value = '';
@@ -230,7 +212,6 @@ function onLoginSuccess(token) {
   closeLogin();
 }
 
-// ---- Đăng nhập ----
 async function doLogin() {
   const email = loginEmail.value.trim().toLowerCase();
   const password = loginPassword.value;
@@ -261,7 +242,6 @@ async function doLogin() {
   }
 }
 
-// ---- Đổi mật khẩu ----
 function enterChangePassMode() {
   changePassMode = true;
   changePassExtra.hidden = false;
@@ -312,7 +292,6 @@ async function doChangePassword() {
   }
 }
 
-// ---- Xem trước avatar theo email ----
 function resetLoginIcon() {
   loginIcon.innerHTML = DEFAULT_ICON;
   loginTitle.textContent = DEFAULT_TITLE;
@@ -339,7 +318,6 @@ async function previewAvatar(email) {
   }
 }
 
-// ---- Đăng nhập bằng Google ----
 const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
 const googleBtnEl = $('google-btn');
 const googleOrEl = $('google-or');
@@ -390,10 +368,8 @@ function renderGoogleBtn() {
   });
 }
 
-// Thư viện Google tải async: khi xong thì khởi tạo (nếu panel đang mở thì vẽ nút luôn)
 window.onGoogleLibraryLoad = () => { initGoogle(); if (!loginPanel.hidden) renderGoogleBtn(); };
 
-// ---- Khởi tạo ----
 function initAuth() {
   loginBtn.addEventListener('click', () => {
     if (changePassMode) exitChangePassMode(); else doLogin();
@@ -433,25 +409,22 @@ function initAuth() {
     }
   });
 
-  // Bấm ra ngoài thẻ / nhấn Esc để đóng panel: xem initMenu
   $('notice-login-btn').addEventListener('click', openLogin);
-  $('notice-register-btn').addEventListener('click', openRegister); // Đăng ký trong popup thông báo -> mở popup đăng ký
+  $('notice-register-btn').addEventListener('click', openRegister);
 
   initGoogle();
   verifyAndBoot();
 }
 
-// ================= Xem trước font =================
 const DEFAULT_PREVIEW_TEXT = 'Phông tiếng Việt';
 const DEFAULT_PREVIEW_SIZE = 40;
 const NEED_LOGIN_TEXT = 'Vui lòng đăng nhập để xem';
-const NEED_LOGIN_SIZE = 20; // size riêng cho chữ "dành cho tk vip"
+const NEED_LOGIN_SIZE = 20;
 
-const loadedPreviewFonts = new Map(); // fontKey -> tên font-family đã đăng ký
-const sucking = new WeakSet();        // khung chữ đang chạy hiệu ứng xóa
+const loadedPreviewFonts = new Map();
+const sucking = new WeakSet();
 let fontSeq = 0;
 
-// Tải font (cần token) và đăng ký vào document.fonts; trả về tên font-family. Có cache.
 async function ensurePreviewFont(font) {
   if (loadedPreviewFonts.has(fontKey(font))) return loadedPreviewFonts.get(fontKey(font));
 
@@ -469,7 +442,6 @@ async function ensurePreviewFont(font) {
   return familyName;
 }
 
-// Chữ bị "hút" vào thùng rác; trả về Promise khi xong
 function suckTextIntoTrash(panel, textEl) {
   return new Promise((done) => {
     const text = textEl.textContent;
@@ -554,7 +526,6 @@ function suckTextIntoTrash(panel, textEl) {
   });
 }
 
-// ================= Danh sách bộ font, card demo, tìm kiếm, tải bộ font =================
 const searchInput = $('search');
 const searchWrap = searchInput.closest('.search-wrap');
 const clearBtn = $('clear-btn');
@@ -565,9 +536,8 @@ const demosMoreBtn = $('demos-more');
 const demoVariantTpl = $('demo-variant-tpl');
 
 let allFonts = [];
-let activeFilter = 'all'; // bộ lọc đang chọn ở menu: all | free | wed | hand
+let activeFilter = 'all';
 
-// Tag của font trong manifest: chấp nhận "wed", "wed,hand", "wed hand" hoặc ["wed","hand"] (trường tag hoặc tags)
 const tagsOf = (f) => {
   const t = f.tags ?? f.tag ?? [];
   return (Array.isArray(t) ? t : String(t).split(/[\s,]+/)).map((s) => String(s).toLowerCase()).filter(Boolean);
@@ -583,12 +553,11 @@ const FILTERS = {
 const filteredGroups = () => demoAll.filter(FILTERS[activeFilter] || FILTERS.all);
 
 const familyKey = (f) => String(f.file).split('/')[0];
-// Thư mục "chứa" font: font free và font trả phí không bao giờ gom chung 1 card
+
 const groupDir = (f) => (f.free ? '@free/' + String(f.file).split('/').slice(0, -1).join('/') : familyKey(f));
 
-// ---- Tải danh sách font ----
 async function loadFonts() {
-  if (allFonts.length) { updateView(); return; } // đã tải rồi (đăng nhập lại)
+  if (allFonts.length) { updateView(); return; }
   try {
     const res = await fetch('manifest.json');
     allFonts = await res.json();
@@ -599,7 +568,6 @@ async function loadFonts() {
   }
 }
 
-// ---- Gợi ý khi gõ sai tên (fuzzy) ----
 function editDistance(a, b) {
   const m = a.length, n = b.length;
   if (!m) return n;
@@ -633,7 +601,7 @@ function fuzzyScore(q, name) {
 
 function suggestFonts(raw, max = 2) {
   const q = foldText(raw);
-  const pool = demoAll; // gợi ý trên toàn bộ font, không phụ thuộc mục đang chọn
+  const pool = demoAll;
   if (q.length < 3 || !pool.length) return [];
   const maxDist = Math.max(1, Math.round(q.length / 3));
   const seen = new Set();
@@ -648,7 +616,6 @@ function suggestFonts(raw, max = 2) {
   return scored.slice(0, max).map((x) => x.name);
 }
 
-// ---- Hiển thị kết quả ----
 function showNotFound() {
   statusEl.innerHTML =
     '<b>KHÔNG TÌM THẤY FONT</b>';
@@ -670,14 +637,12 @@ function showNotFound() {
   statusEl.appendChild(box);
 }
 
-// Tìm kiếm: lọc card demo theo tên bộ / tên từng font trong bộ
 function runSearch() {
   const q = foldText(searchInput.value);
-  searchWrap.classList.toggle('has-value', !!searchInput.value); // desktop nửa màn hình: chấm báo đang có chữ tìm
-  // Có từ khóa: tìm trên TẤT CẢ font, bất kể đang ở mục nào. Ô tìm kiếm trống: hiện theo mục đang chọn.
+  searchWrap.classList.toggle('has-value', !!searchInput.value);
+
   demoList = q ? demoAll.filter((g) => g.keys.some((k) => k.includes(q))) : filteredGroups();
 
-  // Kết quả không đổi (vd gõ thêm chữ mà vẫn ra đúng các card cũ) thì giữ nguyên, khỏi dựng lại
   const same = demoRendered && demoRendered.length === demoList.length && demoRendered.every((g, i) => g === demoList[i]);
   if (!same) renderDemos();
 
@@ -689,16 +654,13 @@ function runSearch() {
   updateView();
 }
 
-// ---- Card demo: font nào có ảnh trùng tên trong imgdemo/ (manifest có trường img) ----
-// Các font cùng 1 bộ (cùng ảnh, ví dụ Regular + Bold) gom chung 1 card, mỗi font 1 dòng preview.
-const DEMO_PAGE_SIZE = 24; // mỗi lần hiện 24 card, bấm "Xem tiếp font" để hiện thêm
-let demoAll = [];          // toàn bộ card demo: [{ title, fonts: [font...] }]
-let demoList = [];         // danh sách đang hiển thị (toàn bộ, hoặc kết quả tìm kiếm)
-let demoRendered = null;   // danh sách đã dựng ra màn hình
-let demoShown = 0;         // số card đã đưa ra màn hình
-const demoGroups = new WeakMap(); // card -> group
+const DEMO_PAGE_SIZE = 24;
+let demoAll = [];
+let demoList = [];
+let demoRendered = null;
+let demoShown = 0;
+const demoGroups = new WeakMap();
 
-// Thứ tự hiện trong card: Thin, Thin Italic, ExtraLight, ..., Regular, Italic, Medium, ..., Black, Black Italic
 const WEIGHT_ORDER = [
   ['hairline', 'thin'],
   ['extralight', 'ultralight'],
@@ -716,10 +678,9 @@ function styleRank(style) {
   const italic = /italic|oblique/.test(s);
   const weight = s.replace(/italic|oblique/g, '');
   const i = WEIGHT_ORDER.findIndex((names) => names.includes(weight));
-  return (i < 0 ? 99 : i) * 2 + (italic ? 1 : 0); // chưa nhận ra kiểu chữ -> xuống cuối, giữ thứ tự cũ
+  return (i < 0 ? 99 : i) * 2 + (italic ? 1 : 0);
 }
 
-// Giá hiển thị trên nhãn: manifest ghi "price": 50000 -> "50.000đ"; ghi chuỗi ("50K", "Liên hệ") -> hiện nguyên chuỗi
 const priceLabel = (p) => {
   if (p === undefined || p === null || p === '') return '';
   return typeof p === 'number' ? p.toLocaleString('vi-VN') + 'đ' : String(p).trim();
@@ -734,10 +695,10 @@ function buildDemoGroups() {
   });
 
   return [...map.values()].map((g) => {
-    g.fonts.sort((a, b) => styleRank(a.style) - styleRank(b.style)); // xếp theo độ đậm: Thin ... Black
-    g.price = g.free ? '' : priceLabel(g.fonts.map((f) => f.price).find((p) => priceLabel(p))); // 1 card = 1 giá (lấy của font đầu tiên có ghi giá)
+    g.fonts.sort((a, b) => styleRank(a.style) - styleRank(b.style));
+    g.price = g.free ? '' : priceLabel(g.fonts.map((f) => f.price).find((p) => priceLabel(p)));
     g.title = g.fonts.length > 1 ? (g.fonts[0].group || g.fonts[0].name) : g.fonts[0].name;
-    g.keys = [foldText(g.title), ...g.fonts.map((f) => f._key)]; // chuỗi dùng để tìm kiếm
+    g.keys = [foldText(g.title), ...g.fonts.map((f) => f._key)];
     return g;
   });
 }
@@ -750,7 +711,7 @@ function createDemoCard(g) {
   img.src = encodeURI(g.fonts[0].img);
   if (g.free) {
     const badge = document.createElement('span');
-    badge.className = 'demo-free-badge'; // nhãn đè lên góc trái ảnh, CSS riêng (.demo-free-badge)
+    badge.className = 'demo-free-badge';
     badge.textContent = 'Free';
     img.after(badge);
   }
@@ -758,7 +719,7 @@ function createDemoCard(g) {
   nameEl.textContent = g.title;
   if (g.price) {
     const price = document.createElement('span');
-    price.className = 'demo-price-badge'; // nhãn giá nằm ngay sau tên font, CSS riêng (.demo-price-badge)
+    price.className = 'demo-price-badge';
     price.textContent = g.price;
     nameEl.after(price);
   }
@@ -771,7 +732,7 @@ function showMoreDemos() {
   const next = demoList.slice(demoShown, demoShown + DEMO_PAGE_SIZE);
   next.forEach((g) => demosEl.appendChild(createDemoCard(g)));
   demoShown += next.length;
-  paintFreeWait(); // card vừa dựng ra có thể đang đếm ngược font free
+  paintFreeWait();
   updateView();
 }
 
@@ -785,11 +746,10 @@ function renderDemos() {
 function buildDemos() {
   demoAll = buildDemoGroups();
   demoRendered = null;
-  runSearch(); // dựng card theo ô tìm kiếm hiện tại (rỗng = tất cả)
+  runSearch();
 }
 
-// ---- Panel preview của card demo: gõ trực tiếp vào chữ preview, canh lề phải/trái/giữa ----
-const demoOpeners = new WeakMap(); // card -> hàm mở panel (nạp font + hiển thị)
+const demoOpeners = new WeakMap();
 const EDITABLE_MODE = (() => {
   const el = document.createElement('div');
   el.contentEditable = 'plaintext-only';
@@ -806,10 +766,9 @@ function bindDemoPanel(card, group) {
   const alignBtns = panel.querySelectorAll('.demo-align-btn');
   const multi = group.fonts.length > 1;
 
-  let align = 'center'; // mặc định canh giữa
+  let align = 'center';
   let savedText = DEFAULT_PREVIEW_TEXT;
 
-  // Mỗi font của bộ = 1 dòng preview (bộ nhiều font thì có nhãn Regular/Bold...)
   const variants = group.fonts.map((font) => {
     const el = demoVariantTpl.content.firstElementChild.cloneNode(true);
     const label = el.querySelector('.demo-variant-label');
@@ -841,13 +800,13 @@ function bindDemoPanel(card, group) {
   alignBtns.forEach((b) => b.addEventListener('click', () => { align = b.dataset.align; applyAlign(); }));
 
   variants.forEach((v) => {
-    // Gõ ở dòng nào thì các dòng còn lại đổi theo
+
     v.textEl.addEventListener('input', () => {
-      if (!v.textEl.textContent) v.textEl.replaceChildren(); // để placeholder hiện lại
+      if (!v.textEl.textContent) v.textEl.replaceChildren();
       savedText = v.textEl.textContent;
       variants.forEach((o) => { if (o !== v && !o.locked) o.textEl.textContent = savedText; });
     });
-    // Dán chỉ lấy chữ thuần (không mang định dạng)
+
     v.textEl.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text');
@@ -855,7 +814,6 @@ function bindDemoPanel(card, group) {
     });
   });
 
-  // Xóa nhanh: chữ ở mọi dòng cùng bị "hút" vào thùng rác
   clearBtn.addEventListener('click', async () => {
     spinIcon(clearBtn);
     const active = variants.filter((v) => !v.locked);
@@ -890,7 +848,7 @@ function bindDemoPanel(card, group) {
   return async () => {
     const pending = [];
     variants.forEach((v) => {
-      if (!isLoggedIn() && !v.font.free) showLocked(v); // font trả phí: phải đăng nhập mới xem
+      if (!isLoggedIn() && !v.font.free) showLocked(v);
       else if (loadedPreviewFonts.has(fontKey(v.font))) showFont(v, loadedPreviewFonts.get(fontKey(v.font)));
       else pending.push(v);
     });
@@ -924,19 +882,16 @@ function toggleDemo(card) {
   demoOpeners.get(card)();
 }
 
-// Card demo luôn hiện (đã được lọc theo ô tìm kiếm)
 function updateView() {
   demosEl.hidden = !demosEl.children.length;
-  demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length; // hết font thì ẩn nút
+  demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length;
 }
 
-// Tải 1 font; font trả phí cần đăng nhập, chưa đăng nhập -> hiện panel thông báo
 function downloadFont(font) {
   if (!font.free && !isLoggedIn()) { openNotice(); return; }
   clickDownloadLink(fontSrc(font));
 }
 
-// Tải nhiều font thành 1 file zip (dùng cho card demo nhiều font)
 async function downloadZip(btn, files, zipName) {
   const icon = btn.querySelector('i');
 
@@ -976,11 +931,10 @@ async function downloadZip(btn, files, zipName) {
   }
 }
 
-// ---- Tải font ở card demo ----
 function startDownload(g, btn) {
-  if (g.fonts.length === 1) { downloadFont(g.fonts[0]); return; } // 1 font: tải thẳng
+  if (g.fonts.length === 1) { downloadFont(g.fonts[0]); return; }
   if (btn.dataset.busy) return;
-  downloadZip(btn, g.fonts, g.title.replace(/[\\/:*?"<>|]+/g, '_')); // nhiều font: gói zip
+  downloadZip(btn, g.fonts, g.title.replace(/[\\/:*?"<>|]+/g, '_'));
 }
 
 function onDemoDownload(g, btn) {
@@ -989,15 +943,12 @@ function onDemoDownload(g, btn) {
   startDownload(g, btn);
 }
 
-// ---- Font free: chưa đăng nhập phải chờ 60s mới tải được, và chỉ chờ được 1 font tại một thời điểm ----
-// Chỉ đếm khi đang ở trang: chuyển tab / thu nhỏ / ra khỏi app thì tạm dừng. Tải lại trang (F5) thì hủy hẳn.
 const FREE_WAIT_SEC = 60;
 const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký tài khoản để tải không giới hạn.`;
 
-let freeWait = null;   // { left: ms còn lại, key: khóa card đang chờ, last: lần cập nhật cuối (0 = đang tạm dừng) }
+let freeWait = null;
 let freeTimer = 0;
 
-// Hiện / bỏ số giây đếm ngược (vd "45s") ngay trong icon download của card
 function setCountdown(card, sec) {
   const btn = card.querySelector('.demo-download');
   if (btn.dataset.busy) return;
@@ -1042,18 +993,17 @@ function tickFreeWait() {
 
   const now = Date.now();
   const visible = document.visibilityState === 'visible';
-  if (freeWait.last) freeWait.left -= now - freeWait.last; // chỉ cộng thời gian đã trôi khi đang ở trang
-  freeWait.last = visible ? now : 0;                        // ẩn trang: tạm dừng
+  if (freeWait.last) freeWait.left -= now - freeWait.last;
+  freeWait.last = visible ? now : 0;
 
   if (freeWait.left > 0 || !visible) { paintFreeWait(); return; }
 
-  // Hết giờ (và đang ở trang): tải font
   const key = stopFreeWait();
   const g = demoAll.find((x) => x.key === key);
   if (!g) return;
   const card = [...demosEl.children].find((c) => demoGroups.get(c) === g);
   let btn = card && card.querySelector('.demo-download');
-  if (!btn) { // card không còn trên màn hình (vd đang tìm kiếm font khác): dùng nút tạm để chạy tải zip
+  if (!btn) {
     btn = document.createElement('button');
     btn.innerHTML = '<i></i>';
   }
@@ -1061,8 +1011,8 @@ function tickFreeWait() {
 }
 
 function onFreeDownload(g, btn) {
-  if (isLoggedIn()) { startDownload(g, btn); return; } // đã đăng nhập: tải ngay, không phải chờ
-  if (freeWait) { openNotice(FREE_WAIT_MSG); return; }  // đang chờ 1 font free rồi
+  if (isLoggedIn()) { startDownload(g, btn); return; }
+  if (freeWait) { openNotice(FREE_WAIT_MSG); return; }
 
   freeWait = { left: FREE_WAIT_SEC * 1000, key: g.key, last: Date.now() };
   clearInterval(freeTimer);
@@ -1070,7 +1020,6 @@ function onFreeDownload(g, btn) {
   paintFreeWait();
 }
 
-// ================= Đăng ký tài khoản VIP (gửi về bot Telegram qua /api/register) =================
 const registerPanel = $('register-panel');
 const regEmail = $('reg-email');
 const regContact = $('reg-contact');
@@ -1082,7 +1031,7 @@ const regHint = $('register-hint');
 const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
 const REG_BUSY_LABEL = SPINNER + ' Đang xử lý...';
 const REG_PHOTO_TEXT = regPhotoName.textContent;
-const REG_MAX_SIDE = 1600; // thu nhỏ ảnh chuyển khoản cho nhẹ khi gửi
+const REG_MAX_SIDE = 1600;
 let regHintTimer = null;
 let regBusy = false;
 
@@ -1111,7 +1060,6 @@ function resetRegisterForm() {
   regFileBox.classList.remove('has-file');
 }
 
-// Thu nhỏ ảnh bằng canvas; lỗi thì dùng ảnh gốc
 async function shrinkImage(file) {
   try {
     const bmp = await createImageBitmap(file);
@@ -1135,7 +1083,6 @@ async function doRegister() {
   const photo = regPhoto.files[0];
 
   if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ'); return; }
-  if (!contact) { showRegHint('Vui lòng nhập thông tin liên hệ'); return; }
   if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản'); return; }
   if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh'); return; }
 
@@ -1154,7 +1101,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký tài khoản thành công.\nVui lòng đăng nhập sau 3p phút.', 3000);
+      showRegHint('Đăng ký thành công.\nVui lòng đăng nhập sau ít phút.', 5000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
@@ -1174,7 +1121,6 @@ regPhoto.addEventListener('change', () => {
 });
 regSubmit.addEventListener('click', doRegister);
 
-// ================= Menu (bottom-nav) & popup KD Font Finder =================
 const menuBtn = $('menu-btn');
 const menuIcon = menuBtn.querySelector('i');
 const menuPanel = $('menu-panel');
@@ -1208,10 +1154,9 @@ function openFinder() {
 
 function closeFinder() {
   finderPanel.hidden = true;
-  finderVideo.pause(); // đóng popup thì dừng video
+  finderVideo.pause();
 }
 
-// Chọn mục lọc: Tất cả / Free / Cưới / Viết tay
 function setFilter(name) {
   if (!FILTERS[name]) return;
   activeFilter = name;
@@ -1220,12 +1165,11 @@ function setFilter(name) {
     b.classList.toggle('active', on);
     if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
   });
-  searchInput.value = ''; // chọn mục thì xóa chữ đang tìm, để hiện đúng danh sách của mục
-  if (allFonts.length) runSearch(); // chưa tải xong manifest thì buildDemos() sẽ tự lọc theo mục đang chọn
+  searchInput.value = '';
+  if (allFonts.length) runSearch();
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
 
-// Desktop (>= 768px): ô tìm kiếm nằm trong sidebar; mobile: nằm đầu danh sách như cũ
 const desktopMQ = window.matchMedia('(min-width: 768px)');
 const dockSearch = $('dock-search');
 
@@ -1235,7 +1179,7 @@ function placeSearch() {
   } else if (searchWrap.parentElement !== contentEl) {
     contentEl.insertBefore(searchWrap, contentEl.firstChild);
   }
-  closeMenu(); // đổi layout thì đóng menu popup của mobile
+  closeMenu();
 }
 
 function initMenu() {
@@ -1244,7 +1188,6 @@ function initMenu() {
 
   menuBtn.addEventListener('click', () => { if (isMenuOpen()) closeMenu(); else openMenu(); });
 
-  // Menu popup (góc trên trái): Messenger, Facebook, Zalo, Đăng nhập, KD Font Finder, 10K font khác
   menuPanel.addEventListener('click', (e) => {
     const item = e.target.closest('.menu-item, .nav-btn');
     if (!item) return;
@@ -1253,7 +1196,6 @@ function initMenu() {
     closeMenu();
   });
 
-  // Thanh dưới (mobile): Trang chủ, Font free, Font cưới, Font viết tay
   $('bottom-nav').addEventListener('click', (e) => {
     const item = e.target.closest('[data-filter]');
     if (!item) return;
@@ -1261,9 +1203,6 @@ function initMenu() {
     closeMenu();
   });
 
-  // Bấm ra ngoài menu thì đóng. Panel đăng nhập / thông báo / KD Font Finder / đăng ký đang mở:
-  // bấm bất cứ vùng nào ngoài thẻ (kể cả thanh dưới, nút menu, sidebar) đều đóng panel.
-  // Bấm trong thẻ thì giữ nguyên để còn nhập liệu, xem video, bấm nút.
   document.addEventListener('click', (e) => {
     if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
     if (panelJustOpened) return;
@@ -1284,7 +1223,6 @@ function initMenu() {
   });
 }
 
-// ---- Sự kiện ----
 function initFonts() {
   searchInput.addEventListener('input', runSearch);
 
@@ -1301,20 +1239,19 @@ function initFonts() {
     runSearch();
   });
 
-  document.addEventListener('visibilitychange', tickFreeWait); // ẩn/hiện trang: dừng/đếm tiếp ngay
+  document.addEventListener('visibilitychange', tickFreeWait);
 
   demosMoreBtn.addEventListener('click', showMoreDemos);
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');
     if (btn) { onDemoDownload(demoGroups.get(btn.closest('.demo-card')), btn); return; }
-    if (e.target.closest('.demo-panel')) return; // bấm trong panel: không đóng
+    if (e.target.closest('.demo-panel')) return;
     const card = e.target.closest('.demo-card');
     if (card) toggleDemo(card);
   });
 }
 
-// ================= Nút đóng popup (giữa, cách đáy 20px) =================
 const popupClose = $('popup-close');
 const popups = [loginPanel, noticePanel, finderPanel, registerPanel];
 const syncPopupClose = () => { popupClose.hidden = popups.every((p) => p.hidden); };
@@ -1323,8 +1260,7 @@ popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilt
 popupClose.addEventListener('click', () => closeAllPanels());
 syncPopupClose();
 
-// ================= Khởi động =================
 initFonts();
 initMenu();
-initAuth(); // xác thực xong sẽ tự gọi loadFonts()
+initAuth();
 })();
