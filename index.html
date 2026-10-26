@@ -9,38 +9,39 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
 <link rel="stylesheet" href="style.css">
+<script>try{var w=matchMedia("(min-width:1280px)").matches,s=localStorage.getItem("kd-dock");document.documentElement.dataset.dock=w&&s!=="collapsed"?"expanded":"collapsed"}catch(e){}</script>
 </head>
 <body>
 
   <div class="menu-backdrop" id="menu-backdrop"></div>
 
-  <div class="dock">
+  <div class="dock" id="dock">
 
-    <div class="dock-search" id="dock-search"></div>
+    <div class="menu-divider dock-head"><span>Menu</span><button type="button" class="btn-icon dock-toggle" id="dock-toggle" aria-label="Thu nhỏ menu" aria-expanded="true" aria-controls="dock"><i class="ri-menu-fold-line"></i></button></div>
 
-    <button type="button" class="nav-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu-panel"><i class="ri-menu-2-line"></i></button>
+    <button type="button" class="btn-icon" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu-panel"><i class="ri-menu-2-line"></i></button>
 
     <div class="menu-panel" id="menu-panel" aria-label="Menu">
       <div class="notice-title menu-title"><i class="ri-menu-2-line"></i> Menu</div>
       <div class="menu-scroll">
         <div class="menu-divider"><span>Ứng dụng tìm font</span></div>
-        <button type="button" class="menu-item" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
-        <a class="menu-item" href="#ggdrive" data-action="folder" target="_blank" rel="noopener" title="10K font khác"><i class="ri-folder-2-line"></i><span>10K Font vh khác</span></a>
+        <button type="button" class="menu-item menu-row" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
+        <a class="menu-item menu-row" href="#ggdrive" data-action="folder" target="_blank" rel="noopener" title="10K font khác"><i class="ri-folder-2-line"></i><span>10K Font vh khác</span></a>
         <div class="menu-divider"><span>Liên hệ</span></div>
-        <a class="nav-btn" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Fanpage" title="Fanpage"><i class="ri-facebook-line"></i><span class="nav-label">Fanpage</span></a>
-        <a class="nav-btn" href="https://www.m.me/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger" title="Messenger"><i class="ri-messenger-line"></i><span class="nav-label">Messenger</span></a>
-        <a class="nav-btn nav-text" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin" title="Zalo"><span class="nav-zalo-text">Zalo</span><i class="ri-chat-3-line nav-zalo-icon"></i><span class="nav-label">Zalo</span></a>
+        <a class="menu-row" href="https://www.facebook.com/fontkemdoan" target="_blank" rel="noopener" aria-label="Fanpage" title="Fanpage"><i class="ri-facebook-line"></i><span class="nav-label">Fanpage</span></a>
+        <a class="menu-row" href="https://www.m.me/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger" title="Messenger"><i class="ri-messenger-line"></i><span class="nav-label">Messenger</span></a>
+        <a class="menu-row" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin" title="Zalo"><span class="nav-zalo-text">Zalo</span><i class="ri-chat-3-line nav-zalo-icon"></i><span class="nav-label">Zalo</span></a>
         <div class="menu-divider"><span>Tài khoản</span></div>
-        <button class="nav-btn" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
-        <button type="button" class="nav-btn" id="register-btn" data-action="register" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></button>
+        <button class="menu-row" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
+        <button type="button" class="menu-row" id="register-btn" data-action="register" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></button>
       </div>
     </div>
 
     <nav class="bottom-nav" id="bottom-nav">
-      <button type="button" class="menu-item active" data-filter="all" title="Trang chủ" aria-current="true"><i class="ri-home-3-line"></i><span>Trang chủ</span></button>
-      <button type="button" class="menu-item" data-filter="free" title="Font free"><i class="ri-gift-line"></i><span>Font Free</span></button>
-      <button type="button" class="menu-item" data-filter="wed" title="Font cưới"><i class="ri-heart-3-line"></i><span>Font Cưới</span></button>
-      <button type="button" class="menu-item" data-filter="hand" title="Font viết tay"><i class="ri-pen-nib-line"></i><span>Font Viết tay</span></button>
+      <button type="button" class="menu-item menu-row active" data-filter="all" title="Trang chủ" aria-current="true"><i class="ri-home-3-line"></i><span>Trang chủ</span></button>
+      <button type="button" class="menu-item menu-row" data-filter="free" title="Font free"><i class="ri-gift-line"></i><span>Font Free</span></button>
+      <button type="button" class="menu-item menu-row" data-filter="wed" title="Font cưới"><i class="ri-heart-3-line"></i><span>Font Cưới</span></button>
+      <button type="button" class="menu-item menu-row" data-filter="hand" title="Font viết tay"><i class="ri-pen-nib-line"></i><span>Font Viết tay</span></button>
     </nav>
 
     <div class="dock-footer">&copy;<span> Kem Đoàn</span></div>
@@ -75,8 +76,8 @@
         <input type="password" id="new-password" placeholder="Mật khẩu mới">
       </div>
       <div class="login-btn-row">
-        <button id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
-        <button id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+        <button class="btn" id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
+        <button class="btn" id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
       </div>
       <div class="login-or" id="google-or"><span>Hoặc</span></div>
       <div class="google-btn-wrap" id="google-btn"></div>
@@ -108,14 +109,14 @@
           </label>
         </div>
           <div class="notice-btn-row register-actions">
-            <button type="button" class="notice-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
+            <button type="button" class="btn notice-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
           </div>
         </div>
 
         <div class="reg-bank">
           <div class="reg-qr-col">
             <div class="reg-qr"><img src="img/qr.jpg" alt="QR chuyển khoản"></div>
-            <a class="reg-qr-dl" href="img/qrfull.jpg" download="qrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+            <a class="btn reg-qr-dl" href="img/qrfull.jpg" download="qrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
           </div>
           <ul class="reg-info">
             <li><i class="ri-price-tag-line"></i><span>300.000 vnđ</span></li>
@@ -134,8 +135,8 @@
       <div class="notice-title"><i class="ri-megaphone-line"></i> Thông báo</div>
       <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
       <div class="notice-btn-row">
-        <button type="button" class="notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
-        <button type="button" class="notice-btn" id="notice-register-btn"><i class="ri-user-add-line"></i> Đăng ký</button>
+        <button type="button" class="btn notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+        <button type="button" class="btn notice-btn" id="notice-register-btn"><i class="ri-user-add-line"></i> Đăng ký</button>
       </div>
     </div>
   </div>
@@ -170,8 +171,8 @@
 
           </ul>
           <div class="notice-btn-row finder-actions">
-            <a class="notice-btn" href="https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
-            <a class="notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
+            <a class="btn notice-btn" href="https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
+            <a class="btn notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
           </div>
         </div>
       </div>
@@ -182,11 +183,11 @@
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
       <input type="text" id="search" placeholder="Nhập tên font..." autocomplete="off" autocorrect="off" spellcheck="false">
-      <button id="clear-btn"><i class="ri-close-line"></i></button>
+      <button class="btn-icon" id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
 
     <div id="demos" hidden></div>
-    <button type="button" id="demos-more" class="demos-more" hidden>Xem thêm <i class="ri-arrow-down-s-line"></i></button>
+    <button type="button" id="demos-more" class="btn demos-more" hidden>Xem thêm <i class="ri-arrow-down-s-line"></i></button>
     <div id="status"></div>
   </main>
 
@@ -195,21 +196,21 @@
       <img class="demo-img" alt="" loading="lazy">
       <div class="demo-foot">
         <span class="demo-name"></span>
-        <button type="button" class="demo-download" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
+        <button type="button" class="btn-icon demo-download" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
       </div>
       <div class="demo-panel">
         <div class="demo-panel-row">
           <input type="range" class="preview-size-slider" min="1" max="100" step="1" aria-label="Cỡ chữ">
           <span class="preview-size-value"></span>
           <div class="demo-align">
-            <button type="button" class="demo-align-btn" data-align="left" aria-label="Canh trái"><i class="ri-align-left"></i></button>
-            <button type="button" class="demo-align-btn" data-align="center" aria-label="Canh giữa"><i class="ri-align-center"></i></button>
-            <button type="button" class="demo-align-btn" data-align="right" aria-label="Canh phải"><i class="ri-align-right"></i></button>
+            <button type="button" class="btn-icon demo-align-btn" data-align="left" aria-label="Canh trái"><i class="ri-align-left"></i></button>
+            <button type="button" class="btn-icon demo-align-btn" data-align="center" aria-label="Canh giữa"><i class="ri-align-center"></i></button>
+            <button type="button" class="btn-icon demo-align-btn" data-align="right" aria-label="Canh phải"><i class="ri-align-right"></i></button>
           </div>
         </div>
         <div class="preview-loading" hidden><i class="ri-loader-4-line kd-spinner"></i> Đang tải font...</div>
         <div class="demo-variants"></div>
-        <button type="button" class="preview-clear-btn demo-clear-btn" aria-label="Xóa" hidden><i class="ri-close-line"></i></button>
+        <button type="button" class="btn-icon preview-clear-btn demo-clear-btn" aria-label="Xóa" hidden><i class="ri-close-line"></i></button>
       </div>
     </div>
   </template>
@@ -223,7 +224,7 @@
     </div>
   </template>
 
-<button type="button" class="popup-close" id="popup-close" aria-label="Đóng" title="Đóng" hidden><i class="ri-close-line"></i></button>
+<button type="button" class="btn-icon popup-close" id="popup-close" aria-label="Đóng" title="Đóng" hidden><i class="ri-close-line"></i></button>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="script.js"></script>

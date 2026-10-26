@@ -1171,11 +1171,10 @@ function setFilter(name) {
 }
 
 const desktopMQ = window.matchMedia('(min-width: 768px)');
-const dockSearch = $('dock-search');
 
 function placeSearch() {
   if (desktopMQ.matches) {
-    if (searchWrap.parentElement !== dockSearch) dockSearch.appendChild(searchWrap);
+    if (searchWrap.parentElement !== brand) brand.appendChild(searchWrap);
   } else if (searchWrap.parentElement !== contentEl) {
     contentEl.insertBefore(searchWrap, contentEl.firstChild);
   }
@@ -1189,7 +1188,7 @@ function initMenu() {
   menuBtn.addEventListener('click', () => { if (isMenuOpen()) closeMenu(); else openMenu(); });
 
   menuPanel.addEventListener('click', (e) => {
-    const item = e.target.closest('.menu-item, .nav-btn');
+    const item = e.target.closest('.menu-row');
     if (!item) return;
     if (item.dataset.action === 'finder') { openFinder(); return; }
     if (item.dataset.action === 'register') { openRegister(); return; }
@@ -1263,13 +1262,13 @@ syncPopupClose();
 function initDockTips() {
   const dock = document.querySelector('.dock');
   if (!dock) return;
-  const collapsedMq = window.matchMedia('(min-width: 768px) and (max-width: 1279.98px)');
+  const isCollapsed = () => desktopMQ.matches && document.documentElement.dataset.dock === 'collapsed';
   const tip = document.createElement('div');
   tip.className = 'dock-tip';
   tip.setAttribute('role', 'tooltip');
   document.body.appendChild(tip);
 
-  const SEL = '.menu-item, .nav-btn';
+  const SEL = '.menu-row';
   let current = null;
 
   const labelOf = (el) => {
@@ -1287,7 +1286,7 @@ function initDockTips() {
   };
 
   const show = (el) => {
-    if (!collapsedMq.matches) return;
+    if (!isCollapsed()) return;
     const text = labelOf(el);
     if (!text) return;
     if (current && current !== el) hide();
@@ -1321,8 +1320,59 @@ function initDockTips() {
   window.addEventListener('resize', hide);
 }
 
+// Ghi nhớ loại thiết bị nhập gần nhất (mouse | touch) để CSS chỉ bật hover khi dùng chuột.
+function initInputMode() {
+  const root = document.documentElement;
+  const set = (e) => {
+    const mode = e.pointerType === 'mouse' ? 'mouse' : 'touch';
+    if (root.dataset.input !== mode) root.dataset.input = mode;
+  };
+  document.addEventListener('pointerdown', set, { passive: true, capture: true });
+  document.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') set(e); }, { passive: true });
+}
+
+// Thu nhỏ / mở rộng menu trái (PC). Trạng thái nằm ở <html data-dock="expanded|collapsed">.
+// Màn >= 1280px: ghi nhớ lựa chọn và đẩy nội dung. Màn nhỏ hơn: mở rộng là lớp phủ, tự thu lại.
+function initDockToggle() {
+  const root = document.documentElement;
+  const btn = $('dock-toggle');
+  const icon = btn.querySelector('i');
+  const wideMQ = window.matchMedia('(min-width: 1280px)');
+  const KEY = 'kd-dock';
+  let pref = null;
+  try { pref = localStorage.getItem(KEY); } catch (e) {}
+
+  const apply = (state) => {
+    const open = state === 'expanded';
+    root.dataset.dock = state;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Thu nhỏ menu' : 'Mở rộng menu');
+    icon.className = open ? 'ri-menu-fold-line' : 'ri-menu-unfold-line';
+  };
+  const initial = () => (wideMQ.matches && pref !== 'collapsed' ? 'expanded' : 'collapsed');
+  apply(initial());
+
+  btn.addEventListener('click', () => {
+    const next = root.dataset.dock === 'expanded' ? 'collapsed' : 'expanded';
+    apply(next);
+    if (wideMQ.matches) {
+      pref = next;
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    }
+  });
+  wideMQ.addEventListener('change', () => apply(initial()));
+
+  document.addEventListener('click', (e) => {
+    if (wideMQ.matches || !desktopMQ.matches || root.dataset.dock !== 'expanded') return;
+    if (e.target.closest('#dock-toggle')) return;
+    if (!e.target.closest('#dock') || e.target.closest('.menu-row')) apply('collapsed');
+  });
+}
+
+initInputMode();
 initFonts();
 initMenu();
+initDockToggle();
 initAuth();
 initDockTips();
 })();
