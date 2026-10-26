@@ -249,7 +249,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
-.demo-download:active {
+.demo-download:hover {
   background: var(--text-black);
   color: var(--text);
 }
@@ -435,13 +435,12 @@ transition: background-color 9999s ease-in-out 0s;
   transition: background 0.15s ease, transform 0.15s ease;
 }
 
-#login-btn:active,
-#change-pass-btn:active,
-.notice-btn:active,
-.demo-download:active,
-.demo-align-btn:active,
-.demos-more:active,
-.nav-btn:active {
+#login-btn:hover,
+#change-pass-btn:hover,
+.notice-btn:hover,
+.demo-download:hover,
+.demo-align-btn:hover,
+.demos-more:hover {
   transform: scale(0.92);
 }
 
@@ -677,7 +676,7 @@ transition: background-color 9999s ease-in-out 0s;
   line-height: 1;
 }
 
-.menu-item:not(.active):active { background: var(--bg); }
+.menu-item:not(.active):hover { background: var(--bg); }
 .menu-item:active { transform: scale(0.92); }
 
 @media (hover: hover) {
@@ -692,7 +691,7 @@ transition: background-color 9999s ease-in-out 0s;
 .menu-item.active {
   background: var(--text-black);
   color: var(--text);
-  border-radius: 10px;
+  border-radius: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1184,8 +1183,8 @@ transition: background-color 9999s ease-in-out 0s;
 
   .nav-btn { color: var(--text-black); }
   .nav-btn i { font-size: 20px; flex-shrink: 0; }
-  .nav-btn:active {
-  transform: scale(0.92);
+  .nav-btn:hover {
+  background: var(--bg);
 }
 
   .nav-zalo-text { display: none; }
@@ -1201,13 +1200,7 @@ transition: background-color 9999s ease-in-out 0s;
   }
 
   @media (hover: hover) {
-    .menu-item:not(.active):hover,
-    .menu-item:not(.active):active,
-    .nav-btn:hover,
-    .nav-btn:active {
-      background: var(--text-black);
-      color: var(--text);
-    }
+    .nav-btn:hover { background: var(--bg); }
   }
 
   .nav-btn:focus-visible {
@@ -1414,9 +1407,9 @@ transition: background-color 9999s ease-in-out 0s;
   }
 
   @media (hover: hover) {
-    .bottom-nav .menu-item:not(.active):hover { background: transparent; color: var(--red); }
+    .bottom-nav .menu-item:not(.active):hover { background: transparent; color: #fff; }
   }
-  .bottom-nav .menu-item:not(.active):active { background: transparent; color: var(--red); }
+  .bottom-nav .menu-item:not(.active):active { background: transparent; color: #fff; }
 
   .menu-panel .nav-btn {
     width: 100%;
@@ -1433,7 +1426,10 @@ transition: background-color 9999s ease-in-out 0s;
     white-space: nowrap;
   }
 
-  .menu-panel .nav-btn:active { background: var(--bg); color: var(--text-black); }
+  .menu-panel .nav-btn:hover {
+    background: var(--bg);
+    color: var(--text-black);
+  }
 
   .menu-panel .nav-btn i,
   .menu-panel .menu-item i {
@@ -1567,7 +1563,7 @@ transition: background-color 9999s ease-in-out 0s;
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 6px;
   box-shadow: var(--shadow-soft);
 }
@@ -1706,3 +1702,13 @@ transition: background-color 9999s ease-in-out 0s;
 .popup-close:active { transform: translateX(-50%) scale(0.92); }
 .popup-close i { display: block; line-height: 1; }
 
+@media (min-width: 768px) {
+  .login-panel,
+  .notice-panel {
+    padding-left: calc(20px + var(--side-w) + 20px);
+  }
+
+  .popup-close {
+    left: calc(50% + (20px + var(--side-w)) / 2);
+  }
+}
