@@ -1101,7 +1101,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công.\nVui lòng đăng nhập sau ít phút.', 5000);
+      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút.', 5000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
@@ -1260,7 +1260,69 @@ popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilt
 popupClose.addEventListener('click', () => closeAllPanels());
 syncPopupClose();
 
+function initDockTips() {
+  const dock = document.querySelector('.dock');
+  if (!dock) return;
+  const collapsedMq = window.matchMedia('(min-width: 768px) and (max-width: 1279.98px)');
+  const tip = document.createElement('div');
+  tip.className = 'dock-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+
+  const SEL = '.menu-item, .nav-btn';
+  let current = null;
+
+  const labelOf = (el) => {
+    const s = el.querySelector('.nav-label, span:not(.nav-zalo-text)');
+    return ((s && s.textContent) || el.getAttribute('aria-label') || el.dataset.tip || '').trim();
+  };
+
+  const hide = () => {
+    tip.classList.remove('show');
+    if (current && current.dataset.tipTitle !== undefined) {
+      current.setAttribute('title', current.dataset.tipTitle);
+      delete current.dataset.tipTitle;
+    }
+    current = null;
+  };
+
+  const show = (el) => {
+    if (!collapsedMq.matches) return;
+    const text = labelOf(el);
+    if (!text) return;
+    if (current && current !== el) hide();
+    current = el;
+    if (el.hasAttribute('title')) {
+      el.dataset.tipTitle = el.getAttribute('title');
+      el.removeAttribute('title');
+    }
+    tip.textContent = text;
+    const r = el.getBoundingClientRect();
+    tip.style.left = Math.round(r.right + 14) + 'px';
+    tip.style.top = Math.round(r.top + r.height / 2 - tip.offsetHeight / 2) + 'px';
+    tip.classList.add('show');
+  };
+
+  dock.addEventListener('mouseover', (e) => {
+    const el = e.target.closest(SEL);
+    if (el && dock.contains(el)) show(el);
+  });
+  dock.addEventListener('mouseout', (e) => {
+    const el = e.target.closest(SEL);
+    if (el && !el.contains(e.relatedTarget)) hide();
+  });
+  dock.addEventListener('focusin', (e) => {
+    const el = e.target.closest(SEL);
+    if (el && el.matches(':focus-visible')) show(el);
+  });
+  dock.addEventListener('focusout', hide);
+  dock.addEventListener('click', hide);
+  dock.addEventListener('scroll', hide, { passive: true });
+  window.addEventListener('resize', hide);
+}
+
 initFonts();
 initMenu();
 initAuth();
+initDockTips();
 })();
