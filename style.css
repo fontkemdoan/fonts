@@ -680,8 +680,14 @@ transition: background-color 9999s ease-in-out 0s;
   line-height: 1;
 }
 
-.menu-item:not(.active):hover { background: var(--bg); }
-.menu-item:active { transform: scale(0.92); }
+.menu-item:not(.active):hover {
+  background: var(--bg);
+  border-radius: 999px;
+}
+.menu-item:active {
+  transform: scale(0.92);
+  border-radius: 999px;
+}
 
 @media (hover: hover) {
   .menu-item:not(.active):hover { background: var(--bg); }
@@ -695,7 +701,7 @@ transition: background-color 9999s ease-in-out 0s;
 .menu-item.active {
   background: var(--text-black);
   color: var(--text);
-  border-radius: 16px;
+  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -720,7 +726,7 @@ transition: background-color 9999s ease-in-out 0s;
 .finder-video {
   display: block;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--bg);
 }
 
@@ -1188,7 +1194,8 @@ transition: background-color 9999s ease-in-out 0s;
   .nav-btn { color: var(--text-black); }
   .nav-btn i { font-size: 20px; flex-shrink: 0; }
   .nav-btn:hover {
-  background: var(--bg);
+    background: var(--bg);
+    border-radius: 999px;
 }
 
   .nav-zalo-text { display: none; }
@@ -1204,7 +1211,10 @@ transition: background-color 9999s ease-in-out 0s;
   }
 
   @media (hover: hover) {
-    .nav-btn:hover { background: var(--bg); }
+    .nav-btn:hover {
+      background: var(--bg);
+      border-radius: 999px;
+    }
   }
 
   .nav-btn:focus-visible {
@@ -1451,6 +1461,7 @@ transition: background-color 9999s ease-in-out 0s;
   .menu-panel .nav-btn:hover {
     background: var(--bg);
     color: var(--text-black);
+    border-radius: 999px;
   }
 
   .menu-panel .nav-btn i,
@@ -1585,7 +1596,7 @@ transition: background-color 9999s ease-in-out 0s;
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 6px;
   box-shadow: var(--shadow-soft);
 }
