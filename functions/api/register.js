@@ -20,7 +20,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const time = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-  const caption = `ĐĂNG KÝ TÀI KHOẢN VIP\nGmail: ${email}\nLiên hệ: ${contact}\nThời gian: ${time}`;
+  const caption = `ĐĂNG KÝ THÀNH VIÊN\nGmail: ${email}\nLiên hệ: ${contact}\nThời gian: ${time}`;
 
   const tg = new FormData();
   tg.append('chat_id', env.TG_CHAT_ID);
