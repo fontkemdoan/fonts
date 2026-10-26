@@ -588,8 +588,12 @@ transition: background-color 9999s ease-in-out 0s;
   line-height: 1;
 }
 
-.nav-btn:active {
+#menu-btn:active {
   color: #fff;
+}
+
+.nav-btn:active {
+  transform: scale(0.92);
 }
 
 .nav-text {
@@ -1101,7 +1105,7 @@ transition: background-color 9999s ease-in-out 0s;
   :root {
     --row-h: 46px;
     --icon-pad: calc((var(--row-h) - 20px) / 2);
-    --item-gap: 12px;
+    --item-gap: 9px;
     --side-w: calc(var(--row-h) + 16px);
   }
 
@@ -1264,9 +1268,9 @@ transition: background-color 9999s ease-in-out 0s;
   .menu-divider span { display: none; }
 
   .search-wrap {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed;
+    top: 28px;
+    left: 28px;
     width: var(--row-h);
     height: var(--row-h);
     z-index: 5;
@@ -1323,8 +1327,26 @@ transition: background-color 9999s ease-in-out 0s;
   }
 }
 
-@media (min-width: 768px) and (max-height: 700px) {
-  :root { --row-h: 38px; }
+/* Menu trái: giữ nguyên kích thước, nếu dài hơn màn hình thì cuộn trong khung nền */
+@media (min-width: 768px) {
+  .dock {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .dock::-webkit-scrollbar { display: none; }
+  .dock > *,
+  .dock-footer { flex-shrink: 0; }
+
+  .dock-search {
+    position: sticky;
+    top: -8px;
+    z-index: 3;
+    padding-top: 8px;
+    height: calc(var(--row-h) + 8px);
+    background: var(--card);
+  }
 }
 
 .login-or {
