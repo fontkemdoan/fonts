@@ -1143,7 +1143,7 @@ function closeMenu() {
   menuPanel.classList.remove('open');
   menuBackdrop.classList.remove('open');
   menuBtn.setAttribute('aria-expanded', 'false');
-  menuIcon.className = 'ri-menu-2-line';
+  menuIcon.className = 'ri-menu-3-line';
 }
 
 function openFinder() {
@@ -1320,7 +1320,6 @@ function initDockTips() {
   window.addEventListener('resize', hide);
 }
 
-// Ghi nhớ loại thiết bị nhập gần nhất (mouse | touch) để CSS chỉ bật hover khi dùng chuột.
 function initInputMode() {
   const root = document.documentElement;
   const set = (e) => {
@@ -1331,8 +1330,6 @@ function initInputMode() {
   document.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') set(e); }, { passive: true });
 }
 
-// Thu nhỏ / mở rộng menu trái (PC). Trạng thái nằm ở <html data-dock="expanded|collapsed">.
-// Màn >= 1280px: ghi nhớ lựa chọn và đẩy nội dung. Màn nhỏ hơn: mở rộng là lớp phủ, tự thu lại.
 function initDockToggle() {
   const root = document.documentElement;
   const btn = $('dock-toggle');
@@ -1347,7 +1344,7 @@ function initDockToggle() {
     root.dataset.dock = state;
     btn.setAttribute('aria-expanded', String(open));
     btn.setAttribute('aria-label', open ? 'Thu nhỏ menu' : 'Mở rộng menu');
-    icon.className = open ? 'ri-menu-fold-line' : 'ri-menu-unfold-line';
+    icon.className = open ? 'ri-menu-unfold-4-line' : 'ri-menu-fold-4-line';
   };
   const initial = () => (wideMQ.matches && pref !== 'collapsed' ? 'expanded' : 'collapsed');
   apply(initial());

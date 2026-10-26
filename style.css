@@ -21,36 +21,19 @@
   --focus: var(--text-black);
   --press: 0.92;
 
-  /* Icon button tokens (component chỉ cần override các biến này) */
+  /* Icon button */
   --ib-size: 36px;
   --ib-icon: 18px;
   --ib-bg: var(--bg);
   --ib-color: var(--text-black);
   --ib-border: none;
 
-  /* Row (mục menu) tokens */
+  /* Row (menu) */
   --row-h: 46px;
   --row-pad: 16px;
 }
 
-
-/* ==========================================================================
-   BUTTON SYSTEM
-   3 họ nút, mỗi họ định nghĩa hình dạng + hover / active / focus / disabled
-   ĐÚNG 1 LẦN ở đây. HTML chỉ cần gắn class của họ:
-
-     .btn       Pill  : nút hành động (đăng nhập, đăng ký, xem thêm, tải QR)
-     .btn-icon  Icon  : nút tròn (tải font, canh lề, xóa, đóng popup, menu mobile)
-     .menu-row  Row   : mục menu (mobile panel + sidebar desktop)
-
-   Component riêng (.notice-btn, .demo-download, ...) chỉ được:
-     - đổi token  : --ib-size, --ib-icon, --ib-bg, --ib-color, --ib-border,
-                    --focus
-     - hoặc layout: width, margin, flex, position
-   Không viết lại màu / radius / hover / transition cho từng nút.
-   ========================================================================== */
-
-/* ---------- 1. PILL ---------- */
+/* ---------- PILL ---------- */
 .btn {
   display: flex;
   align-items: center;
@@ -70,13 +53,13 @@
 }
 
 .btn i {
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1;
 }
 
 .btn:disabled { cursor: default; }
 
-/* ---------- 2. ICON (nút tròn) ---------- */
+/* ---------- ICON (tròn) ---------- */
 .btn-icon {
   display: flex;
   align-items: center;
@@ -101,7 +84,7 @@
   line-height: 1;
 }
 
-/* ---------- 3. ROW (mục menu) ---------- */
+/* ---------- ROW (menu) ---------- */
 .menu-row {
   display: flex;
   align-items: center;
@@ -141,17 +124,14 @@
   scale: var(--press);
 }
 
-/* Menu mở trên điện thoại: nhấn thì thu nhỏ */
+/* Menu open mobile */
 @media (max-width: 767.98px) {
   .menu-panel .menu-row:active {
     scale: var(--press);
   }
 }
 
-/* Rê chuột: chỉ áp dụng khi người dùng đang dùng chuột.
-   script.js (initInputMode) đặt <html data-input="touch|mouse"> theo
-   pointerType của lần tương tác gần nhất, nên chạm trên cảm ứng không bị
-   "dính hover" (nút không trả về kích thước cũ sau khi nhấn). */
+/* mouse */
 @media (any-hover: hover) {
   html:not([data-input="touch"]) .btn:not(:disabled):hover,
   html:not([data-input="touch"]) .btn-icon:hover {
@@ -159,7 +139,7 @@
   }
 }
 
-/* Menu trái trên PC: rê chuột thì đổi nền */
+/* Menu left PC: hover */
 @media (min-width: 768px) and (any-hover: hover) {
   html:not([data-input="touch"]) .menu-row:not(.active):hover {
     background: var(--bg);
@@ -416,7 +396,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   margin-bottom: 140px;
 }
 
-.brand-logo-img {
+.logo-img {
   width: 43px;
   height: 48px;
   flex-shrink: 0;
@@ -503,7 +483,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   left: 18px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 17px;
+  font-size: 18px;
   color: var(--text-black);
   pointer-events: none;
 }
@@ -853,7 +833,7 @@ transition: background-color 9999s ease-in-out 0s;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 500;
 }
 
@@ -1020,8 +1000,8 @@ transition: background-color 9999s ease-in-out 0s;
   margin-left: 8px;
   padding: 3px 12px;
   border-radius: var(--radius-pill);
-  background: var(--bg);
-  color: var(--text-black);
+  background: var(--text-black);
+  color: var(--text);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.3;
@@ -1146,10 +1126,10 @@ transition: background-color 9999s ease-in-out 0s;
   /* Search nằm trong header brand, ngay cạnh logo + slogan, cùng một hàng */
   .logo-text { flex-shrink: 0; }
   .logo .search-wrap {
-    flex: 0 1 340px;
+    flex: 0 1 500px;
     min-width: 0;
     max-width: none;
-    margin: 0 0 0 24px;
+    margin: 0 0 0 30px;
   }
 
   #search {
@@ -1408,7 +1388,7 @@ transition: background-color 9999s ease-in-out 0s;
   cursor: pointer;
 }
 
-.reg-file i { font-size: 17px; line-height: 1; flex-shrink: 0; color: var(--text-black); }
+.reg-file i { font-size: 18px; line-height: 1; flex-shrink: 0; color: var(--text-black); }
 .reg-file span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reg-file.has-file { color: var(--text-black); border-style: solid; }
 
