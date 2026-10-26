@@ -14,13 +14,13 @@ export async function onRequestPost({ request, env }) {
   const contact = String(form.get('contact') || '').trim().slice(0, 200);
   const photo = form.get('photo');
 
-  if (!emailRegex.test(email) || !contact) return json({ ok: false, error: 'invalid' }, 400);
+  if (!emailRegex.test(email)) return json({ ok: false, error: 'invalid' }, 400);
   if (!photo || typeof photo === 'string' || !String(photo.type).startsWith('image/') || photo.size > MAX_PHOTO) {
     return json({ ok: false, error: 'invalid_photo' }, 400);
   }
 
   const time = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-  const caption = `ĐĂNG KÝ THÀNH VIÊN\nGmail: ${email}\nLiên hệ: ${contact}\nThời gian: ${time}`;
+  const caption = `ĐĂNG KÝ THÀNH VIÊN\nGmail: ${email}\nLiên hệ: ${contact || 'Không có'}\nThời gian: ${time}`;
 
   const tg = new FormData();
   tg.append('chat_id', env.TG_CHAT_ID);
