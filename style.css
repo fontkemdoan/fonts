@@ -116,9 +116,7 @@
   text-align: center;
 }
 
-/* ---------- Trạng thái dùng chung ---------- */
-
-/* Nút trong panel: nhấn thì thu nhỏ (mọi thiết bị) */
+/* btn panel */
 .btn:not(:disabled):active,
 .btn-icon:active {
   scale: var(--press);
@@ -127,6 +125,17 @@
 /* Menu open mobile */
 @media (max-width: 767.98px) {
   .menu-panel .menu-row:active {
+    scale: var(--press);
+  }
+}
+
+/* Menu mobile hover */
+@media (max-width: 767.98px) {
+  .menu-panel .menu-row:active {
+    scale: var(--press);
+  }
+
+  .bottom-nav .menu-row:active {
     scale: var(--press);
   }
 }
