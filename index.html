@@ -133,11 +133,7 @@
   <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="notice-card">
       <div class="notice-title"><i class="ri-megaphone-line"></i> Thông báo</div>
-      <div class="notice-msg">Vui lòng đăng nhập để tải font</div>
-      <div class="notice-btn-row">
-        <button type="button" class="btn notice-btn" id="notice-login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
-        <button type="button" class="btn notice-btn" id="notice-register-btn"><i class="ri-user-add-line"></i> Đăng ký</button>
-      </div>
+      <div class="notice-msg">Font dành cho thành viên.<br>Vui lòng đăng nhập để tải font.</div>
     </div>
   </div>
 
@@ -193,9 +189,15 @@
 
   <template id="demo-card-tpl">
     <div class="demo-card">
-      <img class="demo-img" alt="" loading="lazy">
+      <div class="demo-media">
+        <img class="demo-img" alt="" loading="lazy">
+      </div>
       <div class="demo-foot">
         <span class="demo-name"></span>
+        <div class="demo-nav-group" hidden>
+          <button type="button" class="btn-icon demo-nav demo-prev" aria-label="Ảnh trước"><i class="ri-arrow-left-line"></i></button>
+          <button type="button" class="btn-icon demo-nav demo-next" aria-label="Ảnh sau"><i class="ri-arrow-right-line"></i></button>
+        </div>
         <button type="button" class="btn-icon demo-download" aria-label="Tải font"><i class="ri-download-cloud-2-line"></i></button>
       </div>
       <div class="demo-panel">
