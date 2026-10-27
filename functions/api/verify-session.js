@@ -10,5 +10,5 @@ export async function onRequestPost({ request, env }) {
 
   const token = String((body && body.token) || '').trim();
   const session = await validateSession(env, token);
-  return json({ ok: !!session });
+  return json({ ok: !!session, email: (session && session.email) || undefined });
 }
