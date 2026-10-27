@@ -265,6 +265,11 @@ function showLoginError(msg) {
   loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
 }
 
+function showLoginLoading(msg) {
+  clearTimeout(loginErrorTimer);
+  loginError.innerHTML = SPINNER + ' ' + msg;
+}
+
 function onLoginSuccess(token, profile) {
   setToken(token);
   if (profile && profile.email) setProfile(profile);
@@ -388,10 +393,11 @@ let googleReady = false;
 
 async function onGoogleCredential(resp) {
   if (!resp || !resp.credential) return;
-  loginError.textContent = '';
+  showLoginLoading('Đang đăng nhập...');
   try {
     const data = await postJson('/api/google-login', { credential: resp.credential });
     if (data.ok) {
+      loginError.textContent = '';
       onLoginSuccess(data.token, { email: data.email, avatar: data.avatar, name: data.name, picture: data.picture });
     } else if (data.error === 'not_registered') {
       showLoginError('Tài khoản chưa được đăng ký');
