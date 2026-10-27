@@ -65,15 +65,15 @@
       <div class="login-title">Thành Viên</div>
       <div class="login-input-wrap">
         <i class="ri-user-line login-input-icon"></i>
-        <input type="email" id="login-email" placeholder="Tài khoản" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <input type="email" id="login-email" name="username" autocomplete="username" placeholder="Tài khoản" autocapitalize="off" autocorrect="off" spellcheck="false">
       </div>
       <div class="login-input-wrap">
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" placeholder="Mật khẩu">
+        <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mật khẩu">
       </div>
       <div class="login-input-wrap" id="change-pass-extra" hidden>
         <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="new-password" placeholder="Mật khẩu mới">
+        <input type="password" id="new-password" name="new-password" autocomplete="new-password" placeholder="Mật khẩu mới">
       </div>
       <div class="login-btn-row">
         <button class="btn" id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
@@ -178,7 +178,7 @@
   <main class="content" id="content" hidden>
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
-      <input type="text" id="search" placeholder="Tìm kiếm..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <input type="search" id="search" name="q" placeholder="Tìm kiếm..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" data-lpignore="true" data-1p-ignore data-bwignore data-form-type="other">
       <button class="btn-icon" id="clear-btn"><i class="ri-close-line"></i></button>
     </div>
 
