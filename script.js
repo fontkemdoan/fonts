@@ -242,7 +242,14 @@ async function verifyAndBoot() {
   try {
     const data = await postJson('/api/verify-session', { token });
     if (!data.ok) clearToken();
-    else if (data.email) setProfile({ email: data.email, avatar: data.avatar, name: data.name });
+    else if (data.email) {
+      const old = getProfile() || {};
+      setProfile({
+        email: data.email,
+        avatar: 'avatar' in data ? data.avatar : old.avatar,
+        name: 'name' in data ? data.name : old.name
+      });
+    }
   } catch (e) {
 
   }
