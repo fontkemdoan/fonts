@@ -555,6 +555,12 @@ transition: background-color 9999s ease-in-out 0s;
   box-shadow: var(--shadow-soft);
 }
 
+#login-error .kd-spinner {
+  margin-right: 4px;
+  vertical-align: -3px;
+  font-size: 17px;
+}
+
 #login-error:empty { display: none; }
 
 .notice-panel .notice-card { margin-top: 30px; }
@@ -1658,7 +1664,7 @@ transition: background-color 9999s ease-in-out 0s;
   color: var(--text-black);
 }
 
-/* Desktop: nằm mép phải header, ngang hàng brand + search */
+/* Desktop: mail */
 @media (min-width: 768px) {
   .logo > .user-chip { order: 2; margin-left: 30px; flex-shrink: 0; max-width: 300px; }
   .logo > .user-chip .user-avatar { width: var(--row-h); height: var(--row-h); font-size: 20px; }
@@ -1667,16 +1673,14 @@ transition: background-color 9999s ease-in-out 0s;
   .logo > .user-chip .user-mail { display: none; }
 }
 
-/* Mobile: nằm dưới nút Đăng xuất trong menu */
+/* Mobile: mail */
 @media (max-width: 767.98px) {
   .menu-scroll > .user-chip { flex-shrink: 0; padding: 8px var(--row-pad); }
 }
 
-/* Search dùng type="search" để trình duyệt không nhầm là ô tài khoản; ẩn nút X mặc định (đã có clear-btn riêng) */
+/* Search fix */
 #search { -webkit-appearance: none; appearance: none; }
 #search::-webkit-search-cancel-button,
 #search::-webkit-search-decoration,
 #search::-webkit-search-results-button,
 #search::-webkit-search-results-decoration { -webkit-appearance: none; display: none; }
-
-#login-error .kd-spinner { margin-right: 4px; vertical-align: -3px; font-size: 17px; }
