@@ -142,9 +142,11 @@ function renderUserChip() {
     av.replaceChildren();
     av.textContent = (p.email.trim().charAt(0) || '?').toUpperCase();
   };
-  if (p.avatar) {
+  const src = p.avatar ? 'avatars/' + p.avatar : (p.picture || '');
+  if (src) {
     const img = document.createElement('img');
-    img.src = 'avatars/' + p.avatar;
+    img.referrerPolicy = 'no-referrer';
+    img.src = src;
     img.alt = '';
     img.onerror = showLetter;
     av.appendChild(img);
@@ -247,7 +249,8 @@ async function verifyAndBoot() {
       setProfile({
         email: data.email,
         avatar: 'avatar' in data ? data.avatar : old.avatar,
-        name: 'name' in data ? data.name : old.name
+        name: 'name' in data ? data.name : old.name,
+        picture: old.email === data.email ? old.picture : undefined
       });
     }
   } catch (e) {
@@ -389,7 +392,7 @@ async function onGoogleCredential(resp) {
   try {
     const data = await postJson('/api/google-login', { credential: resp.credential });
     if (data.ok) {
-      onLoginSuccess(data.token, { email: data.email, avatar: data.avatar, name: data.name });
+      onLoginSuccess(data.token, { email: data.email, avatar: data.avatar, name: data.name, picture: data.picture });
     } else if (data.error === 'not_registered') {
       showLoginError('Tài khoản chưa được đăng ký');
     } else {
