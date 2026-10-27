@@ -53,5 +53,5 @@ export async function onRequestPost({ request, env }) {
 
   const token = await createSession(env, email);
 
-  return json({ ok: true, email, avatar: match.avatar || null, name: match.name || null, token });
+  return json({ ok: true, email, avatar: match.avatar || null, name: match.name || null, picture: info.picture || null, token });
 }
