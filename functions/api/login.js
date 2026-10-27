@@ -33,12 +33,10 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false });
   }
 
-  // Chế độ xem trước: chỉ trả avatar/tên, không cần mật khẩu
   if (mode === 'preview') {
     return json({ ok: true, avatar: match.avatar || null, name: match.name || null });
   }
 
-  // Chế độ đăng nhập thật: bắt buộc kiểm tra mật khẩu
   if (!password) {
     return json({ ok: false, error: 'missing_password' });
   }
@@ -47,7 +45,6 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: 'wrong_password' });
   }
 
-  // Đăng nhập thành công -> cấp session token gắn với phiên bản mật khẩu hiện tại
   const token = await createSession(env, email);
 
   return json({ ok: true, avatar: match.avatar || null, name: match.name || null, token });

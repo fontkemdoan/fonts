@@ -9,18 +9,15 @@ export async function onRequestGet({ request, env }) {
     return new Response('Missing file parameter', { status: 400 });
   }
 
-  // ---- Bắt buộc có session hợp lệ mới cho tải ----
   if (!(await validateSession(env, token))) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  // ---- Chặn path traversal (../emails.json, đường dẫn tuyệt đối, ...) ----
   const parts = filePath.split('/');
   if (parts.some(p => !p || p === '.' || p === '..' || p.includes('\\'))) {
     return new Response('Invalid file parameter', { status: 400 });
   }
-
-  // ---- Session hợp lệ -> lấy file từ repo private ----
+  
   const res = await fetch(contentsUrl(['fonts', ...parts].map(encodeURIComponent).join('/')), {
     headers: githubHeaders(env, 'application/vnd.github.v3.raw')
   });

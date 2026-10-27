@@ -1,6 +1,5 @@
 import { json, contentsUrl, githubHeaders, normEmail, findUser, getPwver } from '../_lib.js';
 
-// base64 <-> UTF-8 (thay cho escape/unescape đã lỗi thời)
 function decodeBase64Utf8(b64) {
   const bin = atob(b64.replace(/\n/g, ''));
   return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));

@@ -1,7 +1,5 @@
 import { json, contentsUrl, githubHeaders, normEmail, findUser, createSession, GOOGLE_CLIENT_ID } from '../_lib.js';
 
-// Nhận ID token (credential) từ Google Identity Services, xác minh phía server,
-// rồi so email Google với emails.json. Trùng mới cấp session token.
 export async function onRequestPost({ request, env }) {
   let body;
   try {
@@ -15,7 +13,6 @@ export async function onRequestPost({ request, env }) {
 
   const clientId = env.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID;
 
-  // ---- Google xác minh chữ ký + hạn của token ----
   let info;
   try {
     const r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential));
@@ -25,7 +22,6 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: 'Cannot verify token' }, 500);
   }
 
-  // ---- Token phải được cấp cho đúng app này, và email phải đã xác minh ----
   const issuerOk = info.iss === 'accounts.google.com' || info.iss === 'https://accounts.google.com';
   if (!issuerOk || info.aud !== clientId) return json({ ok: false, error: 'invalid_token' });
   if (info.email_verified !== true && info.email_verified !== 'true') {
@@ -35,7 +31,6 @@ export async function onRequestPost({ request, env }) {
   const email = normEmail(info.email);
   if (!email) return json({ ok: false, error: 'invalid_token' });
 
-  // ---- So với danh sách email ----
   const res = await fetch(contentsUrl('emails.json'), {
     headers: githubHeaders(env, 'application/vnd.github.v3.raw')
   });
