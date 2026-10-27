@@ -8,6 +8,7 @@
 }
 :root {
   --bg: #efefef;
+  --bgicon: #eaeaea;
   --text: #fff;
   --text-black: #555;
   --card: #fff;
@@ -24,7 +25,7 @@
   /* Icon button */
   --ib-size: 36px;
   --ib-icon: 18px;
-  --ib-bg: var(--bg);
+  --ib-bg: var(--bgicon);
   --ib-color: var(--text-black);
   --ib-border: none;
 
@@ -151,7 +152,7 @@
 /* Menu left PC: hover */
 @media (min-width: 768px) and (any-hover: hover) {
   html:not([data-input="touch"]) .menu-row:not(.active):hover {
-    background: var(--bg);
+    background: var(--bgicon);
     border-radius: var(--radius-pill);
   }
 }
@@ -344,7 +345,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--bg);
+  background: var(--bgicon);
   border: none;
 }
 
@@ -707,7 +708,7 @@ transition: background-color 9999s ease-in-out 0s;
   display: block;
   width: 100%;
   border-radius: 14px;
-  background: var(--bg);
+  background: var(--bgicon);
 }
 
 @media (min-width: 768px) {
@@ -934,7 +935,7 @@ transition: background-color 9999s ease-in-out 0s;
   padding: 3px 12px;
   border-radius: 16px;
   color: var(--text-black);
-  background: var(--bg);
+  background: var(--bgicon);
   font-size: 12px;
 }
 
@@ -959,13 +960,13 @@ transition: background-color 9999s ease-in-out 0s;
   -webkit-user-select: text;
   user-select: text;
   scrollbar-width: thin;
-  scrollbar-color: var(--bg) transparent;
+  scrollbar-color: var(--bgicon) transparent;
 }
 
 .demo-preview-text::-webkit-scrollbar { height: 6px; }
 .demo-preview-text::-webkit-scrollbar-track { background: transparent; }
 .demo-preview-text::-webkit-scrollbar-thumb {
-  background: var(--bg);
+  background: var(--bgicon);
   border-radius: 16px;
 }
 
@@ -1031,7 +1032,7 @@ transition: background-color 9999s ease-in-out 0s;
 .menu-divider span {
   padding: 4px 20px;
   border-radius: var(--radius-pill);
-  background: var(--bg);
+  background: var(--bgicon);
   color: var(--text-black);
   font-size: 12px;
   white-space: nowrap;
@@ -1147,7 +1148,7 @@ transition: background-color 9999s ease-in-out 0s;
   }
 
   body {
-    padding: 20px 30px 30px calc(20px + var(--side-w) + 30px);
+    padding: calc(var(--header-h) + 15px) 30px 30px calc(20px + var(--side-w) + 30px);
     transition: padding-left 0.2s ease;
   }
 
@@ -1160,6 +1161,25 @@ transition: background-color 9999s ease-in-out 0s;
   .search-brand {
     max-width: 1500px;
     margin: 0 0 30px;
+  }
+
+  /* Logo + search fixed trên cùng, nền --bg 80% + blur 25px */
+  :root { --header-h: 87px; }
+
+  .logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    max-width: none;
+    height: var(--header-h);
+    margin: 0;
+    padding: 20px 30px 15px calc(20px + var(--side-w) + 30px);
+    transition: padding-left 0.2s ease;
+    background: rgba(239, 239, 239, 0.7);
+    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
   }
 
   #demos {
@@ -1458,7 +1478,7 @@ transition: background-color 9999s ease-in-out 0s;
   align-items: center;
   gap: 12px;
   border-radius: var(--radius-pill);
-  background: var(--bg);
+  background: var(--bgicon);
   font-size: 15px;
   color: var(--text-black);
 }
@@ -1583,4 +1603,69 @@ transition: background-color 9999s ease-in-out 0s;
 }
 @media (prefers-reduced-motion: reduce) {
   .dock-tip { transition: none; }
+}
+
+.demo-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.demo-nav-group:not([hidden]) + .demo-download { margin-left: 0; }
+
+.demo-nav {
+  color: var(--text-black);
+  background: var(--bgicon);
+}
+
+
+/* ---------- User chip: avatar + mail ---------- */
+.user-chip { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.user-chip[hidden] { display: none; }
+
+.user-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--text-black);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  user-select: none;
+}
+
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-mail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-black);
+}
+
+/* Desktop: nằm mép phải header, ngang hàng brand + search */
+@media (min-width: 768px) {
+  .logo > .user-chip { margin-left: auto; padding-left: 20px; flex-shrink: 0; max-width: 300px; }
+}
+@media (min-width: 768px) and (max-width: 1099.98px) {
+  .logo > .user-chip .user-mail { display: none; }
+}
+
+/* Mobile: nằm dưới nút Đăng xuất trong menu */
+@media (max-width: 767.98px) {
+  .menu-scroll > .user-chip { flex-shrink: 0; padding: 8px var(--row-pad); }
 }

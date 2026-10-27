@@ -5,7 +5,10 @@ const $ = (id) => document.getElementById(id);
 
 const getToken = () => localStorage.getItem('kd_session_token') || '';
 const setToken = (t) => localStorage.setItem('kd_session_token', t);
-const clearToken = () => localStorage.removeItem('kd_session_token');
+const clearToken = () => { localStorage.removeItem('kd_session_token'); localStorage.removeItem('kd_profile'); };
+
+const getProfile = () => { try { return JSON.parse(localStorage.getItem('kd_profile')) || null; } catch (e) { return null; } };
+const setProfile = (p) => { try { localStorage.setItem('kd_profile', JSON.stringify(p)); } catch (e) {} };
 
 const downloadUrl = (file) =>
   '/api/download?file=' + encodeURIComponent(file) + '&token=' + encodeURIComponent(getToken());
@@ -111,6 +114,52 @@ let previewTimer = null;
 
 const isLoggedIn = () => !!getToken();
 
+/* ---------- User chip (avatar + mail) ---------- */
+const userChip = document.createElement('div');
+userChip.className = 'user-chip';
+userChip.hidden = true;
+
+function placeUserChip() {
+  if (userChip.hidden) return;
+  if (window.matchMedia('(min-width: 768px)').matches) {
+    if (userChip.parentElement !== brand) brand.appendChild(userChip);
+  } else if (userChip.previousElementSibling !== authBtn) {
+    authBtn.after(userChip);
+  }
+}
+
+function renderUserChip() {
+  const p = isLoggedIn() ? getProfile() : null;
+  if (!p || !p.email) {
+    userChip.hidden = true;
+    userChip.replaceChildren();
+    userChip.remove();
+    return;
+  }
+  const av = document.createElement('span');
+  av.className = 'user-avatar';
+  const showLetter = () => {
+    av.replaceChildren();
+    av.textContent = (p.email.trim().charAt(0) || '?').toUpperCase();
+  };
+  if (p.avatar) {
+    const img = document.createElement('img');
+    img.src = 'avatars/' + p.avatar;
+    img.alt = '';
+    img.onerror = showLetter;
+    av.appendChild(img);
+  } else {
+    showLetter();
+  }
+  const mail = document.createElement('span');
+  mail.className = 'user-mail';
+  mail.textContent = p.email;
+  userChip.title = p.email;
+  userChip.replaceChildren(av, mail);
+  userChip.hidden = false;
+  placeUserChip();
+}
+
 function resetPreviews(clearCache) {
   cancelFreeWait();
   document.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
@@ -130,6 +179,7 @@ function updateAuthUI() {
   authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
   registerBtn.hidden = on;
   if (on) closeRegister();
+  renderUserChip();
 }
 
 function showApp() {
@@ -168,12 +218,13 @@ function closeLogin() {
 }
 
 const noticeMsg = noticePanel.querySelector('.notice-msg');
-const NOTICE_DEFAULT_MSG = noticeMsg.textContent;
+const NOTICE_DEFAULT_HTML = noticeMsg.innerHTML;
 
 function openNotice(msg) {
   markPanelOpened();
   closeAllPanels('notice');
-  noticeMsg.textContent = msg || NOTICE_DEFAULT_MSG;
+  if (msg) noticeMsg.textContent = msg;
+  else noticeMsg.innerHTML = NOTICE_DEFAULT_HTML;
   noticePanel.hidden = false;
 }
 
@@ -191,6 +242,7 @@ async function verifyAndBoot() {
   try {
     const data = await postJson('/api/verify-session', { token });
     if (!data.ok) clearToken();
+    else if (data.email && !(getProfile() || {}).email) setProfile({ ...(getProfile() || {}), email: data.email });
   } catch (e) {
 
   }
@@ -203,8 +255,9 @@ function showLoginError(msg) {
   loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
 }
 
-function onLoginSuccess(token) {
+function onLoginSuccess(token, profile) {
   setToken(token);
+  if (profile && profile.email) setProfile(profile);
   loginEmail.value = '';
   resetLoginIcon();
   updateAuthUI();
@@ -228,7 +281,7 @@ async function doLogin() {
   try {
     const data = await postJson('/api/login', { email, password, mode: 'login' });
     if (data.ok) {
-      onLoginSuccess(data.token);
+      onLoginSuccess(data.token, { email, avatar: data.avatar, name: data.name });
     } else if (data.error === 'wrong_password') {
       showLoginError('Sai mật khẩu');
     } else {
@@ -329,7 +382,7 @@ async function onGoogleCredential(resp) {
   try {
     const data = await postJson('/api/google-login', { credential: resp.credential });
     if (data.ok) {
-      onLoginSuccess(data.token);
+      onLoginSuccess(data.token, { email: data.email, avatar: data.avatar, name: data.name });
     } else if (data.error === 'not_registered') {
       showLoginError('Tài khoản chưa được đăng ký');
     } else {
@@ -408,9 +461,6 @@ function initAuth() {
       closeLogin();
     }
   });
-
-  $('notice-login-btn').addEventListener('click', openLogin);
-  $('notice-register-btn').addEventListener('click', openRegister);
 
   initGoogle();
   verifyAndBoot();
@@ -686,11 +736,13 @@ const priceLabel = (p) => {
   return typeof p === 'number' ? p.toLocaleString('vi-VN') + 'đ' : String(p).trim();
 };
 
+const imgsOf = (f) => (Array.isArray(f.img) ? f.img : [f.img]).filter(Boolean);
+
 function buildDemoGroups() {
   const map = new Map();
-  allFonts.filter((f) => f.img).forEach((f) => {
-    const key = f.img + '|' + groupDir(f);
-    if (!map.has(key)) map.set(key, { key, free: !!f.free, fonts: [] });
+  allFonts.filter((f) => imgsOf(f).length).forEach((f) => {
+    const key = imgsOf(f).join('|') + '|' + groupDir(f);
+    if (!map.has(key)) map.set(key, { key, free: !!f.free, imgs: imgsOf(f), fonts: [] });
     map.get(key).fonts.push(f);
   });
 
@@ -707,8 +759,31 @@ function createDemoCard(g) {
   const card = demoCardTpl.content.firstElementChild.cloneNode(true);
   const img = card.querySelector('.demo-img');
   img.alt = g.title;
-  img.addEventListener('error', () => { card.remove(); updateView(); });
-  img.src = encodeURI(g.fonts[0].img);
+  const prevBtn = card.querySelector('.demo-prev');
+  const nextBtn = card.querySelector('.demo-next');
+  const imgs = g.imgs.slice();
+  let idx = 0;
+
+  const showImg = () => { img.src = encodeURI(imgs[idx]); };
+  const go = (step) => {
+    if (imgs.length < 2) return;
+    idx = (idx + step + imgs.length) % imgs.length;
+    showImg();
+    const ahead = new Image();
+    ahead.src = encodeURI(imgs[(idx + step + imgs.length) % imgs.length]);
+  };
+  const navGroup = card.querySelector('.demo-nav-group');
+  const syncNav = () => { navGroup.hidden = imgs.length < 2; };
+
+  img.addEventListener('error', () => {
+    if (imgs.length > 1) return;
+    card.remove();
+    updateView();
+  });
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); go(-1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); go(1); });
+  syncNav();
+  showImg();
   if (g.free) {
     const badge = document.createElement('span');
     badge.className = 'demo-free-badge';
@@ -944,7 +1019,7 @@ function onDemoDownload(g, btn) {
 }
 
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký tài khoản để tải không giới hạn.`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký thành viên để tải không giới hạn.`;
 
 let freeWait = null;
 let freeTimer = 0;
@@ -1101,7 +1176,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút.', 5000);
+      showRegHint('Đăng ký thành công.\nVui lòng đăng nhập sau ít phút.', 3000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
@@ -1178,6 +1253,7 @@ function placeSearch() {
   } else if (searchWrap.parentElement !== contentEl) {
     contentEl.insertBefore(searchWrap, contentEl.firstChild);
   }
+  placeUserChip();
   closeMenu();
 }
 
