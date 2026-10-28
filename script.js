@@ -857,7 +857,7 @@ function bindDemoPanel(card, group) {
   const alignBtns = panel.querySelectorAll('.demo-align-btn');
   const multi = group.fonts.length > 1;
 
-  let align = 'center';
+  let align = 'left';
   let savedText = DEFAULT_PREVIEW_TEXT;
 
   const variants = group.fonts.map((font) => {
