@@ -1281,14 +1281,6 @@ transition: background-color 9999s ease-in-out 0s;
   background: currentColor;
   opacity: .4;
 }
-.login-or[hidden],
-.google-btn-wrap[hidden] { display: none; }
-.google-btn-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  height: 46px;
-}
 
 @media (max-width: 767.98px) {
 
