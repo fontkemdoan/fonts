@@ -1278,7 +1278,7 @@ transition: background-color 9999s ease-in-out 0s;
   content: '';
   flex: 1;
   height: 1px;
-  background: #999;
+  background: currentColor;
   opacity: .4;
 }
 .login-or[hidden],
