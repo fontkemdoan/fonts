@@ -356,7 +356,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   margin-top: 15px;
   padding-top: 0.2em;
   font-size: 30px;
-  line-height: 2;
+  line-height: 1.7;
   color: #444;
   word-break: break-word;
   min-height: 36px;
