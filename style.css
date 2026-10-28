@@ -1278,15 +1278,16 @@ transition: background-color 9999s ease-in-out 0s;
   content: '';
   flex: 1;
   height: 1px;
-  background: currentColor;
+  background: #999;
   opacity: .4;
 }
-
+.login-or[hidden],
+.google-btn-wrap[hidden] { display: none; }
 .google-btn-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  min-height: 40px;
+  min-height: 44px;
 }
 
 @media (max-width: 767.98px) {
