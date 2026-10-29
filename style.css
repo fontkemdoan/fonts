@@ -617,7 +617,7 @@ transition: background-color 9999s ease-in-out 0s;
 .bottom-nav {
   position: fixed;
   left: 50%;
-  bottom: 10px;
+  bottom: 15px;
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 400px;
@@ -654,8 +654,8 @@ transition: background-color 9999s ease-in-out 0s;
 
 .menu-panel {
   position: fixed;
-  right: 20px;
-  top: 80px;
+  right: max(20px, calc(50% - 200px));
+  bottom: 90px;
   width: calc(100% - 40px);
   max-width: 400px;
   margin: 0;
@@ -666,8 +666,8 @@ transition: background-color 9999s ease-in-out 0s;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-12px) scale(0.92);
-  transform-origin: top right;
+  transform: translateY(12px) scale(0.92);
+  transform-origin: bottom right;
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
 }
 
@@ -679,7 +679,7 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .menu-scroll {
-  max-height: calc(100dvh - 214px);
+  max-height: calc(100dvh - 150px - env(safe-area-inset-top, 0px));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1292,23 +1292,34 @@ transition: background-color 9999s ease-in-out 0s;
 
 @media (max-width: 767.98px) {
 
-  .logo { padding-right: 60px; }
+  /* Nút menu nằm trong bottom nav (phần tử cuối), cùng cỡ với các nút khác */
+  .bottom-nav { justify-content: space-between; padding: 0 6px; }
 
   #menu-btn {
+    --ib-size: 40px;
+    --ib-icon: 20px;
     --ib-color: var(--text);
-    --ib-bg: rgba(0,0,0, 0.6);
-    --ib-border: 1px solid rgba(239,239,239, 0.3);
-    position: fixed;
-    top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px));
-    right: 20px;
-    left: auto;
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
-    box-shadow: var(--shadow-card);
-    z-index: 1000;
+    --ib-bg: transparent;
+    --ib-border: none;
   }
 
-  .bottom-nav { justify-content: space-between; padding: 0 6px; }
+  #menu-btn[aria-expanded="true"] {
+    --ib-bg: var(--card);
+    --ib-color: var(--text-black);
+  }
+
+  /* Khi menu mở: nâng bottom nav lên trên lớp làm mờ để nút menu vẫn bấm được */
+  .menu-panel.open ~ .bottom-nav { z-index: 1001; }
+
+  /* Khi menu mở: nút lọc đang active về dạng thường, chỉ còn nút menu sáng */
+  .menu-panel.open ~ .bottom-nav .menu-item.active {
+    width: 40px;
+    padding: 0;
+    gap: 0;
+    background: transparent;
+    color: var(--text);
+  }
+  .menu-panel.open ~ .bottom-nav .menu-item.active span { display: none; }
 
   .bottom-nav .menu-item {
     width: 40px;
@@ -1337,6 +1348,11 @@ transition: background-color 9999s ease-in-out 0s;
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
+  }
+
+  @media (max-width: 359.98px) {
+    .bottom-nav .menu-item.active { width: 40px; padding: 0; gap: 0; }
+    .bottom-nav .menu-item.active span { display: none; }
   }
 
   .menu-panel .nav-label {
@@ -1563,25 +1579,22 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .popup-close {
+  --ib-size: 20px;
+  --ib-icon: 15px;
   --ib-bg: transparent;
-  --ib-color: #fff;
-  --ib-border: 1.5px solid #fff;
-  --focus: #fff;
-  position: fixed;
-  left: 50%;
-  bottom: 20px;
-  transform: translateX(-50%);
-  z-index: 1001;
+  --ib-color: var(--muted);
+  --ib-border: 1.3px solid var(--muted);
+  --focus: var(--text-black);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
 }
 
 @media (min-width: 768px) {
   .login-panel,
   .notice-panel {
     padding-left: calc(20px + var(--side-w) + 20px);
-  }
-
-  .popup-close {
-    left: calc(50% + (20px + var(--side-w)) / 2);
   }
 }
 

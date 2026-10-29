@@ -1376,7 +1376,12 @@ function initFonts() {
 
 const popupClose = $('popup-close');
 const popups = [loginPanel, noticePanel, finderPanel, registerPanel];
-const syncPopupClose = () => { popupClose.hidden = popups.every((p) => p.hidden); };
+const syncPopupClose = () => {
+  const open = popups.find((p) => !p.hidden);
+  const card = open && open.querySelector('.login-card, .notice-card');
+  if (card && popupClose.parentElement !== card) card.appendChild(popupClose);
+  popupClose.hidden = !card;
+};
 const popupObserver = new MutationObserver(syncPopupClose);
 popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
 popupClose.addEventListener('click', () => closeAllPanels());
