@@ -838,6 +838,7 @@ function buildDemos() {
   demoAll = buildDemoGroups();
   demoRendered = null;
   runSearch();
+  applyHash();
 }
 
 const demoOpeners = new WeakMap();
@@ -968,9 +969,35 @@ function bindDemoPanel(card, group) {
 function toggleDemo(card) {
   const wasOpen = card.classList.contains('open');
   demosEl.querySelectorAll('.demo-card.open').forEach((c) => c.classList.remove('open'));
-  if (wasOpen) return;
+  if (wasOpen) { syncHash(); return; }
   card.classList.add('open');
   demoOpeners.get(card)();
+  syncHash();
+}
+
+/* ---------- Deep link: /#tenfont ---------- */
+function syncHash() {
+  const open = demosEl.querySelector('.demo-card.open');
+  const group = open && demoGroups.get(open);
+  const slug = group ? foldText(group.title) : foldText(searchInput.value);
+  history.replaceState(null, '', slug ? '#' + slug : location.pathname + location.search);
+}
+
+function applyHash() {
+  let raw = location.hash.slice(1);
+  try { raw = decodeURIComponent(raw); } catch (_) {}
+  const q = foldText(raw);
+  if (!q || !demoAll.length) return;
+
+  const g = demoAll.find((x) => x.keys.includes(q));
+  searchInput.value = g ? g.title : raw;
+  runSearch();
+  if (!g) return;
+
+  const card = [...demosEl.children].find((c) => demoGroups.get(c) === g);
+  if (!card) return;
+  if (!card.classList.contains('open')) toggleDemo(card);
+  card.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
 
 function updateView() {
@@ -1258,6 +1285,7 @@ function setFilter(name) {
   });
   searchInput.value = '';
   if (allFonts.length) runSearch();
+  syncHash();
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
 
@@ -1315,12 +1343,14 @@ function initMenu() {
 }
 
 function initFonts() {
-  searchInput.addEventListener('input', runSearch);
+  searchInput.addEventListener('input', () => { runSearch(); syncHash(); });
+  window.addEventListener('hashchange', applyHash);
 
   clearBtn.addEventListener('click', () => {
     spinIcon(clearBtn);
     searchInput.value = '';
     runSearch();
+    syncHash();
   });
 
   statusEl.addEventListener('click', (e) => {
@@ -1328,6 +1358,7 @@ function initFonts() {
     if (!chip) return;
     searchInput.value = chip.dataset.name;
     runSearch();
+    syncHash();
   });
 
   document.addEventListener('visibilitychange', tickFreeWait);
