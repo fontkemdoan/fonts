@@ -599,6 +599,8 @@ const statusEl = $('status');
 const demosEl = $('demos');
 const demoCardTpl = $('demo-card-tpl');
 const demosMoreBtn = $('demos-more');
+const demosActionsEl = $('demos-actions');
+const backToTopBtn = $('back-to-top');
 const demoVariantTpl = $('demo-variant-tpl');
 
 let allFonts = [];
@@ -1000,8 +1002,15 @@ function applyHash() {
   card.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 }
 
+function updateBackToTop() {
+  const long = document.documentElement.scrollHeight > window.innerHeight * 2;
+  backToTopBtn.hidden = !long;
+}
+
 function updateView() {
   demosEl.hidden = !demosEl.children.length;
+  demosActionsEl.hidden = demosEl.hidden;
+  updateBackToTop();
   demosMoreBtn.hidden = demosEl.hidden || demoShown >= demoList.length;
 }
 
@@ -1062,7 +1071,7 @@ function onDemoDownload(g, btn) {
 }
 
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký thành viên để tải không giới hạn.`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác. Hoặc đăng ký thành viên để tải không giới hạn.`;
 
 let freeWait = null;
 let freeTimer = 0;
@@ -1364,6 +1373,11 @@ function initFonts() {
   document.addEventListener('visibilitychange', tickFreeWait);
 
   demosMoreBtn.addEventListener('click', showMoreDemos);
+  if ('ResizeObserver' in window) new ResizeObserver(updateBackToTop).observe(document.documentElement);
+  window.addEventListener('resize', updateBackToTop);
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  });
 
   demosEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.demo-download');
@@ -1472,7 +1486,7 @@ function initDockToggle() {
     root.dataset.dock = state;
     btn.setAttribute('aria-expanded', String(open));
     btn.setAttribute('aria-label', open ? 'Thu nhỏ menu' : 'Mở rộng menu');
-    icon.className = open ? 'ri-menu-unfold-4-line' : 'ri-menu-fold-4-line';
+    icon.className = open ? 'ri-arrow-left-s-line' :'ri-arrow-right-s-line';
   };
   const initial = () => (wideMQ.matches && pref !== 'collapsed' ? 'expanded' : 'collapsed');
   apply(initial());

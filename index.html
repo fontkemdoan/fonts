@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kem Đoàn</title>
-<link rel="icon" href="img/kemdoan.jpg">
+<title>Font - Kem Đoàn</title>
+<link rel="icon" href="img/kdwhite.png">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
@@ -17,7 +17,7 @@
 
   <div class="dock" id="dock">
 
-    <div class="menu-divider dock-head"><span>Menu</span><button type="button" class="btn-icon dock-toggle" id="dock-toggle" aria-label="Thu nhỏ menu" aria-expanded="true" aria-controls="dock"><i class="ri-menu-unfold-4-line"></i></button></div>
+    <div class="menu-divider dock-head"><span>Menu</span><button type="button" class="btn-icon dock-toggle" id="dock-toggle" aria-label="Thu nhỏ menu" aria-expanded="true" aria-controls="dock"><i class="ri-arrow-right-s-line"></i></button></div>
 
     <div class="menu-panel" id="menu-panel" aria-label="Menu">
       <div class="notice-title menu-title"><i class="ri-menu-2-line"></i> Menu</div>
@@ -43,7 +43,7 @@
       <button type="button" class="btn-icon" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu-panel"><i class="ri-menu-3-line"></i></button>
     </nav>
 
-    <div class="dock-footer">&copy;<span> Kem Đoàn</span></div>
+    <div class="dock-footer">&copy;<span> Font - Kem Đoàn</span></div>
   </div>
 
   <div class="boot-loading" id="boot-loading">
@@ -51,7 +51,7 @@
   </div>
 
   <header class="logo" id="brand" hidden>
-    <img src="img/kemdoanblack.png" alt="logo" class="logo-img">
+    <img src="img/kdblack.png" alt="logo" class="logo-img">
     <div class="logo-text">
       <div class="logo-name">KEM ĐOÀN</div>
       <div class="logo-slogan">Font Việt hóa</div>
@@ -114,8 +114,8 @@
 
         <div class="reg-bank">
           <div class="reg-qr-col">
-            <div class="reg-qr"><img src="img/qr.jpg" alt="QR chuyển khoản"></div>
-            <a class="btn reg-qr-dl" href="img/qrfull.jpg" download="qrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+            <div class="reg-qr"><img src="img/kdqr.jpg" alt="QR chuyển khoản"></div>
+            <a class="btn reg-qr-dl" href="img/kdqrfull.jpg" download="kdqrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
           </div>
           <ul class="reg-info">
             <li><i class="ri-price-tag-line"></i><span>300.000 vnđ</span></li>
@@ -132,7 +132,7 @@
   <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="notice-card">
       <div class="notice-title"><i class="ri-megaphone-line"></i> Thông báo</div>
-      <div class="notice-msg">Font dành cho thành viên.<br>Vui lòng đăng nhập để tải font.</div>
+      <div class="notice-msg">Font dành cho thành viên.<br>Vui lòng Đăng nhập hoặc Đăng ký để tải font.</div>
     </div>
   </div>
 
@@ -190,7 +190,10 @@
     </div>
 
     <div id="demos" hidden></div>
-    <button type="button" id="demos-more" class="btn demos-more" hidden>Xem thêm <i class="ri-arrow-down-s-line"></i></button>
+    <div class="demos-actions" id="demos-actions" hidden>
+      <button type="button" id="demos-more" class="btn demos-more" hidden>Xem thêm <i class="ri-arrow-down-s-line"></i></button>
+      <button type="button" id="back-to-top" class="btn-icon back-to-top" aria-label="Lên đầu trang" hidden><i class="ri-arrow-up-line"></i></button>
+    </div>
     <div id="status"></div>
   </main>
 

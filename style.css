@@ -11,11 +11,13 @@
   --bgicon: #eaeaea;
   --text: #fff;
   --text-black: #555;
+  --black: #555;
+  --white: #fff;
   --card: #fff;
   --red: #e7644f;
   --border: 1px solid #ababab;
-  --shadow-soft: 0 4px 10px rgba(0,0,0, 0.2);
-  --shadow-card: 0 6px 20px rgba(0,0,0, 0.1);
+  --shadow-soft: 0 4px 12px rgba(0,0,0, 0.1);
+  --shadow-card: 0 6px 20px rgba(0,0,0, 0.13);
   --radius-pill: 999px;
   --muted: #999;
   --ease: 0.15s ease;
@@ -43,7 +45,7 @@
   padding: 14px 0;
   border: none;
   border-radius: var(--radius-pill);
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
   font-family: inherit;
   font-size: 14px;
@@ -85,7 +87,7 @@
   line-height: 1;
 }
 
-/* ---------- ROW (menu) ---------- */
+/* ROW (menu) */
 .menu-row {
   display: flex;
   align-items: center;
@@ -337,7 +339,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   height: 21px;
   margin-top: -7px;
   border-radius: 50%;
-  background: var(--text-black);
+  background: var(--black);
   border: 3px solid #fff;
   box-shadow:  0 2px 6px rgba(0,0,0, 0.2);
 }
@@ -357,7 +359,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   padding-top: 0.2em;
   font-size: 30px;
   line-height: 1.7;
-  color: #444;
+  color: var(text-black);
   word-break: break-word;
   min-height: 36px;
   text-align: center;
@@ -408,8 +410,8 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 .logo-img {
-  width: 43px;
-  height: 48px;
+  width: 44px;
+  height: auto;
   flex-shrink: 0;
   object-fit: cover;
 }
@@ -438,7 +440,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 .search-brand {
-  margin-bottom: 40px;
+  margin-bottom: 25px;
 }
 
 .login-card {
@@ -460,7 +462,7 @@ background: linear-gradient(#555, #555) 0 0 / calc(10px + (100% - 20px) * var(--
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: var(--text-black);
+  background: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -552,7 +554,7 @@ transition: background-color 9999s ease-in-out 0s;
   text-align: center;
   padding: 10px 16px;
   border-radius: var(--radius-pill);
-  background: var(--text);
+  background: var(--white);
   box-shadow: var(--shadow-soft);
 }
 
@@ -585,7 +587,7 @@ transition: background-color 9999s ease-in-out 0s;
   left: 20px;
   padding: 6px 16px;
   border-radius: 50px;
-  background: var(--text-black);
+  background: var(--black);
   border: none;
   color: var(--text);
   white-space: nowrap;
@@ -626,7 +628,7 @@ transition: background-color 9999s ease-in-out 0s;
   align-items: center;
   justify-content: space-between;
   padding: 0 18px;
-  background: rgba(0,0,0, 0.6);
+  background: rgba(0,0,0, 0.5);
   border: 1px solid rgba(239,239,239, 0.3);
   border-radius: var(--radius-pill);
   z-index: 500;
@@ -687,7 +689,7 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .menu-item.active {
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
   border-radius: var(--radius-pill);
 }
@@ -859,12 +861,31 @@ transition: background-color 9999s ease-in-out 0s;
   font-style: normal;
 }
 
+.demos-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 25px auto 0;
+}
+
+.demos-actions[hidden] { display: none; }
+
+.back-to-top[hidden] { display: none; }
+
+.back-to-top {
+  --ib-size: 46px;
+  --ib-icon: 22px;
+  box-shadow: var(--shadow-soft);
+  background: var(--white);
+}
+
 .demos-more {
   width: 100%;
   max-width: 200px;
-  margin: 25px auto 0;
-  box-shadow: var(--shadow-card);
-  background: var(--text);
+  margin: 0;
+  box-shadow: var(--shadow-soft);
+  background: var(--white);
   color: var(--text-black);
 }
 
@@ -928,7 +949,7 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .demo-align-btn.active {
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
 }
 
@@ -1007,7 +1028,7 @@ transition: background-color 9999s ease-in-out 0s;
   z-index: 1;
   padding: 3px 12px;
   border-radius: var(--radius-pill);
-  background: var(--text);
+  background: var(--white);
   color: var(--text-black);
   font-size: 12px;
   font-weight: 400;
@@ -1019,7 +1040,7 @@ transition: background-color 9999s ease-in-out 0s;
   margin-left: 8px;
   padding: 3px 12px;
   border-radius: var(--radius-pill);
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
   font-size: 12px;
   font-weight: 400;
@@ -1142,7 +1163,7 @@ transition: background-color 9999s ease-in-out 0s;
     font-weight: 500;
   }
 
-  /* Search nằm trong header brand, ngay cạnh logo + slogan, cùng một hàng */
+  /* Search header */
   .logo-text { flex-shrink: 0; }
   .logo .search-wrap {
     flex: 1 1 0;
@@ -1169,11 +1190,11 @@ transition: background-color 9999s ease-in-out 0s;
   .logo,
   .search-brand {
     max-width: 1500px;
-    margin: 0 0 30px;
+    margin: 0 0 25px;
   }
 
-  /* Logo + search fixed trên cùng, nền --bg 80% + blur 25px */
-  :root { --header-h: 87px; }
+  /* Logo + search fixed */
+  :root { --header-h: 90px; }
 
   .logo {
     position: fixed;
@@ -1223,7 +1244,7 @@ transition: background-color 9999s ease-in-out 0s;
   html[data-dock="collapsed"] .menu-divider span { display: none; }
 }
 
-/* Hàng đầu menu: nhãn "Menu" + đường kẻ + nút thu nhỏ / mở rộng */
+/* Hàng menu + mở/đóng*/
 .menu-divider.dock-head { display: none; }
 .dock-toggle { --ib-size: 32px; }
 
@@ -1250,7 +1271,7 @@ transition: background-color 9999s ease-in-out 0s;
   body { transition: none; }
 }
 
-/* Menu trái: giữ nguyên kích thước, nếu dài hơn màn hình thì cuộn trong khung nền */
+/* Menu left size full */
 @media (min-width: 768px) {
   .dock {
     overflow-y: auto;
@@ -1308,10 +1329,8 @@ transition: background-color 9999s ease-in-out 0s;
     --ib-color: var(--text-black);
   }
 
-  /* Khi menu mở: nâng bottom nav lên trên lớp làm mờ để nút menu vẫn bấm được */
   .menu-panel.open ~ .bottom-nav { z-index: 1001; }
 
-  /* Khi menu mở: nút lọc đang active về dạng thường, chỉ còn nút menu sáng */
   .menu-panel.open ~ .bottom-nav .menu-item.active {
     width: 40px;
     padding: 0;
@@ -1470,7 +1489,7 @@ transition: background-color 9999s ease-in-out 0s;
   margin: 0 auto;
   padding: 10px;
   border-radius: 16px;
-  background: var(--text);
+  background: var(--white);
 }
 
 .reg-qr img {
@@ -1528,7 +1547,7 @@ transition: background-color 9999s ease-in-out 0s;
   margin-top: 15px;
   padding: 10px 16px;
   border-radius: var(--radius-pill);
-  background: var(--text);
+  background: var(--white);
   box-shadow: var(--shadow-soft);
   color: var(--text-black);
   font-size: 15px;
@@ -1582,8 +1601,8 @@ transition: background-color 9999s ease-in-out 0s;
   --ib-size: 20px;
   --ib-icon: 15px;
   --ib-bg: transparent;
-  --ib-color: var(--muted);
-  --ib-border: 1.3px solid var(--muted);
+  --ib-color: var(--text-black);
+  --ib-border: 1.3px solid var(--text-black);
   --focus: var(--text-black);
   position: absolute;
   top: 10px;
@@ -1605,7 +1624,7 @@ transition: background-color 9999s ease-in-out 0s;
   z-index: 1100;
   padding: 14px 20px;
   border-radius: var(--radius-pill);
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
   font-size: 15px;
   font-weight: 500;
@@ -1644,7 +1663,7 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 
-/* ---------- User chip: avatar + mail ---------- */
+/* avatar + mail */
 .user-chip { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .user-chip[hidden] { display: none; }
 
@@ -1656,14 +1675,14 @@ transition: background-color 9999s ease-in-out 0s;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--text-black);
+  background: var(--black);
   color: var(--text);
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
   border: 2px solid #fff;
   box-sizing: border-box;
-  box-shadow: var(--shadow-soft);
+  box-shadow:  0 2px 6px rgba(0,0,0, 0.2);
   overflow: hidden;
   user-select: none;
 }
@@ -1702,7 +1721,7 @@ transition: background-color 9999s ease-in-out 0s;
 #search::-webkit-search-results-decoration { -webkit-appearance: none; display: none; }
 
 
-/* ---------- BANNER CARD ---------- */
+/* BANNER CARD */
 .banner-card {
   position: relative;
   max-width: 400px;
@@ -1718,7 +1737,7 @@ transition: background-color 9999s ease-in-out 0s;
   justify-content: center;
   color: #fff;
   background: linear-gradient(130deg, #6fb78a 0%, #3b6f53 100%);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 6px 13px rgba(59,111,83,0.4);
 }
 
 .banner-text {
