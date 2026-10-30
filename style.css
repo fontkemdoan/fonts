@@ -1598,15 +1598,15 @@ transition: background-color 9999s ease-in-out 0s;
 }
 
 .popup-close {
-  --ib-size: 20px;
-  --ib-icon: 15px;
+  --ib-size: 30px;
+  --ib-icon: 17px;
   --ib-bg: transparent;
   --ib-color: var(--text-black);
-  --ib-border: 1.3px solid var(--text-black);
+  --ib-bg: var(--bgicon);
   --focus: var(--text-black);
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   z-index: 2;
 }
 
