@@ -1071,7 +1071,7 @@ function onDemoDownload(g, btn) {
 }
 
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác. Hoặc đăng ký thành viên để tải không giới hạn.`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký thành viên để tải không giới hạn.`;
 
 let freeWait = null;
 let freeTimer = 0;
@@ -1228,7 +1228,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút.', 3000);
+      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút. Không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage', 5000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }
@@ -1396,7 +1396,28 @@ const syncPopupClose = () => {
   if (card && popupClose.parentElement !== card) card.appendChild(popupClose);
   popupClose.hidden = !card;
 };
-const popupObserver = new MutationObserver(syncPopupClose);
+/* Menu chứa popup: sáng active khi popup đang mở (PC) */
+const popupMenuRows = [
+  [finderPanel, document.querySelector('.menu-row[data-action="finder"]')],
+  [loginPanel, authBtn],
+  [registerPanel, $('register-btn')],
+];
+const syncPopupMenuActive = () => {
+  const anyOpen = popupMenuRows.some(([panel]) => !panel.hidden);
+  /* Popup mở thì tạm tắt active của Trang chủ / Font free...; đóng lại thì khôi phục */
+  document.querySelectorAll('[data-filter]').forEach((b) => {
+    const on = !anyOpen && b.dataset.filter === activeFilter;
+    b.classList.toggle('active', on);
+    if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  });
+  popupMenuRows.forEach(([panel, row]) => {
+    if (!row) return;
+    const on = !panel.hidden;
+    row.classList.toggle('active', on);
+    if (on) row.setAttribute('aria-current', 'true'); else row.removeAttribute('aria-current');
+  });
+};
+const popupObserver = new MutationObserver(() => { syncPopupClose(); syncPopupMenuActive(); });
 popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
 popupClose.addEventListener('click', () => closeAllPanels());
 syncPopupClose();
@@ -1508,10 +1529,80 @@ function initDockToggle() {
   });
 }
 
+/* Pill active trượt: bottom nav (mobile) + dock (PC) */
+function initNavSlider() {
+  const root = document.documentElement;
+  const dock = $('dock');
+  const nav = $('bottom-nav');
+  const pill = document.createElement('span');
+  pill.className = 'nav-pill no-anim hide';
+  pill.setAttribute('aria-hidden', 'true');
+  nav.appendChild(pill);
+
+  const lefts = new Map();
+  const navItems = () => Array.from(nav.querySelectorAll('.menu-item, #menu-btn'));
+  const snapshot = () => {
+    lefts.clear();
+    if (!desktopMQ.matches) navItems().forEach((el) => lefts.set(el, el.offsetLeft));
+  };
+  const getActive = () => (desktopMQ.matches
+    ? dock.querySelector('.menu-row.active')
+    : nav.querySelector('.menu-item.active'));
+
+  /* Mobile: các nút bên cạnh cũng trượt mượt khi nút active đổi độ rộng */
+  const flip = () => {
+    const moved = [];
+    navItems().forEach((el) => {
+      const prev = lefts.get(el);
+      if (prev == null) return;
+      const dx = prev - el.offsetLeft;
+      if (!dx) return;
+      el.style.transition = 'none';
+      el.style.transform = `translateX(${dx}px)`;
+      moved.push(el);
+    });
+    if (!moved.length) return;
+    void nav.offsetWidth;
+    moved.forEach((el) => { el.style.transition = ''; el.style.transform = ''; });
+  };
+
+  const place = (animate) => {
+    const el = getActive();
+    if (!el) { pill.classList.add('hide'); snapshot(); return; }
+    const desktop = desktopMQ.matches;
+    const slide = animate && !pill.classList.contains('hide') && !prefersReducedMotion();
+    pill.classList.toggle('no-anim', !slide);
+    pill.style.transform = `translate(${desktop ? 0 : el.offsetLeft}px, ${el.offsetTop}px)`;
+    pill.style.width = desktop ? '' : `${el.offsetWidth}px`;
+    pill.style.height = desktop ? '' : `${el.offsetHeight}px`;
+    pill.classList.remove('hide');
+    if (slide && !desktop) flip();
+    snapshot();
+  };
+
+  const mo = new MutationObserver((records) => {
+    const dockChanged = records.some((r) => r.target === root);
+    const classChanged = records.some((r) => r.attributeName === 'class');
+    place(classChanged && !dockChanged);
+  });
+  dock.querySelectorAll('.menu-row').forEach((el) => mo.observe(el, { attributes: true, attributeFilter: ['class'] }));
+  mo.observe(root, { attributes: true, attributeFilter: ['data-dock'] });
+  mo.observe(menuBtn, { attributes: true, attributeFilter: ['aria-expanded'] });
+
+  let raf = 0;
+  const refresh = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => place(false)); };
+  window.addEventListener('resize', refresh);
+  window.addEventListener('load', refresh);
+  desktopMQ.addEventListener('change', refresh);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+  place(false);
+}
+
 initInputMode();
 initFonts();
 initMenu();
 initDockToggle();
 initAuth();
 initDockTips();
+initNavSlider();
 })();
