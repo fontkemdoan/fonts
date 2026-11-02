@@ -20,7 +20,7 @@
     <div class="menu-divider dock-head"><span>Menu</span><button type="button" class="btn-icon dock-toggle" id="dock-toggle" aria-label="Thu nhỏ menu" aria-expanded="true" aria-controls="dock"><i class="ri-arrow-right-s-line"></i></button></div>
 
     <div class="menu-panel" id="menu-panel" aria-label="Menu">
-      <div class="notice-title menu-title"><i class="ri-menu-2-line"></i> Menu</div>
+      <div class="popup-title menu-title"><i class="ri-menu-2-line"></i> Menu</div>
       <div class="menu-scroll">
         <div class="menu-divider"><span>Ứng dụng tìm font</span></div>
         <button type="button" class="menu-item menu-row" data-action="finder" title="KD Font Finder"><i class="ri-search-eye-line"></i><span>KD Font Finder</span></button>
@@ -58,47 +58,47 @@
     </div>
   </header>
 
-  <div class="login-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
-    <div class="login-card">
+  <div class="popup-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
+    <div class="popup-card login-card">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành Viên</div>
-      <div class="login-input-wrap">
-        <i class="ri-user-line login-input-icon"></i>
-        <input type="email" id="login-email" name="username" autocomplete="username" placeholder="Tài khoản" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="popup-field">
+        <i class="ri-user-line popup-field-icon"></i>
+        <input class="popup-input" type="email" id="login-email" name="username" autocomplete="username" placeholder="Tài khoản" autocapitalize="off" autocorrect="off" spellcheck="false">
       </div>
-      <div class="login-input-wrap">
-        <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mật khẩu">
+      <div class="popup-field">
+        <i class="ri-lock-line popup-field-icon"></i>
+        <input class="popup-input" type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mật khẩu">
       </div>
-      <div class="login-input-wrap" id="change-pass-extra" hidden>
-        <i class="ri-lock-line login-input-icon"></i>
-        <input type="password" id="new-password" name="new-password" autocomplete="new-password" placeholder="Mật khẩu mới">
+      <div class="popup-field" id="change-pass-extra" hidden>
+        <i class="ri-lock-line popup-field-icon"></i>
+        <input class="popup-input" type="password" id="new-password" name="new-password" autocomplete="new-password" placeholder="Mật khẩu mới">
       </div>
-      <div class="login-btn-row">
-        <button class="btn" id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
-        <button class="btn" id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
+      <div class="popup-btn-row login-btn-row">
+        <button class="btn popup-btn" id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
+        <button class="btn popup-btn" id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
       </div>
       <div class="login-or" id="google-or"><span>Hoặc</span></div>
       <div class="google-btn-wrap" id="google-btn"></div>
-      <div id="login-error"></div>
+      <div class="popup-toast" id="login-error"></div>
     </div>
   </div>
 
-  <div class="notice-panel" id="register-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành viên" hidden>
-    <div class="notice-card register-card">
-      <div class="notice-title"><i class="ri-vip-crown-2-line"></i> Đăng ký thành viên</div>
+  <div class="popup-panel" id="register-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành viên" hidden>
+    <div class="popup-card register-card">
+      <div class="popup-title"><i class="ri-vip-crown-2-line"></i> Đăng ký thành viên</div>
 
       <div class="register-scroll">
         <div class="reg-left">
         <div class="reg-form">
-          <div class="login-input-wrap">
-            <i class="ri-mail-line login-input-icon"></i>
+          <div class="popup-field">
+            <i class="ri-mail-line popup-field-icon"></i>
             <span class="req" aria-hidden="true">*</span>
-            <input type="email" id="reg-email" placeholder="Gmail" aria-required="true" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <input class="popup-input reg-input" type="email" id="reg-email" placeholder="Gmail" aria-required="true" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
           </div>
-          <div class="login-input-wrap">
-            <i class="ri-phone-line login-input-icon"></i>
-            <input type="text" id="reg-contact" placeholder="Zalo, Facebook, Telegram..." autocomplete="off" maxlength="200">
+          <div class="popup-field">
+            <i class="ri-phone-line popup-field-icon"></i>
+            <input class="popup-input reg-input" type="text" id="reg-contact" placeholder="Zalo, Facebook, Telegram..." autocomplete="off" maxlength="200">
           </div>
           <label class="reg-file" for="reg-photo">
             <i class="ri-image-add-line"></i>
@@ -107,8 +107,8 @@
             <input type="file" id="reg-photo" accept="image/*" aria-required="true" hidden>
           </label>
         </div>
-          <div class="notice-btn-row register-actions">
-            <button type="button" class="btn notice-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
+          <div class="popup-btn-row register-actions">
+            <button type="button" class="btn popup-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
           </div>
         </div>
 
@@ -125,20 +125,20 @@
           </ul>
         </div>
       </div>
-      <div id="register-hint"></div>
+      <div class="popup-toast" id="register-hint"></div>
     </div>
   </div>
 
-  <div class="notice-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
-    <div class="notice-card">
-      <div class="notice-title"><i class="ri-megaphone-line"></i> Thông báo</div>
+  <div class="popup-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
+    <div class="popup-card">
+      <div class="popup-title"><i class="ri-megaphone-line"></i> Thông báo</div>
       <div class="notice-msg">Font dành cho thành viên.<br>Vui lòng Đăng nhập hoặc Đăng ký để tải font.</div>
     </div>
   </div>
 
-  <div class="notice-panel" id="finder-panel" role="dialog" aria-modal="true" aria-label="KD Font Finder" hidden>
-    <div class="notice-card">
-      <div class="notice-title"><i class="ri-search-eye-line"></i> KD Font Finder</div>
+  <div class="popup-panel" id="finder-panel" role="dialog" aria-modal="true" aria-label="KD Font Finder" hidden>
+    <div class="popup-card">
+      <div class="popup-title"><i class="ri-search-eye-line"></i> KD Font Finder</div>
       <div class="finder-scroll">
         <div class="finder-media">
           <video class="finder-video" id="finder-video" src="img/kdfontfinder.mp4" controls playsinline preload="metadata"></video>
@@ -165,9 +165,9 @@
             </li>
 
           </ul>
-          <div class="notice-btn-row finder-actions">
-            <a class="btn notice-btn" href="https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
-            <a class="btn notice-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
+          <div class="popup-btn-row finder-actions">
+            <a class="btn popup-btn" href="https://drive.google.com/file/d/1WKED6F2CMCtNs6SRWuNm7eq0U_EwepzJ" target="_blank" rel="noopener"><i class="ri-windows-fill"></i> Tải App</a>
+            <a class="btn popup-btn" href="#" target="_blank" rel="noopener"><i class="ri-download-cloud-2-line"></i> Tải Font</a>
           </div>
         </div>
       </div>

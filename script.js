@@ -191,47 +191,152 @@ function showApp() {
   loadFonts();
 }
 
-function closeAllPanels(keep) {
-  if (keep !== 'login') closeLogin();
-  if (keep !== 'register') closeRegister();
-  if (keep !== 'notice') closeNotice();
-  if (keep !== 'finder') closeFinder();
-  if (keep !== 'menu') closeMenu();
-}
+/* =====================================================================
+   POPUP: login · thông báo · font finder · đăng ký (+ menu)
+   Chung: mở cái này thì đóng các cái khác · bấm ra ngoài thẻ để đóng ·
+   Esc đóng hết · một nút X dùng chung · dòng menu tương ứng sáng active.
+   Muốn thêm popup mới: thêm 1 mục vào POPUPS (+ hàm open/close nếu cần).
+   ===================================================================== */
+const finderPanel = $('finder-panel');
+const finderVideo = $('finder-video');
+const registerPanel = $('register-panel');
+const popupClose = $('popup-close');
 
-let panelJustOpened = false;
-function markPanelOpened() {
-  panelJustOpened = true;
-  setTimeout(() => { panelJustOpened = false; }, 0);
-}
-
-function openLogin() {
-  markPanelOpened();
-  closeAllPanels('login');
-  loginPanel.hidden = false;
-  renderGoogleBtn();
-}
-
-function closeLogin() {
-  loginPanel.hidden = true;
-  loginPassword.value = '';
-  loginError.textContent = '';
-  if (changePassMode) exitChangePassMode();
-}
+const menuBtn = $('menu-btn');
+const menuIcon = menuBtn.querySelector('i');
+const menuPanel = $('menu-panel');
+const menuBackdrop = $('menu-backdrop');
 
 const noticeMsg = noticePanel.querySelector('.notice-msg');
 const NOTICE_DEFAULT_HTML = noticeMsg.innerHTML;
 
-function openNotice(msg) {
-  markPanelOpened();
-  closeAllPanels('notice');
-  if (msg) noticeMsg.textContent = msg;
-  else noticeMsg.innerHTML = NOTICE_DEFAULT_HTML;
-  noticePanel.hidden = false;
+/* panel · row: dòng menu sáng active khi popup mở · onClose: dọn dẹp khi đóng */
+const POPUPS = {
+  login: {
+    panel: loginPanel,
+    row: authBtn,
+    onClose() {
+      loginPassword.value = '';
+      loginError.textContent = '';
+      if (changePassMode) exitChangePassMode();
+    },
+  },
+  register: {
+    panel: registerPanel,
+    row: registerBtn,
+    onClose() { regHint.textContent = ''; },
+  },
+  notice: { panel: noticePanel },
+  finder: {
+    panel: finderPanel,
+    row: document.querySelector('.menu-row[data-action="finder"]'),
+    onClose() { finderVideo.pause(); },
+  },
+};
+
+let panelJustOpened = false;
+
+function openPopup(name) {
+  panelJustOpened = true;
+  setTimeout(() => { panelJustOpened = false; }, 0);
+  closeAllPanels(name);
+  POPUPS[name].panel.hidden = false;
 }
 
-function closeNotice() {
-  noticePanel.hidden = true;
+function closePopup(name) {
+  const p = POPUPS[name];
+  p.panel.hidden = true;
+  if (p.onClose) p.onClose();
+}
+
+const isMenuOpen = () => menuPanel.classList.contains('open');
+
+function openMenu() {
+  closeAllPanels('menu');
+  menuPanel.classList.add('open');
+  menuBackdrop.classList.add('open');
+  menuBtn.setAttribute('aria-expanded', 'true');
+  menuIcon.className = 'ri-close-line';
+}
+
+function closeMenu() {
+  if (!isMenuOpen()) return;
+  menuPanel.classList.remove('open');
+  menuBackdrop.classList.remove('open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  menuIcon.className = 'ri-menu-3-line';
+}
+
+function closeAllPanels(keep) {
+  Object.keys(POPUPS).forEach((name) => { if (name !== keep) closePopup(name); });
+  if (keep !== 'menu') closeMenu();
+}
+
+function openLogin() { openPopup('login'); renderGoogleBtn(); }
+function closeLogin() { closePopup('login'); }
+
+function openNotice(msg) {
+  if (msg) noticeMsg.textContent = msg;
+  else noticeMsg.innerHTML = NOTICE_DEFAULT_HTML;
+  openPopup('notice');
+}
+function closeNotice() { closePopup('notice'); }
+
+function openRegister() { openPopup('register'); }
+function closeRegister() { closePopup('register'); }
+
+function openFinder() { openPopup('finder'); }
+function closeFinder() { closePopup('finder'); }
+
+function initPopups() {
+  /* bấm ra ngoài: đóng menu + popup nào không chứa chỗ bấm */
+  document.addEventListener('click', (e) => {
+    if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
+    if (panelJustOpened) return;
+    const path = e.composedPath();
+    Object.keys(POPUPS).forEach((name) => {
+      const { panel } = POPUPS[name];
+      if (panel.hidden) return;
+      const card = panel.querySelector('.popup-card');
+      if (card && path.includes(card)) return;
+      closePopup(name);
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllPanels();
+  });
+
+  /* nút X dùng chung: gắn vào thẻ của popup đang mở */
+  const syncPopupClose = () => {
+    const open = Object.values(POPUPS).find((p) => !p.panel.hidden);
+    const card = open && open.panel.querySelector('.popup-card');
+    if (card && popupClose.parentElement !== card) card.appendChild(popupClose);
+    popupClose.hidden = !card;
+  };
+
+  /* dòng menu chứa popup sáng active khi popup mở (PC) */
+  const syncPopupMenuActive = () => {
+    const popups = Object.values(POPUPS);
+    const anyOpen = popups.some((p) => !p.panel.hidden);
+    /* Popup mở thì tạm tắt active của Trang chủ / Font free...; đóng lại thì khôi phục */
+    document.querySelectorAll('[data-filter]').forEach((b) => {
+      const on = !anyOpen && b.dataset.filter === activeFilter;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+    popups.forEach(({ panel, row }) => {
+      if (!row) return;
+      const on = !panel.hidden;
+      row.classList.toggle('active', on);
+      if (on) row.setAttribute('aria-current', 'true'); else row.removeAttribute('aria-current');
+    });
+  };
+
+  const observer = new MutationObserver(() => { syncPopupClose(); syncPopupMenuActive(); });
+  Object.values(POPUPS).forEach((p) => observer.observe(p.panel, { attributes: true, attributeFilter: ['hidden'] }));
+  popupClose.addEventListener('click', () => closeAllPanels());
+  syncPopupClose();
 }
 
 async function verifyAndBoot() {
@@ -1147,7 +1252,6 @@ function onFreeDownload(g, btn) {
   paintFreeWait();
 }
 
-const registerPanel = $('register-panel');
 const regEmail = $('reg-email');
 const regContact = $('reg-contact');
 const regPhoto = $('reg-photo');
@@ -1166,17 +1270,6 @@ function showRegHint(msg, ms = 4000) {
   regHint.textContent = msg;
   clearTimeout(regHintTimer);
   regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
-}
-
-function openRegister() {
-  markPanelOpened();
-  closeAllPanels('register');
-  registerPanel.hidden = false;
-}
-
-function closeRegister() {
-  registerPanel.hidden = true;
-  regHint.textContent = '';
 }
 
 function resetRegisterForm() {
@@ -1248,42 +1341,6 @@ regPhoto.addEventListener('change', () => {
 });
 regSubmit.addEventListener('click', doRegister);
 
-const menuBtn = $('menu-btn');
-const menuIcon = menuBtn.querySelector('i');
-const menuPanel = $('menu-panel');
-const menuBackdrop = $('menu-backdrop');
-const finderPanel = $('finder-panel');
-const finderVideo = $('finder-video');
-
-const isMenuOpen = () => menuPanel.classList.contains('open');
-
-function openMenu() {
-  closeAllPanels('menu');
-  menuPanel.classList.add('open');
-  menuBackdrop.classList.add('open');
-  menuBtn.setAttribute('aria-expanded', 'true');
-  menuIcon.className = 'ri-close-line';
-}
-
-function closeMenu() {
-  if (!isMenuOpen()) return;
-  menuPanel.classList.remove('open');
-  menuBackdrop.classList.remove('open');
-  menuBtn.setAttribute('aria-expanded', 'false');
-  menuIcon.className = 'ri-menu-3-line';
-}
-
-function openFinder() {
-  markPanelOpened();
-  closeAllPanels('finder');
-  finderPanel.hidden = false;
-}
-
-function closeFinder() {
-  finderPanel.hidden = true;
-  finderVideo.pause();
-}
-
 function setFilter(name) {
   if (!FILTERS[name]) return;
   activeFilter = name;
@@ -1330,25 +1387,6 @@ function initMenu() {
     setFilter(item.dataset.filter);
     closeMenu();
   });
-
-  document.addEventListener('click', (e) => {
-    if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
-    if (panelJustOpened) return;
-    const path = e.composedPath();
-    [[loginPanel, '.login-card', closeLogin],
-     [noticePanel, '.notice-card', closeNotice],
-     [finderPanel, '.notice-card', closeFinder],
-     [registerPanel, '.register-card', closeRegister]].forEach(([panel, cardSel, close]) => {
-      if (panel.hidden) return;
-      const card = panel.querySelector(cardSel);
-      if (card && path.includes(card)) return;
-      close();
-    });
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllPanels();
-  });
 }
 
 function initFonts() {
@@ -1387,40 +1425,6 @@ function initFonts() {
     if (card) toggleDemo(card);
   });
 }
-
-const popupClose = $('popup-close');
-const popups = [loginPanel, noticePanel, finderPanel, registerPanel];
-const syncPopupClose = () => {
-  const open = popups.find((p) => !p.hidden);
-  const card = open && open.querySelector('.login-card, .notice-card');
-  if (card && popupClose.parentElement !== card) card.appendChild(popupClose);
-  popupClose.hidden = !card;
-};
-/* Menu chứa popup: sáng active khi popup đang mở (PC) */
-const popupMenuRows = [
-  [finderPanel, document.querySelector('.menu-row[data-action="finder"]')],
-  [loginPanel, authBtn],
-  [registerPanel, $('register-btn')],
-];
-const syncPopupMenuActive = () => {
-  const anyOpen = popupMenuRows.some(([panel]) => !panel.hidden);
-  /* Popup mở thì tạm tắt active của Trang chủ / Font free...; đóng lại thì khôi phục */
-  document.querySelectorAll('[data-filter]').forEach((b) => {
-    const on = !anyOpen && b.dataset.filter === activeFilter;
-    b.classList.toggle('active', on);
-    if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
-  });
-  popupMenuRows.forEach(([panel, row]) => {
-    if (!row) return;
-    const on = !panel.hidden;
-    row.classList.toggle('active', on);
-    if (on) row.setAttribute('aria-current', 'true'); else row.removeAttribute('aria-current');
-  });
-};
-const popupObserver = new MutationObserver(() => { syncPopupClose(); syncPopupMenuActive(); });
-popups.forEach((p) => popupObserver.observe(p, { attributes: true, attributeFilter: ['hidden'] }));
-popupClose.addEventListener('click', () => closeAllPanels());
-syncPopupClose();
 
 function initDockTips() {
   const dock = document.querySelector('.dock');
@@ -1601,6 +1605,7 @@ function initNavSlider() {
 initInputMode();
 initFonts();
 initMenu();
+initPopups();
 initDockToggle();
 initAuth();
 initDockTips();
