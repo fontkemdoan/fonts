@@ -8,7 +8,7 @@
 }
 :root {
   --bg: #efefef;
-  --bgicon: #eaeaea;
+  --bgicon: #efefef;
   --text: #fff;
   --text-black: #444;
   --black: #444;
@@ -16,7 +16,7 @@
   --card: #fff;
   --red: #e7644f;
   --border: 1px solid #ababab;
-  --shadow-soft: 0 4px 12px rgba(0,0,0, 0.1);
+  --shadow-soft: 0 3px 10px rgba(0,0,0, 0.08);
   --shadow-card: 0 6px 20px rgba(0,0,0, 0.13);
   --radius-pill: 999px;
   --muted: #999;
@@ -1665,7 +1665,6 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
     padding: 0 20px;
     border-radius: var(--radius-pill);
     background: var(--card);
-    box-shadow: var(--shadow-soft);
   }
   .header-actions > .menu-row.active { background: var(--black); color: var(--text); }
   html:not([data-input="touch"]) .header-actions > .menu-row:not(.active):hover {
