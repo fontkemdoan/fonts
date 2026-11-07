@@ -119,10 +119,22 @@ const userChip = document.createElement('div');
 userChip.className = 'user-chip';
 userChip.hidden = true;
 
+const headerActions = $('header-actions');
+const menuScroll = document.querySelector('.menu-scroll');
+
+/* PC: Đăng nhập / Đăng ký nằm góc phải header · Mobile: trả về menu */
+function placeAuthButtons() {
+  if (window.matchMedia('(min-width: 768px)').matches) {
+    if (authBtn.parentElement !== headerActions) headerActions.append(authBtn, registerBtn);
+  } else if (authBtn.parentElement !== menuScroll) {
+    menuScroll.append(authBtn, registerBtn);
+  }
+}
+
 function placeUserChip() {
   if (userChip.hidden) return;
   if (window.matchMedia('(min-width: 768px)').matches) {
-    if (userChip.parentElement !== brand) brand.appendChild(userChip);
+    if (userChip.parentElement !== headerActions) headerActions.appendChild(userChip);
   } else if (userChip.previousElementSibling !== authBtn) {
     authBtn.after(userChip);
   }
@@ -157,7 +169,14 @@ function renderUserChip() {
   mail.className = 'user-mail';
   mail.textContent = p.email;
   userChip.title = p.email;
-  userChip.replaceChildren(av, mail);
+  const out = document.createElement('button');
+  out.type = 'button';
+  out.className = 'btn-icon user-logout';
+  out.setAttribute('aria-label', 'Đăng xuất');
+  out.title = 'Đăng xuất';
+  out.innerHTML = '<i class="ri-logout-box-line"></i>';
+  out.addEventListener('click', (e) => { e.stopPropagation(); doLogout(); });
+  userChip.replaceChildren(av, mail, out);
   userChip.hidden = false;
   placeUserChip();
 }
@@ -175,13 +194,19 @@ function resetPreviews(clearCache) {
 
 function updateAuthUI() {
   const on = isLoggedIn();
-  authIcon.className = on ? 'ri-logout-box-line' : 'ri-user-line';
-  authBtn.setAttribute('aria-label', on ? 'Đăng xuất' : 'Đăng nhập');
-  authBtn.title = on ? 'Đăng xuất' : 'Đăng nhập';
-  authLabel.textContent = on ? 'Đăng xuất' : 'Đăng nhập';
+  authBtn.hidden = on;
   registerBtn.hidden = on;
   if (on) closeRegister();
   renderUserChip();
+}
+
+function doLogout() {
+  clearToken();
+  updateAuthUI();
+  resetPreviews(true);
+  closeLogin();
+  closeNotice();
+  closeMenu();
 }
 
 function showApp() {
@@ -571,11 +596,7 @@ function initAuth() {
 
   authBtn.addEventListener('click', () => {
     if (isLoggedIn()) {
-      clearToken();
-      updateAuthUI();
-      resetPreviews(true);
-      closeLogin();
-      closeNotice();
+      doLogout();
     } else if (loginPanel.hidden) {
       openLogin();
     } else {
@@ -1363,6 +1384,7 @@ function placeSearch() {
   } else if (searchWrap.parentElement !== contentEl) {
     contentEl.insertBefore(searchWrap, contentEl.firstChild);
   }
+  placeAuthButtons();
   placeUserChip();
   closeMenu();
 }
@@ -1377,9 +1399,10 @@ function initMenu() {
     const item = e.target.closest('.menu-row');
     if (!item) return;
     if (item.dataset.action === 'finder') { openFinder(); return; }
-    if (item.dataset.action === 'register') { openRegister(); return; }
     closeMenu();
   });
+
+  registerBtn.addEventListener('click', () => openRegister());
 
   $('bottom-nav').addEventListener('click', (e) => {
     const item = e.target.closest('[data-filter]');
