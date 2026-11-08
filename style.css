@@ -1673,7 +1673,7 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
   }
   .header-actions > .user-chip { max-width: 320px; flex-shrink: 0; }
   .header-actions > .user-chip .user-avatar { width: var(--row-h); height: var(--row-h); font-size: 20px; }
-  .header-actions > .user-chip .user-logout { margin-left: 4px; --ib-size: var(--row-h); background: var(--card); box-shadow: var(--shadow-soft); }
+  .header-actions > .user-chip .user-logout { margin-left: 4px; --ib-size: var(--row-h); background: var(--card); }
 
   /* Dock không còn mục "Tài khoản" */
   .menu-panel .menu-divider:nth-of-type(3) { display: none; }
