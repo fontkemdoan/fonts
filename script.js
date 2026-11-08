@@ -216,12 +216,6 @@ function showApp() {
   loadFonts();
 }
 
-/* =====================================================================
-   POPUP: login · thông báo · font finder · đăng ký (+ menu)
-   Chung: mở cái này thì đóng các cái khác · bấm ra ngoài thẻ để đóng ·
-   Esc đóng hết · một nút X dùng chung · dòng menu tương ứng sáng active.
-   Muốn thêm popup mới: thêm 1 mục vào POPUPS (+ hàm open/close nếu cần).
-   ===================================================================== */
 const finderPanel = $('finder-panel');
 const finderVideo = $('finder-video');
 const registerPanel = $('register-panel');
