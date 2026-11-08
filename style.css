@@ -13,7 +13,7 @@
   --white: #fff;
   --red: #ec5e47;
   --border: 1px solid #777;
-  --shadow-ava: 0 4px 8px rgba(0,0,0, 0.3);
+  --shadow-ava: 0 3px 8px rgba(0,0,0, 0.25);
   --shadow-card:
     0 1px 0 rgba(255,255,255,0.7) inset,
     0 4px 10px -4px rgba(30,40,45,0.1),
