@@ -1297,37 +1297,10 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
 .google-btn-wrap[hidden] { display: none; }
 .google-btn-wrap {
   width: 100%;
-  display: grid;
-  justify-items: center;
-  align-items: start;
+  display: flex;
+  justify-content: center;
   min-height: 44px;
 }
-.google-btn-wrap > * { grid-area: 1 / 1; }
-/* nút giữ chỗ: cùng kích thước nút Google (cao 40px, bo pill) */
-.google-btn-ph {
-  width: var(--gw, 240px);
-  height: 40px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 12px;
-  border: 1px solid #dadce0;
-  border-radius: 20px;
-  background: #fff;
-  color: #3c4043;
-  font: 500 14px/1 Roboto, Arial, sans-serif;
-  letter-spacing: .25px;
-  pointer-events: none;
-  user-select: none;
-}
-.google-btn-ph svg { flex: none; }
-.google-btn-ph span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* nút thật vẫn render (ẩn) để tải iframe, tải xong mới hiện và gỡ nút giữ chỗ */
-#google-btn { visibility: hidden; }
-.google-btn-wrap.ready #google-btn { visibility: visible; }
-.google-btn-wrap.ready .google-btn-ph { display: none; }
 
 @media (max-width: 767.98px) {
 
@@ -1668,14 +1641,14 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
   color: var(--text-black);
 }
 
-/* Nút đăng xuất ở mép phải mail */
+/* icon đăng xuất mail */
 .user-logout {
   --ib-size: 34px;
   --ib-fz: 18px;
   margin-left: auto;
 }
 
-/* Desktop: góc phải header (đăng nhập / đăng ký / mail + đăng xuất) */
+/* Desktop: đăng nhập / đăng ký / mail + đăng xuất */
 .header-actions { display: none; }
 
 @media (min-width: 768px) {
