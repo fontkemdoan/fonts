@@ -1065,8 +1065,8 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 .menu-divider span {
   padding: 4px 20px;
   border-radius: var(--radius-pill);
-  background: #999;
-  color: var(--white);
+  background: var(--bgicon);
+  color: var(--black);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -1076,7 +1076,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   flex: 1;
   height: 1px;
   background: #999;
-  opacity: .3;
+  opacity: .2;
 }
 
 .dock { display: contents; }
@@ -1683,7 +1683,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
     color: var(--white);
   }
   .header-actions > .user-chip { max-width: 320px; flex-shrink: 0; }
-  .header-actions > .user-chip .user-avatar { width: var(--row-h); height: var(--row-h); font-size: 20px; box-shadow: var(--shadow-card); }
+  .header-actions > .user-chip .user-avatar { width: var(--row-h); height: var(--row-h); font-size: 20px; }
   .header-actions > .user-chip .user-logout { margin-left: 4px; --ib-size: var(--row-h); background: var(--glass); box-shadow: var(--shadow-card);}
 
   .menu-panel .menu-divider:nth-of-type(3) { display: none; }
