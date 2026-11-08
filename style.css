@@ -16,7 +16,7 @@
   --card: #fff;
   --red: #e7644f;
   --border: 1px solid #ababab;
-  --shadow-soft: 0 3px 10px rgba(0,0,0, 0.08);
+  --shadow-soft: 0 3px 10px rgba(0,0,0, 0.06);
   --shadow-card: 0 6px 20px rgba(0,0,0, 0.13);
   --radius-pill: 999px;
   --muted: #999;
@@ -253,7 +253,7 @@ textarea {
   color: var(--text-black);
   border: none;
   background: var(--card);
-
+  box-shadow: var(--shadow-soft);
 }
 
 #search::placeholder {
@@ -1624,7 +1624,7 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
   line-height: 1;
   border: 2px solid var(--text);
   box-sizing: border-box;
-  box-shadow:  0 2px 6px rgba(0,0,0, 0.2);
+  box-shadow:  var(--shadow-soft);
   overflow: hidden;
   user-select: none;
 }
@@ -1665,6 +1665,7 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
     padding: 0 20px;
     border-radius: var(--radius-pill);
     background: var(--card);
+    box-shadow: var(--shadow-soft);
   }
   .header-actions > .menu-row.active { background: var(--black); color: var(--text); }
   html:not([data-input="touch"]) .header-actions > .menu-row:not(.active):hover {
@@ -1676,6 +1677,7 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
     width: var(--row-h);
     height: var(--row-h);
     font-size: 20px;
+    box-shadow: var(--shadow-soft);
   }
   .header-actions > .user-chip .user-logout {
     margin-left: 4px;
