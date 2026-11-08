@@ -1675,11 +1675,23 @@ background: linear-gradient(#444, #444) 0 0 / calc(10px + (100% - 20px) * var(--
   .header-actions > .user-chip .user-avatar { width: var(--row-h); height: var(--row-h); font-size: 20px; }
   .header-actions > .user-chip .user-logout { margin-left: 4px; --ib-size: var(--row-h); background: var(--card); box-shadow: var(--shadow-soft); }
 
-  /* Dock không còn mục "Tài khoản" */
   .menu-panel .menu-divider:nth-of-type(3) { display: none; }
 }
 @media (min-width: 768px) and (max-width: 1099.98px) {
   .header-actions > .user-chip .user-mail { display: none; }
+}
+
+/* icon đăng nhập / đăng ký chỉ hiện icon */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .header-actions > #auth-btn,
+  .header-actions > #register-btn {
+    width: var(--row-h);
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+  }
+  .header-actions > #auth-btn .nav-label,
+  .header-actions > #register-btn .nav-label { display: none; }
 }
 
 /* Mobile: mail + đăng xuất trong menu */
