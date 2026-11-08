@@ -518,8 +518,10 @@ async function previewAvatar(email) {
 
 const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
 const googleBtnEl = $('google-btn');
+const googleWrapEl = $('google-wrap');
 const googleOrEl = $('google-or');
 let googleReady = false;
+let googleObserver = null;
 
 async function onGoogleCredential(resp) {
   if (!resp || !resp.credential) return;
@@ -551,13 +553,36 @@ function initGoogle() {
 }
 
 let googleRenderedWidth = 0;
+
+/* Chờ nút Google (iframe) tải xong rồi mới thay cho nút giữ chỗ */
+function watchGoogleBtn() {
+  googleWrapEl.classList.remove('ready');
+  if (googleObserver) googleObserver.disconnect();
+  const done = () => {
+    if (googleObserver) googleObserver.disconnect();
+    googleWrapEl.classList.add('ready');
+  };
+  const check = () => {
+    const f = googleBtnEl.querySelector('iframe');
+    if (!f) return false;
+    if (!f.dataset.watched) {
+      f.dataset.watched = '1';
+      f.addEventListener('load', () => setTimeout(done, 50), { once: true });
+      setTimeout(done, 1500);
+    }
+    return true;
+  };
+  if (check()) return;
+  googleObserver = new MutationObserver(check);
+  googleObserver.observe(googleBtnEl, { childList: true, subtree: true });
+}
+
 function renderGoogleBtn() {
   initGoogle();
-  const hide = !googleReady;
-  googleBtnEl.hidden = hide;
-  googleOrEl.hidden = hide;
-  if (hide) return;
-  const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 60) || 240));
+  /* nút giữ chỗ luôn hiện sẵn đúng kích thước, nên Hoặc + nút không còn bị ẩn/hiện gây giựt */
+  const w = Math.min(400, Math.max(200, Math.round(googleWrapEl.parentElement.clientWidth - 60) || 240));
+  googleWrapEl.style.setProperty('--gw', w + 'px');
+  if (!googleReady) return;
   if (w === googleRenderedWidth) return;
   googleRenderedWidth = w;
   googleBtnEl.innerHTML = '';
@@ -565,7 +590,15 @@ function renderGoogleBtn() {
     type: 'standard', theme: 'outline', size: 'large',
     text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
   });
+  watchGoogleBtn();
 }
+
+/* thư viện Google không tải được (mạng chặn...) thì ẩn luôn chỗ giữ chỗ */
+setTimeout(() => {
+  if (googleReady) return;
+  googleWrapEl.hidden = true;
+  googleOrEl.hidden = true;
+}, 10000);
 
 window.onGoogleLibraryLoad = () => { initGoogle(); if (!loginPanel.hidden) renderGoogleBtn(); };
 
