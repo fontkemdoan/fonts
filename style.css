@@ -236,7 +236,7 @@ textarea {
 
 .search-wrap {
   position: relative;
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
 }
 
@@ -415,7 +415,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin-left: auto;
   margin-right: auto;
   gap: 14px;
@@ -459,7 +459,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 .popup-card {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin-top: 30px;
   border-radius: 25px;
   padding: 26px 20px 20px;
@@ -617,7 +617,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   bottom: 15px;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 400px;
+  max-width: 500px;
   height: 52px;
   display: flex;
   align-items: center;
@@ -649,7 +649,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   right: max(20px, calc(50% - 200px));
   bottom: 80px;
   width: calc(100% - 40px);
-  max-width: 400px;
+  max-width: 500px;
   margin: 0;
   padding: 28px 8px 8px;
   border-radius: 25px;
@@ -889,12 +889,12 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 #demos {
-  max-width: 400px;
+  max-width: 500px;
   width: 100%;
   margin: 25px auto 0;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
 .demo-card {
@@ -915,7 +915,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   width: 100%;
   height: auto;
   border-radius: 25px;
-  padding: 8px 8px 0;
+  padding: 8px;
 }
 
 .demo-name {
@@ -1723,7 +1723,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 /* BANNER CARD */
 .banner-card {
   position: relative;
-  max-width: 400px;
+  max-width: 500px;
   width: 100%;
   min-height: 150px;
   margin: 25px auto 0;
