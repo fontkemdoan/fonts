@@ -216,7 +216,14 @@ function showApp() {
   loadFonts();
 }
 
-const finderPanel = $('finder-panel');
+const finderPanel = $('finder-popup');
+const viewerPanel = $('viewer-panel');
+let viewerImg = $('viewer-img');
+const viewerStage = viewerImg.parentElement;
+const viewerName = $('viewer-name');
+const viewerNav = $('viewer-nav');
+const viewer = { imgs: [], idx: 0, onIdx: null };
+let viewerSliding = null;
 const finderVideo = $('finder-video');
 const registerPanel = $('register-panel');
 const popupClose = $('popup-close');
@@ -246,6 +253,11 @@ const POPUPS = {
     onClose() { regHint.textContent = ''; },
   },
   notice: { panel: noticePanel },
+  viewer: {
+    panel: viewerPanel,
+    keepNav: true,
+    onClose() { viewer.onIdx = null; },
+  },
   finder: {
     panel: finderPanel,
     row: document.querySelector('.menu-row[data-action="finder"]'),
@@ -305,6 +317,75 @@ function openRegister() { openPopup('register'); }
 function closeRegister() { closePopup('register'); }
 
 function openFinder() { openPopup('finder'); }
+
+/* Popup xem ảnh lớn (PC) */
+function openViewer(title, imgs, idx, onIdx) {
+  if (viewerSliding) viewerSliding();
+  viewer.imgs = imgs;
+  viewer.idx = idx;
+  viewer.onIdx = onIdx;
+  viewerName.textContent = title;
+  viewerImg.alt = title;
+  viewerImg.src = encodeURI(imgs[idx]);
+  viewerNav.hidden = imgs.length < 2;
+  openPopup('viewer');
+}
+
+function viewerGo(step) {
+  const n = viewer.imgs.length;
+  if (n < 2) return;
+  if (viewerSliding) viewerSliding();
+  viewer.idx = (viewer.idx + step + n) % n;
+  const src = encodeURI(viewer.imgs[viewer.idx]);
+  if (viewer.onIdx) viewer.onIdx(viewer.idx);
+  if (prefersReducedMotion()) { viewerImg.src = src; return; }
+  viewerSlide(src, step > 0 ? 1 : -1);
+}
+
+function viewerSlide(src, dir) {
+  const old = viewerImg;
+  const next = new Image();
+  next.className = 'viewer-img viewer-img--in';
+  next.alt = old.alt;
+  let done = false;
+  let timer = 0;
+
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    next.removeEventListener('transitionend', onEnd);
+    next.className = 'viewer-img';
+    next.style.transform = '';
+    old.remove();
+    next.id = 'viewer-img';
+    viewerStage.classList.remove('is-sliding');
+    viewerStage.style.height = '';
+    viewerImg = next;
+    viewerSliding = null;
+  };
+  const onEnd = (e) => { if (e.propertyName === 'transform') finish(); };
+
+  /* bấm tiếp khi ảnh mới chưa tải xong: đổi thẳng, không trượt */
+  viewerSliding = () => { next.onload = next.onerror = null; old.src = src; viewerSliding = null; };
+  next.onerror = () => { viewerSliding = null; };
+  next.onload = () => {
+    next.onload = null;
+    viewerStage.style.height = viewerStage.offsetHeight + 'px';
+    next.style.transform = `translateX(${dir * 100}%)`;
+    viewerStage.appendChild(next);
+    const h1 = next.offsetHeight;
+    void viewerStage.offsetWidth;
+    viewerStage.classList.add('is-sliding');
+    old.style.transform = `translateX(${-dir * 100}%)`;
+    next.style.transform = 'translateX(0)';
+    viewerStage.style.height = h1 + 'px';
+    viewerSliding = finish;
+    next.addEventListener('transitionend', onEnd);
+    timer = setTimeout(finish, 750);
+  };
+  next.src = src;
+}
 function closeFinder() { closePopup('finder'); }
 
 function initPopups() {
@@ -324,7 +405,11 @@ function initPopups() {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeAllPanels();
+    else if (!viewerPanel.hidden && e.key === 'ArrowLeft') viewerGo(-1);
+    else if (!viewerPanel.hidden && e.key === 'ArrowRight') viewerGo(1);
   });
+  $('viewer-prev').addEventListener('click', () => viewerGo(-1));
+  $('viewer-next').addEventListener('click', () => viewerGo(1));
 
   /* nút X dùng chung: gắn vào thẻ của popup đang mở */
   const syncPopupClose = () => {
@@ -337,7 +422,7 @@ function initPopups() {
   /* dòng menu chứa popup sáng active khi popup mở (PC) */
   const syncPopupMenuActive = () => {
     const popups = Object.values(POPUPS);
-    const anyOpen = popups.some((p) => !p.panel.hidden);
+    const anyOpen = popups.some((p) => !p.panel.hidden && !p.keepNav);
     /* Popup mở thì tạm tắt active của Trang chủ / Font free...; đóng lại thì khôi phục */
     document.querySelectorAll('[data-filter]').forEach((b) => {
       const on = !anyOpen && b.dataset.filter === activeFilter;
@@ -895,20 +980,71 @@ function buildDemoGroups() {
 
 function createDemoCard(g) {
   const card = demoCardTpl.content.firstElementChild.cloneNode(true);
-  const img = card.querySelector('.demo-img');
+  let img = card.querySelector('.demo-img');
+  const media = card.querySelector('.demo-media');
   img.alt = g.title;
   const prevBtn = card.querySelector('.demo-prev');
   const nextBtn = card.querySelector('.demo-next');
   const imgs = g.imgs.slice();
   let idx = 0;
+  let sliding = null; /* hàm kết thúc ngay slide đang chạy */
 
   const showImg = () => { img.src = encodeURI(imgs[idx]); };
+
+  /* Ảnh mới trượt vào, ảnh cũ trượt ra; chiều cao khung đổi mượt theo ảnh mới */
+  const slideTo = (src, dir) => {
+    const old = img;
+    const next = new Image();
+    next.className = 'demo-img demo-img--in';
+    next.alt = old.alt;
+    let done = false;
+    let timer = 0;
+
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      next.removeEventListener('transitionend', onEnd);
+      next.className = 'demo-img';
+      next.style.transform = '';
+      old.remove();
+      media.classList.remove('is-sliding');
+      media.style.height = '';
+      img = next;
+      sliding = null;
+    };
+    const onEnd = (e) => { if (e.propertyName === 'transform') finish(); };
+
+    /* bấm tiếp khi ảnh mới chưa tải xong: đổi thẳng, không trượt */
+    sliding = () => { next.onload = next.onerror = null; old.src = src; sliding = null; };
+    next.onerror = () => { sliding = null; };
+    next.onload = () => {
+      next.onload = null;
+      media.style.height = media.offsetHeight + 'px';
+      next.style.transform = `translateX(${dir * 100}%)`;
+      media.appendChild(next);
+      const h1 = next.offsetHeight;
+      void media.offsetWidth;
+      media.classList.add('is-sliding');
+      old.style.transform = `translateX(${-dir * 100}%)`;
+      next.style.transform = 'translateX(0)';
+      media.style.height = h1 + 'px';
+      sliding = finish;
+      next.addEventListener('transitionend', onEnd);
+      timer = setTimeout(finish, 750);
+    };
+    next.src = src;
+  };
+
   const go = (step) => {
     if (imgs.length < 2) return;
+    if (sliding) sliding();
     idx = (idx + step + imgs.length) % imgs.length;
-    showImg();
+    const src = encodeURI(imgs[idx]);
     const ahead = new Image();
     ahead.src = encodeURI(imgs[(idx + step + imgs.length) % imgs.length]);
+    if (prefersReducedMotion()) { img.src = src; return; }
+    slideTo(src, step > 0 ? 1 : -1);
   };
   const navGroup = card.querySelector('.demo-nav-group');
   const syncNav = () => { navGroup.hidden = imgs.length < 2; };
@@ -918,8 +1054,21 @@ function createDemoCard(g) {
     card.remove();
     updateView();
   });
-  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); go(-1); });
-  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); go(1); });
+  /* PC: bấm tới/lùi thì bung popup xem ảnh · Mobile: trượt ngay trong card */
+  const step = (d) => {
+    if (imgs.length < 2) return;
+    if (!desktopMQ.matches) { go(d); return; }
+    if (sliding) sliding();
+    idx = (idx + d + imgs.length) % imgs.length;
+    showImg();
+    openViewer(g.title, imgs, idx, (i) => {
+      if (sliding) sliding();
+      idx = i;
+      showImg();
+    });
+  };
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); step(-1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); step(1); });
   syncNav();
   showImg();
   if (g.free) {

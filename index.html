@@ -60,7 +60,7 @@
   </header>
 
   <div class="popup-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
-    <div class="popup-card login-card">
+    <div class="popup-card login-popup">
       <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
       <div class="login-title">Thành Viên</div>
       <div class="popup-field">
@@ -86,7 +86,7 @@
   </div>
 
   <div class="popup-panel" id="register-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành viên" hidden>
-    <div class="popup-card register-card">
+    <div class="popup-card register-popup">
       <div class="popup-title"><i class="ri-vip-crown-2-line"></i> Đăng ký thành viên</div>
 
       <div class="register-scroll">
@@ -137,7 +137,7 @@
     </div>
   </div>
 
-  <div class="popup-panel" id="finder-panel" role="dialog" aria-modal="true" aria-label="KD Font Finder" hidden>
+  <div class="popup-panel" id="finder-popup" role="dialog" aria-modal="true" aria-label="KD Font Finder" hidden>
     <div class="popup-card">
       <div class="popup-title"><i class="ri-search-eye-line"></i> KD Font Finder</div>
       <div class="finder-scroll">
@@ -197,6 +197,21 @@
     </div>
     <div id="status"></div>
   </main>
+
+  <div class="popup-panel" id="viewer-panel" role="dialog" aria-modal="true" aria-label="Xem ảnh" hidden>
+    <div class="popup-card viewer-card">
+      <div class="viewer-stage">
+        <img class="viewer-img" id="viewer-img" alt="">
+      </div>
+      <div class="viewer-bar">
+        <span class="viewer-name" id="viewer-name"></span>
+        <div class="viewer-nav" id="viewer-nav">
+          <button type="button" class="btn-icon demo-nav" id="viewer-prev" aria-label="Ảnh trước"><i class="ri-arrow-left-line"></i></button>
+          <button type="button" class="btn-icon demo-nav" id="viewer-next" aria-label="Ảnh sau"><i class="ri-arrow-right-line"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <template id="demo-card-tpl">
     <div class="demo-card">
