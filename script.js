@@ -1340,7 +1340,7 @@ function onDemoDownload(g, btn) {
 }
 
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\n\nHoặc đăng ký thành viên để tải không giới hạn.`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\nHoặc đăng ký thành viên để tải không giới hạn.`;
 
 let freeWait = null;
 let freeTimer = 0;
@@ -1485,7 +1485,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút. Không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage', 5000);
+      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút. Không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage', 10000);
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau');
     }

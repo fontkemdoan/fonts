@@ -1,5 +1,5 @@
 [
-{"name": "KD Kem Doan", "file": "KD/KD Kem Doan.ttf", "img": "imgdemo/kdkemdoan.jpg", "group": "KD Kem Doan", "style": ""},
+{"name": "KD Kem Doan", "file": "KD/KD Kem Doan.ttf", "img": ["imgdemo/kdkemdoan.jpg","imgdemo/kdboxroom.jpg"], "group": "KD Kem Doan", "style": ""},
 {"name": "KD Forge Sans", "file": "KD/KD Forge Sans.ttf", "img": "imgdemo/kdforgesans.jpg", "group": "KD Forge Sans", "style": ""},
 {"name": "KD Marthi", "file": "KD/KD Marthi.ttf", "img": "imgdemo/kdmarthi.jpg", "group": "KD Marthi", "style": ""},
 {"name": "KD Quisas", "file": "KD/KD Quisas.ttf", "img": "imgdemo/kdquisas.jpg", "group": "KD Quisas", "style": "", "tags": ["hand"]},
