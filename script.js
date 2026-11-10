@@ -495,7 +495,7 @@ async function doLogin() {
   loginError.textContent = '';
 
   if (!email || !password) {
-    showLoginError('Vui lòng nhập email và mật khẩu');
+    showLoginError('Vui lòng nhập email và mật khẩu.');
     return;
   }
 
@@ -509,10 +509,10 @@ async function doLogin() {
     } else if (data.error === 'wrong_password') {
       showLoginError('Sai mật khẩu');
     } else {
-      showLoginError('Tài khoản không tồn tại');
+      showLoginError('Tài khoản không tồn tại.');
     }
   } catch (e) {
-    showLoginError('Lỗi kết nối, hãy thử lại sau');
+    showLoginError('Lỗi kết nối, hãy thử lại sau.');
   } finally {
     loginBtn.disabled = false;
     loginBtn.innerHTML = LABEL.login;
@@ -540,7 +540,7 @@ async function doChangePassword() {
   const newPassword = newPasswordInput.value;
 
   if (!email || !oldPassword || !newPassword) {
-    showLoginError('Vui lòng nhập đầy đủ thông tin');
+    showLoginError('Vui lòng nhập đầy đủ thông tin.');
     return;
   }
 
@@ -551,17 +551,17 @@ async function doChangePassword() {
   try {
     const data = await postJson('/api/change-password', { email, oldPassword, newPassword });
     if (data.ok) {
-      showLoginError('Đổi mật khẩu thành công');
+      showLoginError('Đổi mật khẩu thành công.');
       exitChangePassMode();
     } else if (data.error === 'wrong_password') {
-      showLoginError('Mật khẩu hiện tại không đúng');
+      showLoginError('Mật khẩu hiện tại không đúng.');
     } else if (data.error === 'not_found') {
-      showLoginError('Tài khoản không tồn tại');
+      showLoginError('Tài khoản không tồn tại.');
     } else {
-      showLoginError('Có lỗi xảy ra, hãy thử lại sau');
+      showLoginError('Có lỗi xảy ra, hãy thử lại sau.');
     }
   } catch (e) {
-    showLoginError('Lỗi kết nối, hãy thử lại sau');
+    showLoginError('Lỗi kết nối, hãy thử lại sau.');
   } finally {
     changePassBtn.disabled = false;
     loginBtn.disabled = false;
@@ -1340,7 +1340,7 @@ function onDemoDownload(g, btn) {
 }
 
 const FREE_WAIT_SEC = 60;
-const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\nHoặc đăng ký thành viên để tải không giới hạn.`;
+const FREE_WAIT_MSG = `Vui lòng chờ hết ${FREE_WAIT_SEC}s để tải font khác.\nHoặc Đăng Ký thành viên để tải không giới hạn.`;
 
 let freeWait = null;
 let freeTimer = 0;
@@ -1466,9 +1466,9 @@ async function doRegister() {
   const contact = regContact.value.trim();
   const photo = regPhoto.files[0];
 
-  if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ'); return; }
-  if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản'); return; }
-  if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh'); return; }
+  if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ.'); return; }
+  if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
+  if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh.'); return; }
 
   regBusy = true;
   regSubmit.disabled = true;
@@ -1485,12 +1485,12 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút. Không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage', 10000);
+      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút.', 6000);
     } else {
-      showRegHint('Đăng ký thất bại, hãy thử lại sau');
+      showRegHint('Đăng ký thất bại, hãy thử lại sau.');
     }
   } catch (e) {
-    showRegHint('Lỗi kết nối, hãy thử lại sau');
+    showRegHint('Lỗi kết nối, hãy thử lại sau.');
   } finally {
     regBusy = false;
     regSubmit.disabled = false;
