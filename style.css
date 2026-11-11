@@ -630,6 +630,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   background: var(--glass-bold);
   border: 1px solid var(--rim);
   border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
   z-index: 500;
 }
 
@@ -850,7 +851,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 
 .demo-foot {
   border: none;
-  padding: 10px 14px;
+  padding: 6px 14px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
