@@ -622,7 +622,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   transform: translateX(-50%);
   width: calc(100% - 30px);
   max-width: 500px;
-  height: 52px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -652,7 +652,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 .menu-panel {
   position: fixed;
   right: max(15px, calc(50% - 200px));
-  bottom: 86px;
+  bottom: 90px;
   width: calc(100% - 30px);
   max-width: 500px;
   margin: 0;
@@ -920,6 +920,8 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   height: auto;
   border-radius: 25px;
   padding: 8px;
+  object-fit: cover;
+  aspect-ratio: 16/9;
 }
 
 .demo-name {
@@ -1319,7 +1321,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 @media (max-width: 767.98px) {
 
   /* btn menu bottom nav */
-  .bottom-nav { justify-content: space-between; padding: 0 6px; }
+  .bottom-nav { justify-content: space-between; padding: 0 8px; }
 
   #menu-btn {
     --ib-size: 40px;
@@ -1893,7 +1895,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 /* popup xem ảnh lớn */
 .viewer-card {
   width: auto;
-  max-width: 100%;
+  max-width: 80%;
   margin-top: 0;
   padding: 10px;
   gap: 8px;
@@ -1909,7 +1911,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 .viewer-card .popup-close { --ib-bg: var(--glass-bold); }
 
 .viewer-stage {
-  width: min(1000px, calc(100vw - 340px));
+  width: min(1000px, calc(100vw - var(--v-l, 15px) - var(--v-r, 15px) - 22px));
   max-width: 100%;
   border-radius: 20px;
   overflow: hidden;
@@ -1922,7 +1924,8 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   display: block;
   width: 100%;
   height: auto;
-  max-height: calc(100vh - 230px);
+  max-height: calc(100vh - var(--v-t, 35px) - var(--v-b, 90px) - 80px);
+  max-height: calc(100dvh - var(--v-t, 35px) - var(--v-b, 90px) - 80px);
   object-fit: contain;
 }
 
@@ -1964,4 +1967,17 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 @media (prefers-reduced-motion: reduce) {
   .viewer-stage.is-sliding,
   .viewer-stage.is-sliding .viewer-img { transition: none; }
+}
+
+/* viewer PC: canh giữa vùng còn lại (chừa menu trái + header), ảnh không vượt màn hình */
+@media (min-width: 768px) {
+  .popup-panel:has(.viewer-card) {
+    --v-t: calc(var(--header-h) + 15px);
+    --v-b: 30px;
+    --v-l: calc(20px + var(--side-w) + 30px);
+    --v-r: 30px;
+    padding: var(--v-t) var(--v-r) var(--v-b) var(--v-l);
+    transition: padding-left 0.2s ease;
+  }
+  .viewer-card { max-width: 100%; }
 }
