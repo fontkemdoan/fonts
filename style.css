@@ -12,7 +12,7 @@
   --black: #333;
   --white: #fff;
   --red: #ec5e47;
-  --green: #2fb86b;
+  --green: #1f997e;
   --border: 1px solid #777;
   --shadow-ava: 0 2.7px 7px rgba(0,0,0, 0.22);
   --shadow-card:
@@ -511,6 +511,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 .success-icon {
+  --ib-size: 36px;
   --ib-bg: var(--green);
   --ib-color: var(--white);
   --ib-border: 1px solid var(--rim);
@@ -528,7 +529,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 .success-msg {
   margin-top: 10px;
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.7;
   text-align: center;
   color: var(--black);
 }
@@ -1080,7 +1081,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   margin-left: 8px;
   padding: 3px 12px;
   border-radius: var(--radius-pill);
-  background: #1f997e;
+  background: var(--green);
   color: var(--white);
   font-size: 12px;
   font-weight: 400;
