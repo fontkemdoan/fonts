@@ -505,7 +505,19 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 }
 
 /* Popup đăng ký thành công */
-.success-icon { background: var(--green); }
+.success-popup {
+  align-items: center;
+  padding: 25px 20px 22px;
+}
+
+.success-icon {
+  --ib-bg: var(--green);
+  --ib-color: var(--white);
+  --ib-border: 1px solid var(--rim);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 12px;
+  pointer-events: none;
+}
 
 .success-title {
   font-size: 20px;
@@ -519,13 +531,6 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   line-height: 1.6;
   text-align: center;
   color: var(--black);
-}
-
-.success-msg a {
-  color: inherit;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .login-title {
