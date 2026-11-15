@@ -30,8 +30,8 @@
         <a class="menu-row" href="https://www.m.me/fontkemdoan" target="_blank" rel="noopener" aria-label="Messenger" title="Messenger"><i class="ri-messenger-line"></i><span class="nav-label">Messenger</span></a>
         <a class="menu-row" href="https://zalo.me/0559970246" target="_blank" rel="noopener" aria-label="Nhắn tin" title="Zalo"><span class="nav-zalo-text">Zalo</span><i class="ri-chat-3-line nav-zalo-icon"></i><span class="nav-label">Zalo</span></a>
         <div class="menu-divider"><span>Tài khoản</span></div>
-        <button class="menu-row" id="auth-btn" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></button>
-        <button type="button" class="menu-row" id="register-btn" data-action="register" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></button>
+        <a class="menu-row" id="auth-btn" href="/dang-nhap" aria-label="Đăng nhập" title="Đăng nhập"><i class="ri-user-line"></i><span class="nav-label" id="auth-label">Đăng nhập</span></a>
+        <a class="menu-row" id="register-btn" href="/dang-ky" aria-label="Đăng ký" title="Đăng ký"><i class="ri-user-add-line"></i><span class="nav-label">Đăng ký</span></a>
       </div>
     </div>
 
@@ -59,89 +59,10 @@
     <div class="header-actions" id="header-actions"></div>
   </header>
 
-  <div class="popup-panel" id="login-panel" role="dialog" aria-modal="true" aria-label="Đăng nhập" hidden>
-    <div class="popup-card login-popup">
-      <div class="login-icon" id="login-icon"><i class="ri-user-line"></i></div>
-      <div class="login-title">Thành Viên</div>
-      <div class="popup-field">
-        <i class="ri-user-line popup-field-icon"></i>
-        <input class="popup-input" type="email" id="login-email" name="username" autocomplete="username" placeholder="Tài khoản" autocapitalize="off" autocorrect="off" spellcheck="false">
-      </div>
-      <div class="popup-field">
-        <i class="ri-lock-line popup-field-icon"></i>
-        <input class="popup-input" type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Mật khẩu">
-      </div>
-      <div class="popup-field" id="change-pass-extra" hidden>
-        <i class="ri-lock-line popup-field-icon"></i>
-        <input class="popup-input" type="password" id="new-password" name="new-password" autocomplete="new-password" placeholder="Mật khẩu mới">
-      </div>
-      <div class="popup-btn-row login-btn-row">
-        <button class="btn popup-btn" id="change-pass-btn"><i class="ri-key-2-line"></i> Đổi Pass</button>
-        <button class="btn popup-btn" id="login-btn"><i class="ri-arrow-right-line"></i> Đăng nhập</button>
-      </div>
-      <div class="login-or" id="google-or"><span>Hoặc</span></div>
-      <div class="google-btn-wrap" id="google-btn"></div>
-      <div class="popup-toast" id="login-error"></div>
-    </div>
-  </div>
-
-  <div class="popup-panel" id="register-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành viên" hidden>
-    <div class="popup-card register-popup">
-      <div class="popup-title"><i class="ri-vip-crown-2-line"></i> Đăng ký thành viên</div>
-
-      <div class="register-scroll">
-        <div class="reg-left">
-        <div class="reg-form">
-          <div class="popup-field">
-            <i class="ri-mail-line popup-field-icon"></i>
-            <span class="req" aria-hidden="true">*</span>
-            <input class="popup-input reg-input" type="email" id="reg-email" placeholder="Gmail" aria-required="true" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
-          </div>
-          <div class="popup-field">
-            <i class="ri-user-line popup-field-icon"></i>
-            <input class="popup-input reg-input" type="text" id="reg-contact" placeholder="Zalo, Facebook..." autocomplete="off" maxlength="200">
-          </div>
-          <label class="reg-file" for="reg-photo">
-            <i class="ri-image-add-line"></i>
-            <span class="req" aria-hidden="true">*</span>
-            <span id="reg-photo-name">Tải lên ảnh chuyển khoản</span>
-            <input type="file" id="reg-photo" accept="image/*" aria-required="true" hidden>
-          </label>
-        </div>
-          <div class="popup-btn-row register-actions">
-            <button type="button" class="btn popup-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
-          </div>
-        </div>
-
-        <div class="reg-bank">
-          <div class="reg-qr-col">
-            <div class="reg-qr"><img src="img/kdqr.jpg" alt="QR chuyển khoản"></div>
-            <a class="btn reg-qr-dl" href="img/kdqrfull.jpg" download="kdqrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
-          </div>
-          <ul class="reg-info">
-            <li><i class="ri-price-tag-line"></i><span>300.000 vnđ</span></li>
-            <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
-            <li><i class="ri-bank-card-line"></i><span>1017381370</span></li>
-            <li><i class="ri-bank-line"></i><span>Vietcombank</span></li>
-          </ul>
-        </div>
-      </div>
-      <div class="popup-toast" id="register-hint"></div>
-    </div>
-  </div>
-
-  <div class="popup-panel" id="success-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành công" hidden>
-    <div class="popup-card success-popup">
-      <div class="btn-icon success-icon"><i class="ri-check-line"></i></div>
-      <div class="success-title">Đăng ký thành công.</div>
-      <div class="success-msg">Vui lòng đăng nhập sau ít phút.<br>Nếu không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage.</div>
-    </div>
-  </div>
-
   <div class="popup-panel" id="notice-panel" role="dialog" aria-modal="true" aria-label="Thông báo" hidden>
     <div class="popup-card">
       <div class="popup-title"><i class="ri-megaphone-line"></i> Thông báo</div>
-      <div class="notice-msg">Font dành cho thành viên.<br></>Vui lòng Đăng Nhập để tải font.</div>
+      <div class="notice-msg">Font dành cho thành viên.<br>Vui lòng Đăng Nhập để tải font.<br> Hoặc liên hệ để mua font giá 50.000₫.</div>
     </div>
   </div>
 
@@ -192,8 +113,8 @@
 
     <div class="banner-card" id="banner">
       <div class="banner-text">
-        <div class="banner-title"><span class="bn-a">Giảm ngay</span> <span class="bn-b">100.000 ₫</span> <span class="bn-c">khi đăng ký thành viên</span></div>
-        <div class="banner-date">Giá chỉ <b>200k</b> hôm nay</div>
+        <div class="banner-title"><span class="bn-a">Gói Thành viên</span> <span class="bn-b">150.000₫</span> <span class="bn-c">Thời gian sử dụng 1 năm.</span></div>
+        <div class="banner-date"><i>Giá bán lẽ 50.000₫ / 1 font.</i></div>
       </div>
       <img class="banner-img" src="img/speaker.png" alt="" loading="lazy">
     </div>
@@ -262,7 +183,6 @@
 
 <button type="button" class="btn-icon popup-close" id="popup-close" aria-label="Đóng" title="Đóng" hidden><i class="ri-close-line"></i></button>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="script.js"></script>
 </body>
 </html>

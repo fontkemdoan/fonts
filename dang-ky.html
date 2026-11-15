@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng ký – Kem Đoàn</title>
+<link rel="icon" href="img/kdicon.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="login-register.css">
+<style>
+  /* ===== Card trái: QR + thông tin (nền --black) ===== */
+  .intro {
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    align-items: center; justify-content: center; gap: 28px;
+    --qr: 220px; /* kích thước QR: đổi ở đây */
+  }
+  .reg-qr-col { display: flex; flex-direction: column; align-items: stretch; flex: 0 1 var(--qr); }
+  .reg-qr {
+    width: 100%; max-width: var(--qr); margin: 0 auto; padding: 10px;
+    border-radius: 14px; background: var(--white); box-shadow: var(--shadow-card);
+  }
+  .reg-qr img { display: block; width: 100%; height: auto; }
+  .reg-qr-dl { align-self: center; margin-top: 12px; padding: 8px 18px; background: var(--white); color: var(--black); }
+  .reg-info { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1 1 220px; min-width: 0; }
+  .reg-info li {
+    padding: 10px 18px; display: flex; align-items: center; gap: 12px;
+    border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.1);
+    font-size: 15px; color: var(--white);
+  }
+  .reg-info li i { font-size: 18px; line-height: 1.3; flex-shrink: 0; }
+  .reg-info li span { min-width: 0; overflow-wrap: anywhere; }
+
+  /* ===== Form đăng ký ===== */
+  .popup-input { padding-left: 62px; }
+  .req { color: var(--red); font-weight: 500; line-height: 1.3; }
+  .popup-field .req {
+    position: absolute; left: 50px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; pointer-events: none;
+  }
+
+  .reg-file {
+    width: 100%; margin-top: 14px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    border: 1px dashed var(--muted); border-radius: var(--radius-pill);
+    color: var(--muted); font-size: 15px; cursor: pointer;
+  }
+  .reg-file i { font-size: 18px; line-height: 1.3; flex-shrink: 0; color: var(--black); }
+  .reg-file span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .reg-file .req { margin-right: -8px; flex-shrink: 0; }
+  .reg-file.has-file { color: var(--black); border-style: solid; }
+  .reg-file.has-file .req { display: none; }
+
+  .register-actions { margin-top: 14px; }
+  .register-actions .popup-btn:disabled { cursor: default; }
+
+  /* ===== Popup đăng ký thành công ===== */
+  #success-panel.popup-panel { padding: 15px; }
+  .success-popup { align-items: center; padding: 25px 20px 22px; margin-top: 0; max-width: 420px; }
+  .success-icon {
+    --ib-size: 36px; --ib-bg: var(--green); --ib-color: var(--white);
+    --ib-border: 1px solid var(--rim);
+    box-shadow: var(--shadow-card); margin-bottom: 12px; pointer-events: none;
+  }
+  .success-title { font-size: 20px; font-weight: 500; color: var(--black); }
+  .success-msg { margin-top: 10px; font-size: 15px; line-height: 1.7; text-align: center; color: var(--black); }
+
+  /* PC: cột thông tin cao bằng ảnh QR, nút Tải QR nằm dưới QR */
+  @media (min-width: 961px) {
+    .intro {
+      display: grid;
+      grid-template-columns: var(--qr) minmax(0, 1fr);
+      align-items: stretch; justify-content: center;
+      column-gap: 28px; row-gap: 12px;
+    }
+    .reg-qr-col { display: contents; }
+    .reg-qr { grid-column: 1; grid-row: 1; }
+    .reg-info { grid-column: 2; grid-row: 1; justify-content: space-between; }
+    .reg-info li { flex: 1; }
+    .reg-qr-dl { grid-column: 1; grid-row: 2; justify-self: center; margin-top: 0; }
+  }
+
+</style>
+</head>
+<body class="login-page">
+
+  <header class="login-page-logo">
+    <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit" aria-label="Kem Đoàn – trang chủ">
+      <img src="img/kdblack.png" alt="" class="logo-img">
+      <span class="logo-text">
+        <span class="logo-name">KEM ĐOÀN</span>
+        <span class="logo-slogan">Font Việt hóa</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="stage">
+
+    <!-- Bên trái: QR + thông tin chuyển khoản -->
+    <section class="intro" aria-label="Thông tin chuyển khoản">
+      <div class="reg-qr-col">
+        <div class="reg-qr"><img src="img/kdqr.jpg" alt="QR chuyển khoản"></div>
+        <a class="btn reg-qr-dl" href="img/kdqrfull.jpg" download="kdqrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+      </div>
+      <ul class="reg-info">
+        <li><i class="ri-price-tag-line"></i><span>Giá 150.000₫ / 1 năm</span></li>
+        <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
+        <li><i class="ri-bank-card-line"></i><span>1017381370</span></li>
+        <li><i class="ri-bank-line"></i><span>Vietcombank</span></li>
+      </ul>
+    </section>
+
+    <!-- Bên phải: form đăng ký -->
+    <section class="login-col" aria-label="Đăng ký thành viên">
+      <div class="popup-card">
+        <div class="login-title">ĐĂNG KÝ</div>
+        <div class="popup-field">
+          <i class="ri-mail-line popup-field-icon"></i>
+          <span class="req" aria-hidden="true">*</span>
+          <input class="popup-input" type="email" id="reg-email" placeholder="Gmail đăng nhập..." aria-required="true" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div class="popup-field">
+          <i class="ri-user-line popup-field-icon"></i>
+          <input class="popup-input" type="text" id="reg-contact" placeholder="Zalo, Facebook..." autocomplete="off" maxlength="200">
+        </div>
+        <label class="reg-file" for="reg-photo">
+          <i class="ri-image-add-line"></i>
+          <span class="req" aria-hidden="true">*</span>
+          <span id="reg-photo-name">Tải lên ảnh chuyển khoản</span>
+          <input type="file" id="reg-photo" accept="image/*" aria-required="true" hidden>
+        </label>
+        <div class="popup-btn-row register-actions">
+          <button type="button" class="btn popup-btn" id="register-submit"><i class="ri-user-add-line"></i> Đăng ký</button>
+        </div>
+        <div class="popup-toast" id="register-hint" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Popup đăng ký thành công -->
+  <div class="popup-panel" id="success-panel" role="dialog" aria-modal="true" aria-label="Đăng ký thành công" hidden>
+    <div class="popup-card success-popup">
+      <button type="button" class="btn-icon popup-close" id="success-close" aria-label="Đóng" title="Đóng"><i class="ri-close-line"></i></button>
+      <div class="btn-icon success-icon"><i class="ri-check-line"></i></div>
+      <div class="success-title">Đăng ký thành công.</div>
+      <div class="success-msg">Vui lòng đăng nhập sau ít phút.<br>Nếu không đăng nhập được vui lòng liên hệ Zalo hoặc Fanpage.</div>
+    </div>
+  </div>
+
+<script src="login-register.js"></script>
+<script>
+(() => {
+'use strict';
+
+const { $, SPINNER } = KD;
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const regEmail = $('reg-email');
+const regContact = $('reg-contact');
+const regPhoto = $('reg-photo');
+const regPhotoName = $('reg-photo-name');
+const regFileBox = regPhoto.closest('.reg-file');
+const regSubmit = $('register-submit');
+const regHint = $('register-hint');
+const successPanel = $('success-panel');
+
+const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
+const REG_BUSY_LABEL = SPINNER + ' Đang đăng ký...';
+const REG_PHOTO_TEXT = regPhotoName.textContent;
+const REG_MAX_SIDE = 1600;
+let regHintTimer = null;
+let regBusy = false;
+
+function showRegHint(msg, ms = 4000) {
+  regHint.textContent = msg;
+  clearTimeout(regHintTimer);
+  regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
+}
+
+function resetRegisterForm() {
+  regEmail.value = '';
+  regContact.value = '';
+  regPhoto.value = '';
+  regPhotoName.textContent = REG_PHOTO_TEXT;
+  regFileBox.classList.remove('has-file');
+}
+
+async function shrinkImage(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, REG_MAX_SIDE / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.85));
+    return blob || file;
+  } catch (_) {
+    return file;
+  }
+}
+
+const openSuccess = () => { successPanel.hidden = false; };
+const closeSuccess = () => { successPanel.hidden = true; };
+
+async function doRegister() {
+  if (regBusy) return;
+  const email = regEmail.value.trim().toLowerCase();
+  const contact = regContact.value.trim();
+  const photo = regPhoto.files[0];
+
+  if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ.'); return; }
+  if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
+  if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh.'); return; }
+
+  regBusy = true;
+  regSubmit.disabled = true;
+  regSubmit.innerHTML = REG_BUSY_LABEL;
+
+  try {
+    const img = await shrinkImage(photo);
+    const fd = new FormData();
+    fd.append('email', email);
+    fd.append('contact', contact);
+    fd.append('photo', img, 'chuyen-khoan.jpg');
+
+    const res = await fetch('/api/register', { method: 'POST', body: fd });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) {
+      resetRegisterForm();
+      openSuccess();
+    } else {
+      showRegHint('Đăng ký thất bại, hãy thử lại sau.');
+    }
+  } catch (e) {
+    showRegHint('Lỗi kết nối, hãy thử lại sau.');
+  } finally {
+    regBusy = false;
+    regSubmit.disabled = false;
+    regSubmit.innerHTML = REG_LABEL;
+  }
+}
+
+regPhoto.addEventListener('change', () => {
+  const f = regPhoto.files[0];
+  regPhotoName.textContent = f ? f.name : REG_PHOTO_TEXT;
+  regFileBox.classList.toggle('has-file', !!f);
+});
+regSubmit.addEventListener('click', doRegister);
+[regEmail, regContact].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') doRegister(); }));
+
+/* popup thành công: đóng bằng nút X, bấm ra ngoài hoặc Esc */
+$('success-close').addEventListener('click', closeSuccess);
+successPanel.addEventListener('click', (e) => { if (e.target === successPanel) closeSuccess(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuccess(); });
+})();
+</script>
+</body>
+</html>

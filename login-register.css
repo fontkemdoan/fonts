@@ -1,0 +1,101 @@
+/* ==========================================================
+   Dùng chung cho dang-nhap.html và dang-ky.html
+   (nạp sau style.css; phần riêng từng trang nằm trong <style> của trang đó)
+   ========================================================== */
+
+/* style.css có padding cho bố cục dock (>=768px) làm card dính mép; ghi đè lại */
+/* height:auto để padding-bottom nằm trong vùng cuộn (style.css đặt body height:100%) */
+body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4vw, 32px) 32px; overflow-x: hidden; }
+
+/* ===== Logo ===== */
+.login-page-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto 30px;
+}
+.login-page-logo .logo-img { width: 44px; }
+
+/* ===== Lưới 2 card ===== */
+.stage {
+  flex: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 440px);
+  gap: 20px;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+/* ===== Card trái (nền --black): phần chung ===== */
+.intro {
+  min-width: 0;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 25px;
+  padding: 36px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ===== Card phải (glass) ===== */
+.login-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.login-col .popup-card {
+  margin-top: 0;
+  max-width: 440px;
+  padding: 26px 20px 20px;
+  align-items: center;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.login-title { align-self: flex-start; font-size: 25px; font-weight: 900; line-height: 1.3; color: var(--black); margin-bottom: 10px; }
+
+/* ===== Ô nhập ===== */
+.popup-field { position: relative; width: 100%; margin-top: 14px; }
+.popup-field-icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 18px; color: var(--black); pointer-events: none;
+}
+.popup-input {
+  width: 100%; padding: 14px 14px 14px 50px; font-size: 15px;
+  border: var(--border); border-radius: var(--radius-pill);
+  outline: none; background: none; color: var(--black);
+}
+.popup-input::placeholder { color: var(--muted); }
+.popup-input:-webkit-autofill,
+.popup-input:-webkit-autofill:hover,
+.popup-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--black);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ===== Thông báo dưới card ===== */
+.popup-toast {
+  position: absolute; top: 100%; left: 0; right: 0; margin-top: 15px;
+  color: var(--black); font-size: 15px; line-height: 1.3; text-align: center;
+  padding: 10px 16px; border-radius: 25px;
+  background: var(--glass-bold); box-shadow: var(--shadow-card);
+}
+.popup-toast .kd-spinner { margin-right: 4px; vertical-align: -3px; font-size: 17px; }
+.popup-toast:empty { display: none; }
+
+/* PC: bù chiều cao logo để cụm 2 card nằm giữa cả màn hình */
+@media (min-width: 961px) and (min-height: 960px) { .stage { padding-bottom: 60px; } }
+
+/* ===== Responsive ===== */
+@media (max-width: 960px) {
+  .stage { grid-template-columns: minmax(0, 1fr); align-content: start; }
+  .login-col { order: -1; padding: 0; }
+  .intro { padding: 28px 22px; }
+}

@@ -78,39 +78,12 @@ function loadJSZip() {
   return jszipPromise;
 }
 
-const loginPanel = $('login-panel');
 const brand = $('brand');
 const contentEl = $('content');
 const bootLoading = $('boot-loading');
-const loginEmail = $('login-email');
-const loginPassword = $('login-password');
-const newPasswordInput = $('new-password');
-const changePassExtra = $('change-pass-extra');
-const loginBtn = $('login-btn');
-const changePassBtn = $('change-pass-btn');
 const authBtn = $('auth-btn');
-const authIcon = authBtn.querySelector('i');
-const authLabel = $('auth-label');
 const registerBtn = $('register-btn');
 const noticePanel = $('notice-panel');
-const loginError = $('login-error');
-const loginIcon = $('login-icon');
-const loginTitle = document.querySelector('.login-title');
-
-const SPINNER = '<i class="ri-loader-4-line kd-spinner"></i>';
-const LABEL = {
-  login: '<i class="ri-arrow-right-line"></i> Đăng nhập',
-  back: '<i class="ri-arrow-left-line"></i> Quay lại',
-  changePass: '<i class="ri-key-2-line"></i> Đổi Pass',
-  confirm: '<i class="ri-check-line"></i> Xác nhận'
-};
-const DEFAULT_TITLE = 'Thành Viên';
-const DEFAULT_ICON = '<i class="ri-user-line"></i>';
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-let changePassMode = false;
-let loginErrorTimer = null;
-let previewTimer = null;
 
 const isLoggedIn = () => !!getToken();
 
@@ -196,7 +169,6 @@ function updateAuthUI() {
   const on = isLoggedIn();
   authBtn.hidden = on;
   registerBtn.hidden = on;
-  if (on) closeRegister();
   renderUserChip();
 }
 
@@ -204,7 +176,6 @@ function doLogout() {
   clearToken();
   updateAuthUI();
   resetPreviews(true);
-  closeLogin();
   closeNotice();
   closeMenu();
 }
@@ -225,8 +196,6 @@ const viewerNav = $('viewer-nav');
 const viewer = { imgs: [], idx: 0, onIdx: null };
 let viewerSliding = null;
 const finderVideo = $('finder-video');
-const registerPanel = $('register-panel');
-const successPanel = $('success-panel');
 const popupClose = $('popup-close');
 
 const menuBtn = $('menu-btn');
@@ -239,22 +208,7 @@ const NOTICE_DEFAULT_HTML = noticeMsg.innerHTML;
 
 /* panel · row: dòng menu sáng active khi popup mở · onClose: dọn dẹp khi đóng */
 const POPUPS = {
-  login: {
-    panel: loginPanel,
-    row: authBtn,
-    onClose() {
-      loginPassword.value = '';
-      loginError.textContent = '';
-      if (changePassMode) exitChangePassMode();
-    },
-  },
-  register: {
-    panel: registerPanel,
-    row: registerBtn,
-    onClose() { regHint.textContent = ''; },
-  },
   notice: { panel: noticePanel },
-  success: { panel: successPanel },
   viewer: {
     panel: viewerPanel,
     keepNav: true,
@@ -305,20 +259,12 @@ function closeAllPanels(keep) {
   if (keep !== 'menu') closeMenu();
 }
 
-function openLogin() { openPopup('login'); renderGoogleBtn(); }
-function closeLogin() { closePopup('login'); }
-
 function openNotice(msg) {
   if (msg) noticeMsg.textContent = msg;
   else noticeMsg.innerHTML = NOTICE_DEFAULT_HTML;
   openPopup('notice');
 }
 function closeNotice() { closePopup('notice'); }
-
-function openRegister() { openPopup('register'); }
-function closeRegister() { closePopup('register'); }
-
-function openSuccess() { openPopup('success'); }
 
 function openFinder() { openPopup('finder'); }
 
@@ -472,222 +418,7 @@ async function verifyAndBoot() {
   updateAuthUI();
 }
 
-function showLoginError(msg) {
-  loginError.textContent = msg;
-  clearTimeout(loginErrorTimer);
-  loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
-}
-
-function showLoginLoading(msg) {
-  clearTimeout(loginErrorTimer);
-  loginError.innerHTML = SPINNER + ' ' + msg;
-}
-
-function onLoginSuccess(token, profile) {
-  setToken(token);
-  if (profile && profile.email) setProfile(profile);
-  loginEmail.value = '';
-  resetLoginIcon();
-  updateAuthUI();
-  resetPreviews(false);
-  closeLogin();
-}
-
-async function doLogin() {
-  const email = loginEmail.value.trim().toLowerCase();
-  const password = loginPassword.value;
-  loginError.textContent = '';
-
-  if (!email || !password) {
-    showLoginError('Vui lòng nhập email và mật khẩu.');
-    return;
-  }
-
-  loginBtn.disabled = true;
-  loginBtn.innerHTML = SPINNER;
-
-  try {
-    const data = await postJson('/api/login', { email, password, mode: 'login' });
-    if (data.ok) {
-      onLoginSuccess(data.token, { email, avatar: data.avatar, name: data.name });
-    } else if (data.error === 'wrong_password') {
-      showLoginError('Sai mật khẩu');
-    } else {
-      showLoginError('Tài khoản không tồn tại.');
-    }
-  } catch (e) {
-    showLoginError('Lỗi kết nối, hãy thử lại sau.');
-  } finally {
-    loginBtn.disabled = false;
-    loginBtn.innerHTML = LABEL.login;
-  }
-}
-
-function enterChangePassMode() {
-  changePassMode = true;
-  changePassExtra.hidden = false;
-  changePassBtn.innerHTML = LABEL.confirm;
-  loginBtn.innerHTML = LABEL.back;
-}
-
-function exitChangePassMode() {
-  changePassMode = false;
-  changePassExtra.hidden = true;
-  newPasswordInput.value = '';
-  changePassBtn.innerHTML = LABEL.changePass;
-  loginBtn.innerHTML = LABEL.login;
-}
-
-async function doChangePassword() {
-  const email = loginEmail.value.trim().toLowerCase();
-  const oldPassword = loginPassword.value;
-  const newPassword = newPasswordInput.value;
-
-  if (!email || !oldPassword || !newPassword) {
-    showLoginError('Vui lòng nhập đầy đủ thông tin.');
-    return;
-  }
-
-  changePassBtn.disabled = true;
-  loginBtn.disabled = true;
-  changePassBtn.innerHTML = SPINNER;
-
-  try {
-    const data = await postJson('/api/change-password', { email, oldPassword, newPassword });
-    if (data.ok) {
-      showLoginError('Đổi mật khẩu thành công.');
-      exitChangePassMode();
-    } else if (data.error === 'wrong_password') {
-      showLoginError('Mật khẩu hiện tại không đúng.');
-    } else if (data.error === 'not_found') {
-      showLoginError('Tài khoản không tồn tại.');
-    } else {
-      showLoginError('Có lỗi xảy ra, hãy thử lại sau.');
-    }
-  } catch (e) {
-    showLoginError('Lỗi kết nối, hãy thử lại sau.');
-  } finally {
-    changePassBtn.disabled = false;
-    loginBtn.disabled = false;
-    if (changePassMode) changePassBtn.innerHTML = LABEL.confirm;
-  }
-}
-
-function resetLoginIcon() {
-  loginIcon.innerHTML = DEFAULT_ICON;
-  loginTitle.textContent = DEFAULT_TITLE;
-}
-
-async function previewAvatar(email) {
-  try {
-    const data = await postJson('/api/login', { email, mode: 'preview' });
-    if (!data.ok) {
-      resetLoginIcon();
-      return;
-    }
-    if (data.avatar) {
-      const img = document.createElement('img');
-      img.src = 'avatars/' + data.avatar;
-      img.alt = 'avatar';
-      loginIcon.replaceChildren(img);
-    } else {
-      loginIcon.innerHTML = DEFAULT_ICON;
-    }
-    loginTitle.textContent = data.name || DEFAULT_TITLE;
-  } catch (e) {
-    resetLoginIcon();
-  }
-}
-
-const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
-const googleBtnEl = $('google-btn');
-const googleOrEl = $('google-or');
-let googleReady = false;
-
-async function onGoogleCredential(resp) {
-  if (!resp || !resp.credential) return;
-  showLoginLoading('Đang đăng nhập...');
-  try {
-    const data = await postJson('/api/google-login', { credential: resp.credential });
-    if (data.ok) {
-      loginError.textContent = '';
-      onLoginSuccess(data.token, { email: data.email, avatar: data.avatar, name: data.name, picture: data.picture });
-    } else if (data.error === 'not_registered') {
-      showLoginError('Tài khoản chưa được đăng ký');
-    } else {
-      showLoginError('Đăng nhập Google thất bại');
-    }
-  } catch (e) {
-    showLoginError('Lỗi kết nối, hãy thử lại sau');
-  }
-}
-
-function initGoogle() {
-  if (googleReady || !(window.google && google.accounts && google.accounts.id)) return;
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: onGoogleCredential,
-    ux_mode: 'popup',
-    auto_select: false
-  });
-  googleReady = true;
-}
-
-let googleRenderedWidth = 0;
-function renderGoogleBtn() {
-  initGoogle();
-  const hide = !googleReady;
-  googleBtnEl.hidden = hide;
-  googleOrEl.hidden = hide;
-  if (hide) return;
-  const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 60) || 240));
-  if (w === googleRenderedWidth) return;
-  googleRenderedWidth = w;
-  googleBtnEl.innerHTML = '';
-  google.accounts.id.renderButton(googleBtnEl, {
-    type: 'standard', theme: 'outline', size: 'large',
-    text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
-  });
-}
-
-window.onGoogleLibraryLoad = () => { initGoogle(); if (!loginPanel.hidden) renderGoogleBtn(); };
-
 function initAuth() {
-  loginBtn.addEventListener('click', () => {
-    if (changePassMode) exitChangePassMode(); else doLogin();
-  });
-
-  changePassBtn.addEventListener('click', () => {
-    if (changePassMode) doChangePassword(); else enterChangePassMode();
-  });
-
-  [loginEmail, loginPassword].forEach((input) => {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !changePassMode) doLogin();
-    });
-  });
-
-  loginEmail.addEventListener('input', () => {
-    clearTimeout(previewTimer);
-    const val = loginEmail.value.trim().toLowerCase();
-    if (!emailRegex.test(val)) {
-      resetLoginIcon();
-      return;
-    }
-    previewTimer = setTimeout(() => previewAvatar(val), 400);
-  });
-
-  authBtn.addEventListener('click', () => {
-    if (isLoggedIn()) {
-      doLogout();
-    } else if (loginPanel.hidden) {
-      openLogin();
-    } else {
-      closeLogin();
-    }
-  });
-
-  initGoogle();
   verifyAndBoot();
 }
 
@@ -1420,95 +1151,6 @@ function onFreeDownload(g, btn) {
   paintFreeWait();
 }
 
-const regEmail = $('reg-email');
-const regContact = $('reg-contact');
-const regPhoto = $('reg-photo');
-const regPhotoName = $('reg-photo-name');
-const regFileBox = regPhoto.closest('.reg-file');
-const regSubmit = $('register-submit');
-const regHint = $('register-hint');
-const REG_LABEL = '<i class="ri-user-add-line"></i> Đăng ký';
-const REG_BUSY_LABEL = SPINNER + ' Đang đăng ký...';
-const REG_PHOTO_TEXT = regPhotoName.textContent;
-const REG_MAX_SIDE = 1600;
-let regHintTimer = null;
-let regBusy = false;
-
-function showRegHint(msg, ms = 4000) {
-  regHint.textContent = msg;
-  clearTimeout(regHintTimer);
-  regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
-}
-
-function resetRegisterForm() {
-  regEmail.value = '';
-  regContact.value = '';
-  regPhoto.value = '';
-  regPhotoName.textContent = REG_PHOTO_TEXT;
-  regFileBox.classList.remove('has-file');
-}
-
-async function shrinkImage(file) {
-  try {
-    const bmp = await createImageBitmap(file);
-    const scale = Math.min(1, REG_MAX_SIDE / Math.max(bmp.width, bmp.height));
-    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(bmp.width * scale);
-    canvas.height = Math.round(bmp.height * scale);
-    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.85));
-    return blob || file;
-  } catch (_) {
-    return file;
-  }
-}
-
-async function doRegister() {
-  if (regBusy) return;
-  const email = regEmail.value.trim().toLowerCase();
-  const contact = regContact.value.trim();
-  const photo = regPhoto.files[0];
-
-  if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ.'); return; }
-  if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
-  if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh.'); return; }
-
-  regBusy = true;
-  regSubmit.disabled = true;
-  regSubmit.innerHTML = REG_BUSY_LABEL;
-
-  try {
-    const img = await shrinkImage(photo);
-    const fd = new FormData();
-    fd.append('email', email);
-    fd.append('contact', contact);
-    fd.append('photo', img, 'chuyen-khoan.jpg');
-
-    const res = await fetch('/api/register', { method: 'POST', body: fd });
-    const data = await res.json().catch(() => ({}));
-    if (data.ok) {
-      resetRegisterForm();
-      openSuccess();
-    } else {
-      showRegHint('Đăng ký thất bại, hãy thử lại sau.');
-    }
-  } catch (e) {
-    showRegHint('Lỗi kết nối, hãy thử lại sau.');
-  } finally {
-    regBusy = false;
-    regSubmit.disabled = false;
-    regSubmit.innerHTML = REG_LABEL;
-  }
-}
-
-regPhoto.addEventListener('change', () => {
-  const f = regPhoto.files[0];
-  regPhotoName.textContent = f ? f.name : REG_PHOTO_TEXT;
-  regFileBox.classList.toggle('has-file', !!f);
-});
-regSubmit.addEventListener('click', doRegister);
-
 function setFilter(name) {
   if (!FILTERS[name]) return;
   activeFilter = name;
@@ -1548,8 +1190,6 @@ function initMenu() {
     if (item.dataset.action === 'finder') { openFinder(); return; }
     closeMenu();
   });
-
-  registerBtn.addEventListener('click', () => openRegister());
 
   $('bottom-nav').addEventListener('click', (e) => {
     const item = e.target.closest('[data-filter]');
