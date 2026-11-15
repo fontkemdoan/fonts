@@ -226,6 +226,7 @@ const viewer = { imgs: [], idx: 0, onIdx: null };
 let viewerSliding = null;
 const finderVideo = $('finder-video');
 const registerPanel = $('register-panel');
+const successPanel = $('success-panel');
 const popupClose = $('popup-close');
 
 const menuBtn = $('menu-btn');
@@ -253,6 +254,7 @@ const POPUPS = {
     onClose() { regHint.textContent = ''; },
   },
   notice: { panel: noticePanel },
+  success: { panel: successPanel },
   viewer: {
     panel: viewerPanel,
     keepNav: true,
@@ -315,6 +317,8 @@ function closeNotice() { closePopup('notice'); }
 
 function openRegister() { openPopup('register'); }
 function closeRegister() { closePopup('register'); }
+
+function openSuccess() { openPopup('success'); }
 
 function openFinder() { openPopup('finder'); }
 
@@ -1485,7 +1489,7 @@ async function doRegister() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetRegisterForm();
-      showRegHint('Đăng ký thành công. Vui lòng đăng nhập sau ít phút.', 6000);
+      openSuccess();
     } else {
       showRegHint('Đăng ký thất bại, hãy thử lại sau.');
     }
