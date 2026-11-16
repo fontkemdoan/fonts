@@ -340,7 +340,6 @@ async function submitBuy() {
   try {
     const img = await shrinkImage(photo);
     const fd = new FormData();
-    if (isLoggedIn()) fd.append('token', getToken()); /* có đăng nhập thì kèm token để server biết gmail */
     fd.append('contact', contact);
     fd.append('font', buyCurrent.title);
     fd.append('price', buyCurrent.price);
