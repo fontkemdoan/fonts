@@ -185,7 +185,7 @@ function initLoginPage() {
     googleBtnEl.hidden = hide;
     googleOrEl.hidden = hide;
     if (hide) return;
-    const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 20) || 240));
+    const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 40) || 240));
     if (w === googleRenderedWidth) return;
     googleRenderedWidth = w;
     googleBtnEl.innerHTML = '';
