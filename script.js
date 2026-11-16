@@ -60,6 +60,7 @@ function saveBlob(blob, name) {
 }
 
 const DL_ICON = 'ri-download-cloud-2-line';
+const BUY_ICON = 'ri-shopping-cart-2-line';
 
 const JSZIP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
 let jszipPromise = null;
@@ -196,6 +197,22 @@ const viewerNav = $('viewer-nav');
 const viewer = { imgs: [], idx: 0, onIdx: null };
 let viewerSliding = null;
 const finderVideo = $('finder-video');
+const buyPanel = $('buy-popup');
+const buyName = $('buy-name');
+const buyPrice = $('buy-price');
+const buyContact = $('buy-contact');
+const buyPhoto = $('buy-photo');
+const buyPhotoName = $('buy-photo-name');
+const buyFileBox = buyPhoto.closest('.buy-file');
+const buySubmit = $('buy-submit');
+const buyHint = $('buy-hint');
+const BUY_PHOTO_TEXT = buyPhotoName.textContent;
+const BUY_LABEL = buySubmit.innerHTML;
+const BUY_BUSY_LABEL = '<i class="ri-loader-4-line kd-spinner"></i> Đang gửi...';
+const BUY_MAX_SIDE = 1600;
+let buyCurrent = null;
+let buyBusy = false;
+let buyHintTimer = 0;
 const popupClose = $('popup-close');
 
 const menuBtn = $('menu-btn');
@@ -213,6 +230,10 @@ const POPUPS = {
     panel: viewerPanel,
     keepNav: true,
     onClose() { viewer.onIdx = null; },
+  },
+  buy: {
+    panel: buyPanel,
+    onClose() { resetBuyForm(); showBuyHint(''); },
   },
   finder: {
     panel: finderPanel,
@@ -265,6 +286,83 @@ function openNotice(msg) {
   openPopup('notice');
 }
 function closeNotice() { closePopup('notice'); }
+
+function showBuyHint(msg, ms = 4000) {
+  buyHint.textContent = msg;
+  clearTimeout(buyHintTimer);
+  if (msg) buyHintTimer = setTimeout(() => { buyHint.textContent = ''; }, ms);
+}
+
+function resetBuyForm() {
+  buyPhoto.value = '';
+  buyPhotoName.textContent = BUY_PHOTO_TEXT;
+  buyFileBox.classList.remove('has-file');
+}
+
+function openBuy(g) {
+  buyCurrent = g;
+  buyName.value = g.title;
+  buyPrice.value = g.price;
+  const p = getProfile();
+  buyContact.value = (p && p.email) || '';
+  resetBuyForm();
+  showBuyHint('');
+  openPopup('buy');
+}
+
+async function shrinkImage(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, BUY_MAX_SIDE / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 1.5 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.85));
+    return blob || file;
+  } catch (_) {
+    return file;
+  }
+}
+
+async function submitBuy() {
+  if (buyBusy || !buyCurrent) return;
+  const photo = buyPhoto.files[0];
+  const contact = buyContact.value.trim();
+  if (!contact) { showBuyHint('Vui lòng nhập nơi nhận font (Gmail, Zalo...).'); return; }
+  if (!photo) { showBuyHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
+  if (!photo.type.startsWith('image/')) { showBuyHint('File phải là hình ảnh.'); return; }
+
+  buyBusy = true;
+  buySubmit.disabled = true;
+  buySubmit.innerHTML = BUY_BUSY_LABEL;
+  try {
+    const img = await shrinkImage(photo);
+    const fd = new FormData();
+    if (isLoggedIn()) fd.append('token', getToken()); /* có đăng nhập thì kèm token để server biết gmail */
+    fd.append('contact', contact);
+    fd.append('font', buyCurrent.title);
+    fd.append('price', buyCurrent.price);
+    fd.append('files', JSON.stringify(buyCurrent.fonts.map((f) => f.file)));
+    fd.append('photo', img, 'chuyen-khoan.jpg');
+
+    const res = await fetch('/api/buy', { method: 'POST', body: fd });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok) {
+      resetBuyForm();
+      showBuyHint('Đã gửi thanh toán. Vui lòng chờ xác nhận.', 8000);
+    } else {
+      showBuyHint('Gửi thất bại, hãy thử lại sau.');
+    }
+  } catch (_) {
+    showBuyHint('Lỗi kết nối, hãy thử lại sau.');
+  } finally {
+    buyBusy = false;
+    buySubmit.disabled = false;
+    buySubmit.innerHTML = BUY_LABEL;
+  }
+}
 
 function openFinder() { openPopup('finder'); }
 
@@ -391,6 +489,15 @@ function initPopups() {
   Object.values(POPUPS).forEach((p) => observer.observe(p.panel, { attributes: true, attributeFilter: ['hidden'] }));
   popupClose.addEventListener('click', () => closeAllPanels());
   syncPopupClose();
+
+  /* popup Mua font */
+  buyPhoto.addEventListener('change', () => {
+    const f = buyPhoto.files[0];
+    buyPhotoName.textContent = f ? f.name : BUY_PHOTO_TEXT;
+    buyFileBox.classList.toggle('has-file', !!f);
+  });
+  buySubmit.addEventListener('click', submitBuy);
+  buyContact.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitBuy(); });
 }
 
 async function verifyAndBoot() {
@@ -819,6 +926,10 @@ function createDemoCard(g) {
     price.className = 'demo-price-badge';
     price.textContent = g.price;
     nameEl.after(price);
+    const dl = card.querySelector('.demo-download');
+    dl.setAttribute('aria-label', 'Mua font');
+    dl.title = 'Mua font';
+    dl.querySelector('i').className = BUY_ICON;
   }
   demoGroups.set(card, g);
   demoOpeners.set(card, bindDemoPanel(card, g));
@@ -1070,6 +1181,7 @@ function startDownload(g, btn) {
 
 function onDemoDownload(g, btn) {
   if (g.free) { onFreeDownload(g, btn); return; }
+  if (g.price) { openBuy(g); return; }
   if (!isLoggedIn()) { openNotice(); return; }
   startDownload(g, btn);
 }

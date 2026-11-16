@@ -104,6 +104,49 @@
     </div>
   </div>
 
+  <div class="popup-panel" id="buy-popup" role="dialog" aria-modal="true" aria-label="Mua font" hidden>
+    <div class="popup-card">
+      <div class="popup-title"><i class="ri-shopping-cart-2-line"></i> Mua font</div>
+      <div class="buy-scroll">
+        <div class="buy-form">
+          <div class="buy-field">
+            <i class="ri-font-size-2 buy-field-icon"></i>
+            <input class="buy-input" type="text" id="buy-name" readonly aria-label="Tên font" placeholder="Tên font">
+          </div>
+          <div class="buy-field">
+            <i class="ri-price-tag-3-line buy-field-icon"></i>
+            <input class="buy-input" type="text" id="buy-price" readonly aria-label="Giá" placeholder="Giá">
+          </div>
+          <div class="buy-field">
+            <i class="ri-mail-send-line buy-field-icon"></i>
+            <span class="buy-req" aria-hidden="true">*</span>
+            <input class="buy-input buy-input--req" type="text" id="buy-contact" placeholder="Gmail, Zalo nhận font..." aria-required="true" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="200">
+          </div>
+          <label class="buy-file" for="buy-photo">
+            <i class="ri-image-add-line"></i>
+            <span class="buy-req" aria-hidden="true">*</span>
+            <span id="buy-photo-name">Tải lên ảnh chuyển khoản</span>
+            <input type="file" id="buy-photo" accept="image/*" aria-required="true" hidden>
+          </label>
+          <div class="popup-btn-row">
+            <button type="button" class="btn popup-btn" id="buy-submit"><i class="ri-bank-card-line"></i> Thanh toán</button>
+          </div>
+          <div class="buy-hint" id="buy-hint" role="status" aria-live="polite"></div>
+        </div>
+
+        <aside class="buy-side" aria-label="Thông tin chuyển khoản">
+          <div class="buy-qr"><img src="img/kdqr.jpg" alt="QR chuyển khoản"></div>
+          <a class="btn buy-qr-dl" href="img/kdqrfull.jpg" download="kdqrfull.jpg"><i class="ri-download-cloud-2-line"></i> Tải QR</a>
+          <ul class="buy-info">
+            <li><i class="ri-user-line"></i><span>Doan Nguyen Bao Thanh</span></li>
+            <li><i class="ri-bank-card-line"></i><span>1017381370</span></li>
+            <li><i class="ri-bank-line"></i><span>Vietcombank</span></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+
   <main class="content" id="content" hidden>
     <div class="search-wrap">
       <i class="ri-search-line search-icon"></i>
