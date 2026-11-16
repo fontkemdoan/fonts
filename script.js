@@ -198,6 +198,7 @@ const viewer = { imgs: [], idx: 0, onIdx: null };
 let viewerSliding = null;
 const finderVideo = $('finder-video');
 const buyPanel = $('buy-popup');
+const buySuccessPanel = $('buy-success-popup');
 const buyName = $('buy-name');
 const buyPrice = $('buy-price');
 const buyContact = $('buy-contact');
@@ -231,6 +232,7 @@ const POPUPS = {
     keepNav: true,
     onClose() { viewer.onIdx = null; },
   },
+  buySuccess: { panel: buySuccessPanel },
   buy: {
     panel: buyPanel,
     onClose() { resetBuyForm(); showBuyHint(''); },
@@ -350,7 +352,7 @@ async function submitBuy() {
     const data = await res.json().catch(() => ({}));
     if (data.ok) {
       resetBuyForm();
-      showBuyHint('Đã gửi thanh toán. Vui lòng chờ xác nhận.', 8000);
+      openPopup('buySuccess');
     } else {
       showBuyHint('Gửi thất bại, hãy thử lại sau.');
     }
