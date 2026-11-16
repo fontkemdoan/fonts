@@ -5,7 +5,12 @@
 
 /* style.css có padding cho bố cục dock (>=768px) làm card dính mép; ghi đè lại */
 /* height:auto để padding-bottom nằm trong vùng cuộn (style.css đặt body height:100%) */
-body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4vw, 32px) 32px; overflow-x: hidden; }
+body.login-page {
+  height: auto;
+  min-height: 100dvh;
+  padding: 24px clamp(20px, 4vw, 32px) 32px;
+  overflow-x: hidden;
+}
 
 /* ===== Logo ===== */
 .login-page-logo {
@@ -16,7 +21,9 @@ body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4v
   max-width: 1120px;
   margin: 0 auto 30px;
 }
-.login-page-logo .logo-img { width: 44px; }
+.login-page-logo .logo-img {
+  width: 44px;
+}
 
 /* ===== Lưới 2 card ===== */
 .stage {
@@ -33,7 +40,8 @@ body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4v
 }
 
 /* ===== Card trái (nền --black): phần chung ===== */
-.intro {
+.login-intro,
+.register-intro {
   min-width: 0;
   background: var(--black);
   color: var(--white);
@@ -56,23 +64,44 @@ body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4v
   padding: 26px 20px 20px;
   align-items: center;
   background: var(--glass);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
 }
-.login-title { align-self: flex-start; font-size: 25px; font-weight: 900; line-height: 1.3; color: var(--black); margin-bottom: 10px; }
+.login-title {
+  align-self: flex-start;
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.3;
+  color: var(--black);
+  margin-bottom: 10px;
+}
 
 /* ===== Ô nhập ===== */
-.popup-field { position: relative; width: 100%; margin-top: 14px; }
+.popup-field {
+  position: relative;
+  width: 100%;
+  margin-top: 14px;
+}
 .popup-field-icon {
-  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
-  font-size: 18px; color: var(--black); pointer-events: none;
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--black);
+  pointer-events: none;
 }
 .popup-input {
-  width: 100%; padding: 14px 14px 14px 50px; font-size: 15px;
-  border: var(--border); border-radius: var(--radius-pill);
-  outline: none; background: none; color: var(--black);
+  width: 100%;
+  padding: 14px 14px 14px 50px;
+  font-size: 15px;
+  border: var(--border);
+  border-radius: var(--radius-pill);
+  outline: none;
+  background: none;
+  color: var(--black);
 }
-.popup-input::placeholder { color: var(--muted); }
+.popup-input::placeholder {
+  color: var(--muted);
+}
 .popup-input:-webkit-autofill,
 .popup-input:-webkit-autofill:hover,
 .popup-input:-webkit-autofill:focus {
@@ -82,20 +111,401 @@ body.login-page { height: auto; min-height: 100dvh; padding: 24px clamp(20px, 4v
 
 /* ===== Thông báo dưới card ===== */
 .popup-toast {
-  position: absolute; top: 100%; left: 0; right: 0; margin-top: 15px;
-  color: var(--black); font-size: 15px; line-height: 1.3; text-align: center;
-  padding: 10px 16px; border-radius: 25px;
-  background: var(--glass-bold); box-shadow: var(--shadow-card);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 20px;
+  color: var(--black);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 25px;
+  background: var(--glass-bold);
+  box-shadow: var(--shadow-card);
 }
-.popup-toast .kd-spinner { margin-right: 4px; vertical-align: -3px; font-size: 17px; }
-.popup-toast:empty { display: none; }
+.popup-toast .kd-spinner {
+  margin-right: 4px;
+  vertical-align: -3px;
+  font-size: 17px;
+}
+.popup-toast:empty {
+  display: none;
+}
 
 /* PC: bù chiều cao logo để cụm 2 card nằm giữa cả màn hình */
-@media (min-width: 961px) and (min-height: 960px) { .stage { padding-bottom: 60px; } }
+@media (min-width: 1101px) and (min-height: 960px) {
+  .stage {
+    padding-bottom: 60px;
+  }
+}
 
-/* ===== Responsive ===== */
-@media (max-width: 960px) {
-  .stage { grid-template-columns: minmax(0, 1fr); align-content: start; }
-  .login-col { order: -1; padding: 0; }
-  .intro { padding: 28px 22px; }
+/* ===== Xếp dọc như mobile khi <= 1100px (gồm cả cửa sổ PC chiếm nửa màn hình) ===== */
+@media (max-width: 1100px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+  .login-col {
+    order: -1;
+    padding: 0;
+  }
+  .login-col .popup-card {
+    max-width: none;
+  } /* card form rộng bằng card còn lại */
+  .login-intro,
+  .register-intro {
+    padding: 28px 22px;
+  }
+}
+
+/* ==========================================================
+   RIÊNG TRANG ĐĂNG NHẬP (dang-nhap.html)
+   ========================================================== */
+/* ===== Card giới thiệu (nền --black) ===== */
+.login-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  overflow: hidden;
+}
+
+.intro-head {
+  max-width: 30em;
+}
+
+.intro-title {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+  text-wrap: balance;
+}
+
+.intro-sub {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.74);
+  text-wrap: pretty;
+}
+
+/* ===== Cụm ảnh xếp chồng nghiêng, khung 16:9 ===== */
+.fan {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.photo {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 44cqw;
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%) rotate(var(--r));
+  z-index: var(--z);
+  border: 0.8cqw solid #f1f1f1;
+  border-radius: 3.5cqw;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--mesh-b);
+  box-shadow: 0 2cqw 4cqw rgba(0, 0, 0, 0.4);
+}
+.photo > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Mẫu chữ dự phòng khi chưa có ảnh */
+.specimen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black);
+  line-height: 1.3;
+}
+.photo.has-img .specimen {
+  visibility: hidden;
+}
+.specimen span {
+  font-size: 11cqw;
+}
+
+.sp-hand {
+  background: var(--mesh-a);
+}
+.sp-hand span {
+  font-family: "Segoe Script", "Bradley Hand", "Brush Script MT", cursive;
+  font-size: 9cqw;
+}
+.sp-wed {
+  background: var(--mesh-b);
+}
+.sp-wed span {
+  font-family: "Snell Roundhand", "Apple Chancery", "Palatino Linotype", Georgia, serif;
+  font-style: italic;
+}
+.sp-brand {
+  background: var(--mesh-c);
+}
+.sp-brand span {
+  font-family: "MiSans VF", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.intro-cta {
+  align-self: center;
+  padding: 14px 28px;
+  background: var(--white);
+  color: var(--black);
+}
+.intro-cta:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
+/* ===== Riêng trang đăng nhập ===== */
+.login-btn-row {
+  margin-top: 14px;
+}
+.login-or {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  font-size: 14px;
+  color: var(--black);
+  opacity: 0.7;
+}
+.login-or::before,
+.login-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+.login-or[hidden],
+.google-btn-wrap[hidden] {
+  display: none;
+}
+.google-btn-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* ==========================================================
+   RIÊNG TRANG ĐĂNG KÝ (dang-ky.html)
+   ========================================================== */
+/* ===== Card trái: QR + thông tin (nền --black) ===== */
+.register-intro {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  --qr: 220px; /* kích thước QR: đổi ở đây */
+}
+.reg-qr-col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 1 var(--qr);
+}
+.reg-qr {
+  width: 100%;
+  max-width: var(--qr);
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--shadow-card);
+}
+.reg-qr img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.reg-qr-dl {
+  align-self: center;
+  margin-top: 12px;
+  padding: 8px 18px;
+  background: var(--white);
+  color: var(--black);
+}
+.reg-info {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.reg-info li {
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 15px;
+  color: var(--white);
+}
+.reg-info li i {
+  font-size: 18px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+.reg-info li span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Form đăng ký ===== */
+.reg-input {
+  padding-left: 62px;
+}
+.req {
+  color: var(--red);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.popup-field .req {
+  position: absolute;
+  left: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.reg-file {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed var(--muted);
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+}
+.reg-file i {
+  font-size: 18px;
+  line-height: 1.3;
+  flex-shrink: 0;
+  color: var(--black);
+}
+.reg-file span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reg-file .req {
+  margin-right: -8px;
+  flex-shrink: 0;
+}
+.reg-file.has-file {
+  color: var(--black);
+  border-style: solid;
+}
+.reg-file.has-file .req {
+  display: none;
+}
+
+.register-actions {
+  margin-top: 14px;
+}
+.register-actions .popup-btn:disabled {
+  cursor: default;
+}
+
+/* ===== Popup đăng ký thành công ===== */
+#success-panel.popup-panel {
+  padding: 15px;
+}
+.success-popup {
+  align-items: center;
+  padding: 25px 20px 22px;
+  margin-top: 0;
+  max-width: 420px;
+}
+.success-icon {
+  --ib-size: 36px;
+  --ib-bg: var(--green);
+  --ib-color: var(--white);
+  --ib-border: 1px solid var(--rim);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 12px;
+  pointer-events: none;
+}
+.success-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--black);
+}
+.success-msg {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: center;
+  color: var(--black);
+}
+
+/* Từ 700px: cột thông tin cao bằng ảnh QR, nút Tải QR nằm dưới QR (dưới 700px: QR trên, info dưới) */
+@media (min-width: 700px) {
+  .register-intro {
+    display: grid;
+    grid-template-columns: var(--qr) minmax(0, 1fr);
+    align-items: stretch;
+    justify-content: center;
+    column-gap: 28px;
+    row-gap: 12px;
+  }
+  .reg-qr-col {
+    display: contents;
+  }
+  .reg-qr {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .reg-info {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: space-between;
+  }
+  .reg-info li {
+    flex: 1;
+  }
+  .reg-qr-dl {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+    margin-top: 0;
+  }
 }

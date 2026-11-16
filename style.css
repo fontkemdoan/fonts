@@ -498,7 +498,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   white-space: pre-line;
   text-align: center;
   font-size: 16px;
-  line-height: 2;
+  line-height: 1.7;
   color: var(--black);
 }
 
