@@ -28,7 +28,7 @@
   --mesh-b: #f3e3c8;
   --mesh-c: #d3e6f3;
   --glass: rgba(255,255,255,0.4);
-  --glass-bold: rgba(255,255,255, 0.82);
+  --glass-bold: rgba(255,255,255, 0.8);
   --rim: #ffffffd1;
 
   /* Icon button */
@@ -255,7 +255,7 @@ textarea {
 
 #search {
   width: 100%;
-  padding: 14px 54px 14px 42px;
+  padding: 14px 54px 14px 40px;
   font-size: 15px;
   border-radius: var(--radius-pill);
   outline: none;
@@ -1082,7 +1082,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 
   #search {
     height: var(--row-h);
-    padding: 0 42px 0 44px;
+    padding: 0 40px 0 44px;
   }
 
   body {
@@ -1716,20 +1716,11 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   gap: 20px;
 }
 
-/* Mobile: ẩn thanh cuộn để không đè lên ô nhập (vẫn vuốt cuộn bình thường) */
-@media (max-width: 767px) {
-  .buy-scroll {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .buy-scroll::-webkit-scrollbar { display: none; }
-}
-/* PC: chừa sẵn chỗ cho thanh cuộn, không đè nội dung */
-@media (min-width: 768px) {
-  .buy-scroll {
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
-  }
+/* Thanh cuộn đẩy ra sát mép phải card (nằm trong phần padding), không đè nội dung */
+.buy-scroll {
+  scrollbar-width: thin;
+  margin-right: -14px;
+  padding-right: 14px;
 }
 
 .buy-form {
@@ -1852,10 +1843,10 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 .buy-info li {
-  padding: 10px 18px;
+  padding: 8px 18px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1864,7 +1855,12 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   font-size: 15px;
   color: var(--white);
 }
-.buy-info li i { font-size: 18px; line-height: 1.3; flex-shrink: 0; }
+.buy-info li i {
+  font-size: 18px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+
 .buy-info li span {
   min-width: 0;
   overflow: hidden;
@@ -1880,22 +1876,31 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   .buy-scroll {
     flex-direction: row;
     align-items: stretch;
-    gap: 32px;
+    gap: 30px;
   }
+
   .buy-form {
     flex: 1;
-    justify-content: center;
+    position: relative;
+    justify-content: space-between;
+    padding: 0 0 100px;
+  }
+  .buy-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
   .buy-side { flex: 0 0 340px; justify-content: center; }
 }
 
-/* ---------- popup Thanh toán thành công ---------- */
+/* ---------- popup thanh toán thành công ---------- */
 #buy-success-popup.popup-panel { padding: 15px; }
 .buy-success-card {
   align-items: center;
   padding: 25px 20px 22px;
   margin-top: 0;
-  max-width: 420px;
+  max-width: 450px;
 }
 .buy-success-icon {
   --ib-size: 36px;
