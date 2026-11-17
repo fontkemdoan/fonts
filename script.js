@@ -209,7 +209,7 @@ const buySubmit = $('buy-submit');
 const buyHint = $('buy-hint');
 const BUY_PHOTO_TEXT = buyPhotoName.textContent;
 const BUY_LABEL = buySubmit.innerHTML;
-const BUY_BUSY_LABEL = '<i class="ri-loader-4-line kd-spinner"></i> Đang gửi...';
+const BUY_BUSY_LABEL = '<i class="ri-loader-4-line kd-spinner"></i> Đang thanh toán...';
 const BUY_MAX_SIDE = 1600;
 let buyCurrent = null;
 let buyBusy = false;
