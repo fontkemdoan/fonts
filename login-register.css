@@ -125,25 +125,29 @@ body.login-page {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-/* ===== error ===== */
+/* ===== Toast ===== */
 .popup-toast {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 20px;
-  color: var(--black);
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 25px;
+  background: none;
+  color: var(--red);
   font-size: 15px;
   line-height: 1.3;
   text-align: center;
-  padding: 10px 16px;
-  border-radius: 25px;
-  background: var(--white);
-  box-shadow: var(--shadow-card);
+  border: 1px solid #ec5e47;
+}
+.popup-toast i {
+  flex-shrink: 0;
+  font-size: 17px;
+  line-height: 1.3;
 }
 .popup-toast .kd-spinner {
-  margin-right: 4px;
-  vertical-align: -3px;
   font-size: 17px;
 }
 .popup-toast:empty {
@@ -454,7 +458,7 @@ body.login-page {
   align-items: center;
   justify-content: center;
   gap: 28px;
-  --qr: 220px; /* kích thước QR: đổi ở đây */
+  --qr: 260px;
 }
 .reg-qr-col {
   display: flex;

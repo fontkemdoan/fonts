@@ -244,7 +244,8 @@ function initRegisterPage() {
   let regBusy = false;
 
   function showRegHint(msg, ms = 4000) {
-    regHint.textContent = msg;
+    regHint.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    regHint.lastChild.textContent = msg;
     clearTimeout(regHintTimer);
     regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
   }

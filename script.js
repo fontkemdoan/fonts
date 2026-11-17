@@ -60,7 +60,7 @@ function saveBlob(blob, name) {
 }
 
 const DL_ICON = 'ri-download-cloud-2-line';
-const BUY_ICON = 'ri-shopping-cart-2-line';
+const BUY_ICON = 'ri-shopping-cart-line';
 
 const JSZIP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
 let jszipPromise = null;
