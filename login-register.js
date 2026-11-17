@@ -147,6 +147,7 @@ function initLoginPage() {
 
   /* ---------- Google ---------- */
   const googleBtnEl = $('google-btn');
+  const googleWrapEl = $('google-wrap');
   const googleOrEl = $('google-or');
   let googleReady = false;
   let googleRenderedWidth = 0;
@@ -182,21 +183,27 @@ function initLoginPage() {
   function renderGoogleBtn() {
     initGoogle();
     const hide = !googleReady;
-    googleBtnEl.hidden = hide;
+    googleWrapEl.hidden = hide;
     googleOrEl.hidden = hide;
     if (hide) return;
-    const w = Math.min(400, Math.max(200, Math.round(googleBtnEl.parentElement.clientWidth - 40) || 240));
-    if (w === googleRenderedWidth) return;
-    googleRenderedWidth = w;
-    googleBtnEl.innerHTML = '';
-    google.accounts.id.renderButton(googleBtnEl, {
-      type: 'standard', theme: 'outline', size: 'large',
-      text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
-    });
+    const cw = Math.round(googleWrapEl.clientWidth) || 240;
+    const ch = googleWrapEl.clientHeight || 40;
+    const w = Math.min(400, Math.max(200, cw));
+    if (w !== googleRenderedWidth) {
+      googleRenderedWidth = w;
+      googleBtnEl.innerHTML = '';
+      google.accounts.id.renderButton(googleBtnEl, {
+        type: 'standard', theme: 'outline', size: 'large',
+        text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
+      });
+    }
+    /* nút Google gốc cao cố định 40px: phóng vừa khít nút giao diện bên dưới */
+    googleBtnEl.style.width = w + 'px';
+    googleBtnEl.style.transform = 'scale(' + (cw / w) + ', ' + (ch / 40) + ')';
   }
 
   window.onGoogleLibraryLoad = renderGoogleBtn;
-  googleBtnEl.hidden = true;
+  googleWrapEl.hidden = true;
   googleOrEl.hidden = true;
   window.addEventListener('resize', () => { if (googleReady) renderGoogleBtn(); });
 

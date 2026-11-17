@@ -1,7 +1,7 @@
 body.login-page {
   height: auto;
   min-height: 100dvh;
-  padding: 24px clamp(20px, 4vw, 32px) 32px;
+  padding: 24px clamp(20px, 4vw, 32px) 20px;
   overflow-x: hidden;
 }
 
@@ -346,7 +346,7 @@ body.login-page {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 11px 6px;
+  padding: 14px 0;
   background: var(--black);
   border: none;
   border-radius: var(--radius-pill);
@@ -370,15 +370,42 @@ body.login-page {
 .login-contact-btn:active {
   scale: var(--press);
 }
+@media (any-hover: hover) {
+  html:not([data-input="touch"]) .login-contact-btn:hover {
+    scale: var(--press);
+  }
+}
 .login-or[hidden],
 .google-btn-wrap[hidden] {
   display: none;
 }
 .google-btn-wrap {
+  position: relative;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  min-height: 44px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+}
+/* Nút hiển thị: cùng class .btn nên cao bằng nút Đăng nhập */
+.google-btn-face {
+  background: var(--white);
+  color: var(--black);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+/* Nút Google gốc: trong suốt, phủ lên trên để nhận click */
+.google-btn-hit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  opacity: 0.01;
+  transform-origin: 0 0;
+  cursor: pointer;
+}
+@media (any-hover: hover) {
+  html:not([data-input="touch"]) .google-btn-wrap:hover .google-btn-face {
+    scale: var(--press);
+  }
 }
 
 /* ==========================================================
