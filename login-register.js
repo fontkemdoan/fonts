@@ -223,6 +223,7 @@ function initRegisterPage() {
   const regPhoto = $('reg-photo');
   const regPhotoName = $('reg-photo-name');
   const regFileBox = regPhoto.closest('.reg-file');
+  const regAgree = $('reg-agree');
   const regSubmit = $('register-submit');
   const regHint = $('register-hint');
   const successPanel = $('success-panel');
@@ -246,6 +247,7 @@ function initRegisterPage() {
     regPhoto.value = '';
     regPhotoName.textContent = REG_PHOTO_TEXT;
     regFileBox.classList.remove('has-file');
+    regAgree.checked = false;
   }
 
   async function shrinkImage(file) {
@@ -276,6 +278,7 @@ function initRegisterPage() {
     if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ.'); return; }
     if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
     if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh.'); return; }
+    if (!regAgree.checked) { showRegHint('Vui lòng đồng ý với Điều khoản website'); return; }
 
     regBusy = true;
     regSubmit.disabled = true;

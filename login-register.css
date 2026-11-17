@@ -508,6 +508,54 @@ body.login-page {
   display: none;
 }
 
+/* ===== Checkbox đồng ý điều khoản ===== */
+.reg-agree {
+  width: 100%;
+  margin-top: 14px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--black);
+  cursor: pointer;
+  user-select: none;
+}
+.reg-agree-link {
+  color: var(--red);
+  text-decoration: none;
+}
+.reg-agree-link:hover {
+  text-decoration: underline;
+}
+.reg-agree-circle {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  font-size: 14px;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+.reg-agree-circle i {
+  line-height: 1;
+}
+.reg-agree input:checked + .reg-agree-circle {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+.reg-agree input:focus-visible + .reg-agree-circle {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
 .register-actions {
   margin-top: 14px;
 }
@@ -529,7 +577,7 @@ body.login-page {
   --ib-size: 36px;
   --ib-bg: var(--green);
   --ib-color: var(--white);
-  --ib-border: 1px solid var(--rim);
+  --ib-border: none;
   box-shadow: var(--shadow-card);
   margin-bottom: 12px;
   pointer-events: none;

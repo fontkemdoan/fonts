@@ -332,7 +332,7 @@ async function submitBuy() {
   if (buyBusy || !buyCurrent) return;
   const photo = buyPhoto.files[0];
   const contact = buyContact.value.trim();
-  if (!contact) { showBuyHint('Vui lòng nhập nơi nhận font.'); return; }
+  if (!contact) { showBuyHint('Vui lòng nhập địa chỉ nhận font.'); return; }
   if (!photo) { showBuyHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
   if (!photo.type.startsWith('image/')) { showBuyHint('File phải là hình ảnh.'); return; }
 
