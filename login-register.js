@@ -52,7 +52,8 @@ function initLoginPage() {
   let loginErrorTimer = null;
 
   function showLoginError(msg) {
-    loginError.textContent = msg;
+    loginError.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    loginError.lastChild.textContent = msg;
     clearTimeout(loginErrorTimer);
     loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
   }

@@ -150,6 +150,31 @@ body.login-page {
   display: none;
 }
 
+/* ===== Thông báo trang đăng nhập: chỉ text, nằm dưới nút Google ===== */
+.login-msg {
+  width: 100%;
+  margin: 12px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--black);
+}
+.login-msg i {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.login-msg .kd-spinner {
+  font-size: 16px;
+}
+.login-msg:empty {
+  display: none;
+}
+
 /* PC: bù chiều cao logo để cụm 2 card nằm giữa cả màn hình */
 @media (min-width: 1101px) and (min-height: 960px) {
   .stage {
