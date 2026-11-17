@@ -392,6 +392,16 @@ body.login-page {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
   user-select: none;
 }
+/* Logo Google 4 màu: cao 1.3em để nút cao bằng nút Đăng nhập */
+.google-g {
+  display: flex;
+  align-items: center;
+  height: 1.3em;
+}
+.google-g svg {
+  width: 1em;
+  height: 1em;
+}
 /* Nút Google gốc: trong suốt, phủ lên trên để nhận click */
 .google-btn-hit {
   position: absolute;
