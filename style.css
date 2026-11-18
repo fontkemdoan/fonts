@@ -2074,3 +2074,74 @@ body.terms-page {
   text-align: center;
   color: var(--black);
 }
+
+.nf-stage {
+  align-content: center;
+}
+.nf-wrap {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+  color: var(--black);
+}
+.nf-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.nf-img {
+  order: -1;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  display: block;
+}
+.nf-btn {
+  width: auto;
+  padding: 14px 28px;
+}
+
+.nf-title {
+  margin: 0;
+  font-size: 80px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+.nf-sub {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  opacity: 0.7;
+}
+
+/* PC: chữ bên trái, ảnh bên phải */
+@media (min-width: 768px) {
+  .nf-wrap {
+    max-width: 720px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 90px;
+    text-align: left;
+  }
+  .nf-text {
+    flex: 0 1 auto;
+    min-width: 0;
+    align-items: flex-start;
+  }
+  .nf-text .terms-head {
+    text-align: left;
+  }
+  .nf-img {
+    order: 0;
+    flex: 0 0 240px;
+    max-width: 240px;
+  }
+}
