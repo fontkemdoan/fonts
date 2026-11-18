@@ -434,7 +434,7 @@ body.login-page {
   align-items: center;
   justify-content: center;
   gap: 28px;
-  --qr: 260px;
+  --qr: 250px;
 }
 .reg-qr-col {
   display: flex;

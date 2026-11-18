@@ -1829,7 +1829,7 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
 
 /* QR + thông tin chuyển khoản */
 .buy-side {
-  --qr: 200px;
+  --qr: 250px;
   padding: 20px;
   border-radius: 20px;
   background: var(--black);
