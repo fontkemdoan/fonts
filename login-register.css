@@ -398,8 +398,9 @@ body.login-page {
   border-radius: var(--radius-pill);
 }
 .google-btn-face {
-  background: var(--black);
-  color: var(--white);
+  background: var(--white);
+  color: var(--black);
+  border: 1px solid #777;
   user-select: none;
 }
 .google-g {
