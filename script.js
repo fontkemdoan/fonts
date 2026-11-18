@@ -88,7 +88,6 @@ const noticePanel = $('notice-panel');
 
 const isLoggedIn = () => !!getToken();
 
-/* ---------- User chip (avatar + mail) ---------- */
 const userChip = document.createElement('div');
 userChip.className = 'user-chip';
 userChip.hidden = true;
@@ -96,7 +95,6 @@ userChip.hidden = true;
 const headerActions = $('header-actions');
 const menuScroll = document.querySelector('.menu-scroll');
 
-/* PC: Đăng nhập / Đăng ký nằm góc phải header · Mobile: trả về menu */
 function placeAuthButtons() {
   if (window.matchMedia('(min-width: 768px)').matches) {
     if (authBtn.parentElement !== headerActions) headerActions.append(authBtn, registerBtn);
@@ -224,7 +222,6 @@ const menuBackdrop = $('menu-backdrop');
 const noticeMsg = noticePanel.querySelector('.notice-msg');
 const NOTICE_DEFAULT_HTML = noticeMsg.innerHTML;
 
-/* panel · row: dòng menu sáng active khi popup mở · onClose: dọn dẹp khi đóng */
 const POPUPS = {
   notice: { panel: noticePanel },
   viewer: {
@@ -289,8 +286,13 @@ function openNotice(msg) {
 }
 function closeNotice() { closePopup('notice'); }
 
-function showBuyHint(msg, ms = 4000) {
-  buyHint.textContent = msg;
+function showBuyHint(msg, ms = 2500) {
+  if (msg) {
+    buyHint.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    buyHint.lastChild.textContent = msg;
+  } else {
+    buyHint.textContent = '';
+  }
   clearTimeout(buyHintTimer);
   if (msg) buyHintTimer = setTimeout(() => { buyHint.textContent = ''; }, ms);
 }
@@ -332,9 +334,9 @@ async function submitBuy() {
   if (buyBusy || !buyCurrent) return;
   const photo = buyPhoto.files[0];
   const contact = buyContact.value.trim();
-  if (!contact) { showBuyHint('Vui lòng nhập địa chỉ nhận font.'); return; }
-  if (!photo) { showBuyHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
-  if (!photo.type.startsWith('image/')) { showBuyHint('File phải là hình ảnh.'); return; }
+  if (!contact) { showBuyHint('Vui lòng nhập địa chỉ nhận font'); return; }
+  if (!photo) { showBuyHint('Vui lòng tải lên ảnh chuyển khoản'); return; }
+  if (!photo.type.startsWith('image/')) { showBuyHint('File phải là hình ảnh'); return; }
 
   buyBusy = true;
   buySubmit.disabled = true;
@@ -354,10 +356,10 @@ async function submitBuy() {
       resetBuyForm();
       openPopup('buySuccess');
     } else {
-      showBuyHint('Gửi thất bại, hãy thử lại sau.');
+      showBuyHint('Gửi thất bại, hãy thử lại sau');
     }
   } catch (_) {
-    showBuyHint('Lỗi kết nối, hãy thử lại sau.');
+    showBuyHint('Lỗi kết nối, hãy thử lại sau');
   } finally {
     buyBusy = false;
     buySubmit.disabled = false;
@@ -367,7 +369,6 @@ async function submitBuy() {
 
 function openFinder() { openPopup('finder'); }
 
-/* Popup xem ảnh lớn (PC) */
 function openViewer(title, imgs, idx, onIdx) {
   if (viewerSliding) viewerSliding();
   viewer.imgs = imgs;
@@ -415,7 +416,6 @@ function viewerSlide(src, dir) {
   };
   const onEnd = (e) => { if (e.propertyName === 'transform') finish(); };
 
-  /* bấm tiếp khi ảnh mới chưa tải xong: đổi thẳng, không trượt */
   viewerSliding = () => { next.onload = next.onerror = null; old.src = src; viewerSliding = null; };
   next.onerror = () => { viewerSliding = null; };
   next.onload = () => {
@@ -438,7 +438,6 @@ function viewerSlide(src, dir) {
 function closeFinder() { closePopup('finder'); }
 
 function initPopups() {
-  /* bấm ra ngoài: đóng menu + popup nào không chứa chỗ bấm */
   document.addEventListener('click', (e) => {
     if (isMenuOpen() && !e.target.closest('#menu-panel, #menu-btn')) closeMenu();
     if (panelJustOpened) return;
@@ -460,7 +459,6 @@ function initPopups() {
   $('viewer-prev').addEventListener('click', () => viewerGo(-1));
   $('viewer-next').addEventListener('click', () => viewerGo(1));
 
-  /* nút X dùng chung: gắn vào thẻ của popup đang mở */
   const syncPopupClose = () => {
     const open = Object.values(POPUPS).find((p) => !p.panel.hidden);
     const card = open && open.panel.querySelector('.popup-card');
@@ -468,11 +466,9 @@ function initPopups() {
     popupClose.hidden = !card;
   };
 
-  /* dòng menu chứa popup sáng active khi popup mở (PC) */
   const syncPopupMenuActive = () => {
     const popups = Object.values(POPUPS);
     const anyOpen = popups.some((p) => !p.panel.hidden && !p.keepNav);
-    /* Popup mở thì tạm tắt active của Trang chủ / Font free...; đóng lại thì khôi phục */
     document.querySelectorAll('[data-filter]').forEach((b) => {
       const on = !anyOpen && b.dataset.filter === activeFilter;
       b.classList.toggle('active', on);
@@ -491,7 +487,6 @@ function initPopups() {
   popupClose.addEventListener('click', () => closeAllPanels());
   syncPopupClose();
 
-  /* popup Mua font */
   buyPhoto.addEventListener('change', () => {
     const f = buyPhoto.files[0];
     buyPhotoName.textContent = f ? f.name : BUY_PHOTO_TEXT;
@@ -830,11 +825,10 @@ function createDemoCard(g) {
   const nextBtn = card.querySelector('.demo-next');
   const imgs = g.imgs.slice();
   let idx = 0;
-  let sliding = null; /* hàm kết thúc ngay slide đang chạy */
+  let sliding = null;
 
   const showImg = () => { img.src = encodeURI(imgs[idx]); };
 
-  /* Ảnh mới trượt vào, ảnh cũ trượt ra; chiều cao khung đổi mượt theo ảnh mới */
   const slideTo = (src, dir) => {
     const old = img;
     const next = new Image();
@@ -858,7 +852,6 @@ function createDemoCard(g) {
     };
     const onEnd = (e) => { if (e.propertyName === 'transform') finish(); };
 
-    /* bấm tiếp khi ảnh mới chưa tải xong: đổi thẳng, không trượt */
     sliding = () => { next.onload = next.onerror = null; old.src = src; sliding = null; };
     next.onerror = () => { sliding = null; };
     next.onload = () => {
@@ -897,7 +890,6 @@ function createDemoCard(g) {
     card.remove();
     updateView();
   });
-  /* PC: bấm tới/lùi thì bung popup xem ảnh · Mobile: trượt ngay trong card */
   const step = (d) => {
     if (imgs.length < 2) return;
     if (!desktopMQ.matches) { go(d); return; }
@@ -1093,7 +1085,6 @@ function toggleDemo(card) {
   syncHash();
 }
 
-/* ---------- Deep link: /#tenfont ---------- */
 function syncHash() {
   const open = demosEl.querySelector('.demo-card.open');
   const group = open && demoGroups.get(open);
@@ -1456,7 +1447,6 @@ function initDockToggle() {
   });
 }
 
-/* Pill active trượt: bottom nav (mobile) + dock (PC) */
 function initNavSlider() {
   const root = document.documentElement;
   const dock = $('dock');
@@ -1476,7 +1466,6 @@ function initNavSlider() {
     ? dock.querySelector('.menu-row.active')
     : nav.querySelector('.menu-item.active'));
 
-  /* Mobile: các nút bên cạnh cũng trượt mượt khi nút active đổi độ rộng */
   const flip = () => {
     const moved = [];
     navItems().forEach((el) => {

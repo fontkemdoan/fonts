@@ -1,13 +1,6 @@
-/* ==========================================================
-   JS dùng chung cho dang-nhap.html và dang-ky.html
-   Trang nào chạy phần đó: thẻ <body data-page="login"> hoặc "register"
-   ========================================================== */
 (() => {
 'use strict';
 
-/* ===== Phần dùng chung ===== */
-
-/* Đổi đường dẫn này nếu trang chủ của bạn khác */
 const HOME_URL = '/';
 
 const $ = (id) => document.getElementById(id);
@@ -26,10 +19,6 @@ async function postJson(url, body) {
   return res.json();
 }
 
-
-/* ==========================================================
-   TRANG ĐĂNG NHẬP (dang-nhap.html)
-   ========================================================== */
 function initLoginPage() {
   const GOOGLE_CLIENT_ID = '704991012160-k1f0s7qojcojdeoshnrf6pdhpurse2a1.apps.googleusercontent.com';
 
@@ -55,7 +44,7 @@ function initLoginPage() {
     loginError.innerHTML = '<i class="ri-information-line"></i><span></span>';
     loginError.lastChild.textContent = msg;
     clearTimeout(loginErrorTimer);
-    loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 3000);
+    loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 2500);
   }
 
   function showLoginLoading(msg) {
@@ -75,12 +64,12 @@ function initLoginPage() {
     loginError.textContent = '';
 
     if (!email || !password) {
-      showLoginError('Vui lòng nhập email và mật khẩu.');
+      showLoginError('Vui lòng nhập email và mật khẩu');
       return;
     }
 
     loginBtn.disabled = true;
-    loginBtn.innerHTML = SPINNER;
+    loginBtn.innerHTML = SPINNER + ' Đang đăng nhập...';
 
     try {
       const data = await postJson('/api/login', { email, password, mode: 'login' });
@@ -88,9 +77,9 @@ function initLoginPage() {
         onLoginSuccess(data.token, { email, avatar: data.avatar, name: data.name });
         return;
       }
-      showLoginError(data.error === 'wrong_password' ? 'Sai mật khẩu' : 'Tài khoản không tồn tại.');
+      showLoginError(data.error === 'wrong_password' ? 'Sai mật khẩu' : 'Tài khoản không tồn tại');
     } catch (e) {
-      showLoginError('Lỗi kết nối, hãy thử lại sau.');
+      showLoginError('Lỗi kết nối, hãy thử lại sau');
     }
     loginBtn.disabled = false;
     loginBtn.innerHTML = LABEL.login;
@@ -117,7 +106,7 @@ function initLoginPage() {
     const newPassword = newPasswordInput.value;
 
     if (!email || !oldPassword || !newPassword) {
-      showLoginError('Vui lòng nhập đầy đủ thông tin.');
+      showLoginError('Vui lòng nhập đầy đủ thông tin');
       return;
     }
 
@@ -128,17 +117,17 @@ function initLoginPage() {
     try {
       const data = await postJson('/api/change-password', { email, oldPassword, newPassword });
       if (data.ok) {
-        showLoginError('Đổi mật khẩu thành công.');
+        showLoginError('Đổi mật khẩu thành công');
         exitChangePassMode();
       } else if (data.error === 'wrong_password') {
-        showLoginError('Mật khẩu hiện tại không đúng.');
+        showLoginError('Mật khẩu hiện tại không đúng');
       } else if (data.error === 'not_found') {
         showLoginError('Tài khoản không tồn tại.');
       } else {
-        showLoginError('Có lỗi xảy ra, hãy thử lại sau.');
+        showLoginError('Có lỗi xảy ra, hãy thử lại sau');
       }
     } catch (e) {
-      showLoginError('Lỗi kết nối, hãy thử lại sau.');
+      showLoginError('Lỗi kết nối, hãy thử lại sau');
     } finally {
       changePassBtn.disabled = false;
       loginBtn.disabled = false;
@@ -146,7 +135,6 @@ function initLoginPage() {
     }
   }
 
-  /* ---------- Google ---------- */
   const googleBtnEl = $('google-btn');
   const googleWrapEl = $('google-wrap');
   const googleOrEl = $('google-or');
@@ -198,7 +186,6 @@ function initLoginPage() {
         text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: w
       });
     }
-    /* nút Google gốc cao cố định 40px: phóng vừa khít nút giao diện bên dưới */
     googleBtnEl.style.width = w + 'px';
     googleBtnEl.style.transform = 'scale(' + (cw / w) + ', ' + (ch / 40) + ')';
   }
@@ -208,7 +195,6 @@ function initLoginPage() {
   googleOrEl.hidden = true;
   window.addEventListener('resize', () => { if (googleReady) renderGoogleBtn(); });
 
-  /* ---------- Sự kiện ---------- */
   loginBtn.addEventListener('click', () => { if (changePassMode) exitChangePassMode(); else doLogin(); });
   if (changePassBtn) changePassBtn.addEventListener('click', () => { if (changePassMode) doChangePassword(); else enterChangePassMode(); });
 
@@ -219,10 +205,6 @@ function initLoginPage() {
   if (window.google && google.accounts) renderGoogleBtn();
 }
 
-
-/* ==========================================================
-   TRANG ĐĂNG KÝ (dang-ky.html)
-   ========================================================== */
 function initRegisterPage() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -243,7 +225,7 @@ function initRegisterPage() {
   let regHintTimer = null;
   let regBusy = false;
 
-  function showRegHint(msg, ms = 4000) {
+  function showRegHint(msg, ms = 2500) {
     regHint.innerHTML = '<i class="ri-information-line"></i><span></span>';
     regHint.lastChild.textContent = msg;
     clearTimeout(regHintTimer);
@@ -284,10 +266,10 @@ function initRegisterPage() {
     const contact = regContact.value.trim();
     const photo = regPhoto.files[0];
 
-    if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ.'); return; }
-    if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản.'); return; }
-    if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh.'); return; }
-    if (!regAgree.checked) { showRegHint('Vui lòng đồng ý với Điều khoản website'); return; }
+    if (!emailRegex.test(email)) { showRegHint('Vui lòng nhập Gmail hợp lệ'); return; }
+    if (!photo) { showRegHint('Vui lòng tải lên ảnh chuyển khoản'); return; }
+    if (!photo.type.startsWith('image/')) { showRegHint('File phải là hình ảnh'); return; }
+    if (!regAgree.checked) { showRegHint('Vui lòng đồng ý Điều khoản'); return; }
 
     regBusy = true;
     regSubmit.disabled = true;
@@ -306,10 +288,10 @@ function initRegisterPage() {
         resetRegisterForm();
         openSuccess();
       } else {
-        showRegHint('Đăng ký thất bại, hãy thử lại sau.');
+        showRegHint('Đăng ký thất bại, hãy thử lại sau');
       }
     } catch (e) {
-      showRegHint('Lỗi kết nối, hãy thử lại sau.');
+      showRegHint('Lỗi kết nối, hãy thử lại sau');
     } finally {
       regBusy = false;
       regSubmit.disabled = false;
@@ -325,16 +307,11 @@ function initRegisterPage() {
   regSubmit.addEventListener('click', doRegister);
   [regEmail, regContact].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') doRegister(); }));
 
-  /* popup thành công: đóng bằng nút X, bấm ra ngoài hoặc Esc */
   $('success-close').addEventListener('click', closeSuccess);
   successPanel.addEventListener('click', (e) => { if (e.target === successPanel) closeSuccess(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuccess(); });
 }
 
-
-/* ===== Khởi chạy theo trang ===== */
-
-/* đã đăng nhập thì về trang chủ */
 if (getToken()) {
   window.location.replace(HOME_URL);
 } else {

@@ -5,7 +5,6 @@ body.login-page {
   overflow-x: hidden;
 }
 
-/* ===== Logo ===== */
 .login-page-logo {
   display: flex;
   align-items: center;
@@ -18,7 +17,6 @@ body.login-page {
   width: 44px;
 }
 
-/* ===== Lưới 2 card ===== */
 .stage {
   flex: 1;
   width: 100%;
@@ -32,7 +30,6 @@ body.login-page {
   justify-content: center;
 }
 
-/* ===== button về trang chủ ===== */
 .back-home {
   grid-column: 1 / -1;
   justify-self: start;
@@ -55,7 +52,6 @@ body.login-page {
   scale: var(--press);
 }
 
-/* ===== Card trái - phần chung ===== */
 .login-intro,
 .register-intro {
   min-width: 0;
@@ -66,7 +62,6 @@ body.login-page {
   box-shadow: var(--shadow-card);
 }
 
-/* ===== Card phải ===== */
 .login-col {
   display: flex;
   flex-direction: column;
@@ -90,7 +85,6 @@ body.login-page {
   margin-bottom: 10px;
 }
 
-/* ==== input ===== */
 .popup-field {
   position: relative;
   width: 100%;
@@ -125,11 +119,10 @@ body.login-page {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-/* ===== Toast ===== */
 .popup-toast {
   width: 100%;
-  margin-top: 12px;
-  padding: 10px 16px;
+  margin-top: 14px;
+  padding: 10px 0px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -154,7 +147,6 @@ body.login-page {
   display: none;
 }
 
-/* ===== Thông báo trang đăng nhập: chỉ text, nằm dưới nút Google ===== */
 .login-msg {
   width: 100%;
   margin: 12px 0 0;
@@ -179,14 +171,12 @@ body.login-page {
   display: none;
 }
 
-/* PC: bù chiều cao logo để cụm 2 card nằm giữa cả màn hình */
 @media (min-width: 1101px) and (min-height: 960px) {
   .stage {
     padding-bottom: 60px;
   }
 }
 
-/* ===== Xếp dọc như mobile khi <= 1100px (gồm cả cửa sổ PC chiếm nửa màn hình) ===== */
 @media (max-width: 1100px) {
   .stage {
     grid-template-columns: minmax(0, 1fr);
@@ -201,17 +191,13 @@ body.login-page {
   }
   .login-col .popup-card {
     max-width: none;
-  } /* card form rộng bằng card còn lại */
+  }
   .login-intro,
   .register-intro {
     padding: 28px 22px;
   }
 }
 
-/* ==========================================================
-   RIÊNG TRANG ĐĂNG NHẬP (dang-nhap.html)
-   ========================================================== */
-/* ===== Card giới thiệu (nền --black) ===== */
 .login-intro {
   display: flex;
   flex-direction: column;
@@ -240,7 +226,6 @@ body.login-page {
   text-wrap: pretty;
 }
 
-/* ===== Cụm ảnh xếp chồng nghiêng, khung 16:9 ===== */
 .fan {
   position: relative;
   width: 100%;
@@ -254,16 +239,16 @@ body.login-page {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: 44cqw;
+  width: 50cqw;
   aspect-ratio: 16 / 9;
   transform: translate(-50%, -50%) rotate(var(--r));
   z-index: var(--z);
-  border: 0.8cqw solid #f1f1f1;
-  border-radius: 3.5cqw;
+  border: 2px solid #fff;
+  border-radius: 10px;
   overflow: hidden;
   isolation: isolate;
   background: var(--mesh-b);
-  box-shadow: 0 2cqw 4cqw rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
 }
 .photo > img {
   position: absolute;
@@ -274,7 +259,6 @@ body.login-page {
   z-index: 1;
 }
 
-/* Mẫu chữ dự phòng khi chưa có ảnh */
 .specimen {
   position: absolute;
   inset: 0;
@@ -326,7 +310,6 @@ body.login-page {
   outline-offset: 3px;
 }
 
-/* ===== Riêng trang đăng nhập ===== */
 .login-btn-row {
   margin-top: 14px;
 }
@@ -414,14 +397,12 @@ body.login-page {
   overflow: hidden;
   border-radius: var(--radius-pill);
 }
-/* Nút hiển thị: cùng class .btn nên cao bằng nút Đăng nhập */
 .google-btn-face {
   background: var(--white);
   color: var(--black);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
   user-select: none;
 }
-/* Logo Google 4 màu: cao 1.3em để nút cao bằng nút Đăng nhập */
 .google-g {
   display: flex;
   align-items: center;
@@ -431,7 +412,6 @@ body.login-page {
   width: 1em;
   height: 1em;
 }
-/* Nút Google gốc: trong suốt, phủ lên trên để nhận click */
 .google-btn-hit {
   position: absolute;
   top: 0;
@@ -447,10 +427,6 @@ body.login-page {
   }
 }
 
-/* ==========================================================
-   RIÊNG TRANG ĐĂNG KÝ (dang-ky.html)
-   ========================================================== */
-/* ===== Card trái: QR + thông tin (nền --black) ===== */
 .register-intro {
   display: flex;
   flex-direction: row;
@@ -519,7 +495,6 @@ body.login-page {
   white-space: nowrap;
 }
 
-/* ===== Form đăng ký ===== */
 .reg-input {
   padding-left: 62px;
 }
@@ -574,7 +549,6 @@ body.login-page {
   display: none;
 }
 
-/* ===== Checkbox đồng ý điều khoản ===== */
 .reg-agree {
   width: 100%;
   margin-top: 14px;
@@ -629,7 +603,6 @@ body.login-page {
   cursor: default;
 }
 
-/* ===== Popup đăng ký thành công ===== */
 #success-panel.popup-panel {
   padding: 15px;
 }
@@ -656,12 +629,11 @@ body.login-page {
 .success-msg {
   margin-top: 10px;
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.5;
   text-align: center;
   color: var(--black);
 }
 
-/* Từ 700px: cột thông tin cao bằng ảnh QR, nút Tải QR nằm dưới QR (dưới 700px: QR trên, info dưới) */
 @media (min-width: 700px) {
   .register-intro {
     display: grid;
@@ -694,9 +666,6 @@ body.login-page {
   }
 }
 
-/* ==========================================================
-   PC (>= 768px): cách mép 20px
-   ========================================================== */
 @media (min-width: 768px) {
   body.login-page {
     padding: 20px;
@@ -709,12 +678,9 @@ body.login-page {
   }
 }
 
-/* ==========================================================
-   PC 2 cột (>= 1101px): card phải = 2/3 card trái, cao bằng nhau
-   ========================================================== */
 @media (min-width: 1101px) {
   .stage {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); /* trái 3 : phải 2 */
+    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
     align-items: stretch;
   }
   .login-col {
@@ -724,10 +690,10 @@ body.login-page {
     flex: 1;
     width: 100%;
     max-width: none;
-    justify-content: flex-start; /* nội dung form đẩy lên trên */
+    justify-content: flex-start;
   }
   .login-contact {
-    margin-top: auto; /* phần Liên hệ dồn xuống đáy card cho cân với card trái */
+    margin-top: auto;
     padding-top: 20px;
   }
 }
