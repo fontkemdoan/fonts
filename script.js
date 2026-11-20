@@ -1195,7 +1195,11 @@ function setCountdown(card, sec) {
     delete btn.dataset.counting;
   } else {
     icon.className = 'dl-count';
-    icon.textContent = sec + 's';
+    icon.textContent = 'Vui lòng chờ ';
+    const num = document.createElement('span');
+    num.className = 'dl-sec';
+    num.textContent = sec + 's';
+    icon.appendChild(num);
     btn.dataset.counting = '1';
   }
 }
