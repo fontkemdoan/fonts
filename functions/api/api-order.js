@@ -7,8 +7,12 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 
+// Dùng chung biến môi trường với register.js / buy.js (TG_BOT_TOKEN, TG_CHAT_ID)
+const botToken = (env) => env.TG_BOT_TOKEN || env.TELEGRAM_BOT_TOKEN;
+const chatId = (env) => env.TG_CHAT_ID || env.TELEGRAM_CHAT_ID;
+
 async function tg(env, method, body) {
-  const res = await fetch('https://api.telegram.org/bot' + env.TELEGRAM_BOT_TOKEN + '/' + method, {
+  const res = await fetch('https://api.telegram.org/bot' + botToken(env) + '/' + method, {
     method: 'POST',
     body
   });
@@ -16,6 +20,8 @@ async function tg(env, method, body) {
 }
 
 export async function handleOrder(request, env) {
+  if (!botToken(env) || !chatId(env)) return json({ ok: false, error: 'not_configured' }, 500);
+
   let form;
   try { form = await request.formData(); } catch (_) { return json({ ok: false }, 400); }
 
@@ -39,7 +45,7 @@ export async function handleOrder(request, env) {
   if (email) lines.push('👤 Thành viên: ' + esc(email));
 
   const msg = new FormData();
-  msg.append('chat_id', env.TELEGRAM_CHAT_ID);
+  msg.append('chat_id', chatId(env));
   msg.append('text', lines.join('\n'));
   msg.append('parse_mode', 'HTML');
   msg.append('disable_web_page_preview', 'true');
@@ -47,7 +53,7 @@ export async function handleOrder(request, env) {
 
   for (const f of files) {
     const doc = new FormData();
-    doc.append('chat_id', env.TELEGRAM_CHAT_ID);
+    doc.append('chat_id', chatId(env));
     doc.append('document', f, f.name);
     if (!(await tg(env, 'sendDocument', doc))) return json({ ok: false }, 502);
   }
