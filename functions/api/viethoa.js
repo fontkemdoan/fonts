@@ -7,7 +7,6 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 
-// Dùng chung biến môi trường với register.js / buy.js (TG_BOT_TOKEN, TG_CHAT_ID)
 const botToken = (env) => env.TG_BOT_TOKEN || env.TELEGRAM_BOT_TOKEN;
 const chatId = (env) => env.TG_CHAT_ID || env.TELEGRAM_CHAT_ID;
 
@@ -38,11 +37,10 @@ export async function handleOrder(request, env) {
     '🆕 <b>ĐẶT VIỆT HÓA</b>',
     '⏱ Thời gian: ' + esc(time.label) + ' (' + time.price + ')'
   ];
-  lines.push('📞 Liên hệ: ' + esc(contact));
-  if (link) lines.push('🔗 Link: ' + esc(link));
-  if (files.length) lines.push('📎 File: ' + files.length);
+  if (link) lines.push('🔗 Link font: ' + esc(link));
   if (note) lines.push('📝 Yêu cầu: ' + esc(note));
-  if (email) lines.push('👤 Thành viên: ' + esc(email));
+  if (files.length) lines.push('📎 File: ' + files.length);
+  lines.push('📞 Liên hệ: ' + esc(contact));
 
   const msg = new FormData();
   msg.append('chat_id', chatId(env));
