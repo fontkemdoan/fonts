@@ -465,7 +465,7 @@ function initOrderPage() {
         if (profile && profile.email) fd.append('email', profile.email);
       } catch (_) {}
 
-      const res = await fetch('/api/order', { method: 'POST', body: fd });
+      const res = await fetch('/api/viethoa', { method: 'POST', body: fd });
       const data = await res.json().catch(() => ({}));
       if (data.ok) {
         resetOrderForm();
