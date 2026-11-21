@@ -288,7 +288,7 @@ function closeNotice() { closePopup('notice'); }
 
 function showBuyHint(msg, ms = 2500) {
   if (msg) {
-    buyHint.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    buyHint.innerHTML = '<i class="ri-error-warning-line"></i><span></span>';
     buyHint.lastChild.textContent = msg;
   } else {
     buyHint.textContent = '';

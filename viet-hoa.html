@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Việt hóa – Kem Đoàn</title>
+<link rel="icon" href="img/kdicon.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@5.0.0/lib/Normal/MiSansVF.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="login-register.css">
+</head>
+<body class="login-page" data-page="order">
+
+  <header class="login-page-logo">
+    <a href="/" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit" aria-label="Kem Đoàn – trang chủ">
+      <img src="img/kdblack.png" alt="" class="logo-img">
+      <span class="logo-text">
+        <span class="logo-name">KEM ĐOÀN</span>
+        <span class="logo-slogan">Font Việt hóa</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="stage">
+    <a class="back-home" href="/"><span class="btn-icon"><i class="ri-arrow-left-line"></i></span><span class="back-home-text">Về trang chủ</span></a>
+
+    <section class="order-intro" aria-label="Demo Việt hóa">
+      <iframe class="order-demo-frame" src="demoviethoa.html" title="Demo Việt hóa font" scrolling="no"></iframe>
+    </section>
+
+    <section class="login-col" aria-label="Đặt Việt hóa">
+      <div class="popup-card">
+        <div class="login-title">ĐẶT VIỆT HÓA</div>
+
+        <div class="popup-field">
+          <i class="ri-links-line popup-field-icon"></i>
+          <span class="req" aria-hidden="true">*</span>
+          <input class="popup-input reg-input order-link-input" type="text" id="order-link" placeholder="Link hoặc tải lên file font" aria-required="true" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <button type="button" class="btn-icon order-upload-btn" id="order-upload-btn" aria-label="Tải lên file font" title="Tải lên file font"><i class="ri-upload-cloud-2-line"></i></button>
+          <input type="file" id="order-files" multiple accept=".ttf,.otf,.ttc,.woff,.woff2,.zip,.rar,.7z" hidden>
+        </div>
+        <ul class="order-files" id="order-file-list"></ul>
+
+        <div class="popup-field kd-select" id="order-time">
+          <i class="ri-time-line popup-field-icon"></i>
+          <button type="button" class="kd-select-btn" id="order-time-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Thời gian">
+            <span class="kd-select-label">Bình thường</span>
+            <span class="kd-select-price">100.000đ</span>
+            <i class="ri-arrow-down-s-line kd-select-caret"></i>
+          </button>
+          <ul class="kd-select-list" role="listbox" aria-label="Thời gian" hidden>
+            <li role="option" tabindex="-1" data-value="normal" aria-selected="true"><span>Bình thường</span><span class="kd-select-price">100.000đ</span></li>
+            <li role="option" tabindex="-1" data-value="fast" aria-selected="false"><span>Nhanh - 3h</span><span class="kd-select-price">150.000đ</span></li>
+          </ul>
+        </div>
+
+        <div class="popup-field">
+          <i class="ri-user-line popup-field-icon"></i>
+          <span class="req" aria-hidden="true">*</span>
+          <input class="popup-input reg-input" type="text" id="order-contact" placeholder="Thông tin liên hệ" aria-required="true" autocomplete="off" maxlength="200">
+        </div>
+
+        <div class="popup-field order-note-field">
+          <i class="ri-edit-line popup-field-icon"></i>
+          <textarea class="popup-input order-note" id="order-note" rows="4" placeholder="Cho chúng tôi biết nếu bạn có thêm yêu cầu nhé..." maxlength="500"></textarea>
+        </div>
+
+        <p class="order-hint"><i class="ri-information-line"></i><span>Đơn giá được tính theo Giá/1 font.</span></p>
+        <p class="order-hint"><i class="ri-information-line"></i><span>Nếu link thuộc font trả phí, sẽ tính thêm phí tải font, tùy thuộc vào font nên mức giá không cố định.</span></p>
+
+        <div class="popup-btn-row register-actions">
+          <button type="button" class="btn popup-btn" id="order-submit"><i class="ri-send-plane-2-line"></i> Đặt hàng</button>
+        </div>
+        <div class="popup-toast" id="order-toast" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="popup-panel" id="success-panel" role="dialog" aria-modal="true" aria-label="Thành công" hidden>
+    <div class="popup-card success-popup">
+      <button type="button" class="btn-icon popup-close" id="success-close" aria-label="Đóng" title="Đóng"><i class="ri-close-line"></i></button>
+      <div class="btn-icon success-icon"><i class="ri-check-line"></i></div>
+      <div class="success-title">Thành công.</div>
+      <div class="success-msg">Chúng tôi sẽ liên hệ lại bạn sau khi nhận được yêu cầu.</div>
+    </div>
+  </div>
+
+  <footer class="footer-dock">© Kem Đoàn</footer>
+
+<script src="login-register.js"></script>
+</body>
+</html>

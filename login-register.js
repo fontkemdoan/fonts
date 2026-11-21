@@ -41,7 +41,7 @@ function initLoginPage() {
   let loginErrorTimer = null;
 
   function showLoginError(msg) {
-    loginError.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    loginError.innerHTML = '<i class="ri-error-warning-line"></i><span></span>';
     loginError.lastChild.textContent = msg;
     clearTimeout(loginErrorTimer);
     loginErrorTimer = setTimeout(() => { loginError.textContent = ''; }, 2500);
@@ -226,7 +226,7 @@ function initRegisterPage() {
   let regBusy = false;
 
   function showRegHint(msg, ms = 2500) {
-    regHint.innerHTML = '<i class="ri-information-line"></i><span></span>';
+    regHint.innerHTML = '<i class="ri-error-warning-line"></i><span></span>';
     regHint.lastChild.textContent = msg;
     clearTimeout(regHintTimer);
     regHintTimer = setTimeout(() => { regHint.textContent = ''; }, ms);
@@ -312,11 +312,194 @@ function initRegisterPage() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuccess(); });
 }
 
-if (getToken()) {
+const ORDER_MAX_TOTAL = 25 * 1024 * 1024;
+const ORDER_FILE_RE = /\.(ttf|otf|ttc|woff2?|zip|rar|7z)$/i;
+const ORDER_LABEL = '<i class="ri-send-plane-2-line"></i> Đặt hàng';
+const ORDER_BUSY_LABEL = SPINNER + ' Đang đặt hàng...';
+
+function initOrderPage() {
+  const linkInput = $('order-link');
+  const contactInput = $('order-contact');
+  const noteInput = $('order-note');
+  const uploadBtn = $('order-upload-btn');
+  const fileInput = $('order-files');
+  const fileList = $('order-file-list');
+  const submitBtn = $('order-submit');
+  const toast = $('order-toast');
+  const successPanel = $('success-panel');
+
+  const sel = $('order-time');
+  const selBtn = $('order-time-btn');
+  const selList = sel.querySelector('.kd-select-list');
+  const selLabel = sel.querySelector('.kd-select-label');
+  const selPrice = selBtn.querySelector('.kd-select-price');
+  const opts = Array.from(selList.querySelectorAll('[role="option"]'));
+
+  let files = [];
+  let timeValue = 'normal';
+  let busy = false;
+  let toastTimer = null;
+
+  function showHint(msg, ms = 2500) {
+    toast.innerHTML = '<i class="ri-error-warning-line"></i><span></span>';
+    toast.lastChild.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.textContent = ''; }, ms);
+  }
+
+  function renderFiles() {
+    fileList.textContent = '';
+    files.forEach((f, i) => {
+      const li = document.createElement('li');
+      const icon = document.createElement('i');
+      icon.className = 'ri-file-3-line';
+      const name = document.createElement('span');
+      name.className = 'order-file-name';
+      name.textContent = f.name;
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'order-file-remove';
+      rm.setAttribute('aria-label', 'Xóa file');
+      rm.innerHTML = '<i class="ri-close-line"></i>';
+      rm.addEventListener('click', () => { files.splice(i, 1); renderFiles(); });
+      li.append(icon, name, rm);
+      fileList.appendChild(li);
+    });
+  }
+
+  function addFiles(list) {
+    let rejected = false;
+    Array.from(list).forEach((f) => {
+      if (!ORDER_FILE_RE.test(f.name)) { rejected = true; return; }
+      const dup = files.some((x) => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified);
+      if (!dup) files.push(f);
+    });
+    if (rejected) showHint('Chỉ nhận file font (ttf, otf, woff...) hoặc file nén');
+    renderFiles();
+  }
+
+  function openSel() {
+    selList.hidden = false;
+    sel.classList.add('open');
+    selBtn.setAttribute('aria-expanded', 'true');
+    const cur = opts.find((o) => o.dataset.value === timeValue) || opts[0];
+    cur.focus();
+  }
+
+  function closeSel(focusBtn) {
+    selList.hidden = true;
+    sel.classList.remove('open');
+    selBtn.setAttribute('aria-expanded', 'false');
+    if (focusBtn) selBtn.focus();
+  }
+
+  function chooseOpt(o) {
+    timeValue = o.dataset.value;
+    opts.forEach((x) => x.setAttribute('aria-selected', String(x === o)));
+    selLabel.textContent = o.children[0].textContent;
+    selPrice.textContent = o.children[1].textContent;
+    closeSel(true);
+  }
+
+  selBtn.addEventListener('click', () => { if (selList.hidden) openSel(); else closeSel(); });
+  selBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (selList.hidden) openSel(); }
+  });
+  opts.forEach((o) => {
+    o.addEventListener('click', () => chooseOpt(o));
+    o.addEventListener('keydown', (e) => {
+      const i = opts.indexOf(o);
+      if (e.key === 'ArrowDown') { e.preventDefault(); opts[(i + 1) % opts.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); opts[(i - 1 + opts.length) % opts.length].focus(); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); chooseOpt(o); }
+      else if (e.key === 'Escape') { e.stopPropagation(); closeSel(true); }
+      else if (e.key === 'Tab') { closeSel(false); }
+    });
+  });
+  document.addEventListener('click', (e) => { if (!sel.contains(e.target)) closeSel(false); });
+
+  function resetOrderForm() {
+    linkInput.value = '';
+    contactInput.value = '';
+    noteInput.value = '';
+    noteInput.style.height = '';
+    files = [];
+    renderFiles();
+    chooseOpt(opts[0]);
+    closeSel(false);
+  }
+
+  const openSuccess = () => { successPanel.hidden = false; };
+  const closeSuccess = () => { successPanel.hidden = true; };
+
+  async function doOrder() {
+    if (busy) return;
+    const link = linkInput.value.trim();
+    const contact = contactInput.value.trim();
+    const note = noteInput.value.trim();
+
+    if (!link && !files.length) { showHint('Vui lòng dán link hoặc tải lên file font'); return; }
+    if (link && !link.split(/[\s,]+/).every((u) => /^https?:\/\/\S+\.\S+/i.test(u))) {
+      showHint('Link font không hợp lệ');
+      return;
+    }
+    if (!contact) { showHint('Vui lòng nhập thông tin liên hệ'); return; }
+    const total = files.reduce((n, f) => n + f.size, 0);
+    if (total > ORDER_MAX_TOTAL) { showHint('Tổng dung lượng file tối đa ' + Math.round(ORDER_MAX_TOTAL / 1048576) + 'MB'); return; }
+
+    busy = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = ORDER_BUSY_LABEL;
+
+    try {
+      const fd = new FormData();
+      fd.append('link', link);
+      fd.append('time', timeValue);
+      fd.append('contact', contact);
+      fd.append('note', note);
+      files.forEach((f) => fd.append('files', f, f.name));
+      const token = getToken();
+      if (token) fd.append('token', token);
+      try {
+        const profile = JSON.parse(localStorage.getItem('kd_profile') || 'null');
+        if (profile && profile.email) fd.append('email', profile.email);
+      } catch (_) {}
+
+      const res = await fetch('/api/order', { method: 'POST', body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        resetOrderForm();
+        openSuccess();
+      } else {
+        showHint('Gửi thất bại, hãy thử lại sau');
+      }
+    } catch (e) {
+      showHint('Lỗi kết nối, hãy thử lại sau');
+    } finally {
+      busy = false;
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = ORDER_LABEL;
+    }
+  }
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+  submitBtn.addEventListener('click', doOrder);
+  [linkInput, contactInput].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') doOrder(); }));
+
+  $('success-close').addEventListener('click', closeSuccess);
+  successPanel.addEventListener('click', (e) => { if (e.target === successPanel) closeSuccess(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuccess(); });
+}
+
+const page = document.body.dataset.page;
+if (page === 'order') {
+  initOrderPage();
+} else if (getToken()) {
   window.location.replace(HOME_URL);
-} else {
-  const page = document.body.dataset.page;
-  if (page === 'login') initLoginPage();
-  else if (page === 'register') initRegisterPage();
+} else if (page === 'login') {
+  initLoginPage();
+} else if (page === 'register') {
+  initRegisterPage();
 }
 })();
