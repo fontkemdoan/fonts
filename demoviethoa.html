@@ -19,7 +19,7 @@
   .l { position:relative; z-index:0; display:inline-block; white-space:pre; }
   .cursor { display:inline-block; width:.05em; background:var(--white); margin-left:.03em; align-self:center; animation:blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity:0; } }
-  .guide { position:absolute; left:0; right:0; height:0; border-top:1px dashed #666; transform:scaleX(0); transform-origin:left; transition:transform .8s ease; }
+  .guide { position:absolute; left:0; right:0; height:0; border-top:1px dashed #666; transform:scaleX(0); transform-origin:left; transition:transform .5s ease; }
   .guide.on { transform:scaleX(1); }
   .ovt { position:absolute; left:0; top:0; z-index:-1; color:#ffd24a; transition:color .6s ease; pointer-events:none; white-space:pre; }
   svg.ov { position:absolute; left:0; top:0; overflow:visible; pointer-events:none; }
@@ -51,12 +51,12 @@ const MASK = {"kae": {"x0": 604, "x1": 883, "yTop": 458, "yBot": 439, "png": "iV
   const mk = ch => { const e = document.createElement('span'); e.className = 'l'; e.textContent = ch; return e; };
   const svgNS = 'http://www.w3.org/2000/svg';
 
-  function makeRow(fam) {
+  function makeRow(fam, withDesc = false) {
     const M = metrics(fam);
     const stage = document.createElement('div'); stage.className = 'stage'; stage.style.height = M.H + 'px';
     const line = document.createElement('div'); line.className = 'line';
     line.style.fontSize = fs + 'px'; line.style.lineHeight = M.H + 'px'; line.style.fontFamily = fam;
-    const guides = [M.B - M.asc, M.B - M.xh, M.B, M.B + M.desc].map(y => {
+    const guides = [M.B - M.asc, M.B - M.xh, M.B, ...(withDesc ? [M.B + M.desc] : [])].map(y => {
       const g = document.createElement('div'); g.className = 'guide'; g.style.top = y + 'px'; stage.appendChild(g); return g;
     });
     const wA = document.createElement('span'), wB = document.createElement('span'), sp = mk(' ');
@@ -135,12 +135,12 @@ const MASK = {"kae": {"x0": 604, "x1": 883, "yTop": 458, "yBot": 439, "png": "iV
   const finish = (letter, ch) => { letter.childNodes[0].nodeValue = ch; letter.querySelectorAll('svg.ov, .ovt').forEach(n => n.remove()); };
 
   async function play() {
-  const top = makeRow('KDKae'), bot = makeRow('KDDoan');
+  const top = makeRow('KDKae'), bot = makeRow('KDDoan', true);
 
   // 1. guide lines first
-  await sleep(400);
-  [...top.guides, ...bot.guides].forEach((g, i) => setTimeout(() => g.classList.add('on'), i * 120));
-  await sleep(1600);
+  await sleep(200);
+  [...top.guides, ...bot.guides].forEach((g, i) => setTimeout(() => g.classList.add('on'), i * 40));
+  await sleep(900);
 
   // 2. top row: Kem Doan (KD Kaelyna Script) -> Kem Đoàn
   top.line.append(top.cursor);
