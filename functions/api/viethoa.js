@@ -1,5 +1,7 @@
+const ORDER_IMAGE = '/imgdemo/demoviethoa.jpg';
+
 const TIMES = {
-  normal: { label: 'Bình thường', price: '100.000đ' },
+  normal: { label: 'Tiêu chuẩn', price: '100.000đ' },
   fast: { label: 'Nhanh', price: '150.000đ' }
 };
 
@@ -47,6 +49,13 @@ export async function handleOrder(request, env) {
   msg.append('parse_mode', 'HTML');
   msg.append('disable_web_page_preview', 'true');
   if (!(await tg(env, 'sendMessage', msg))) return json({ ok: false }, 502);
+
+  try {
+    const photo = new FormData();
+    photo.append('chat_id', chatId(env));
+    photo.append('photo', new URL(ORDER_IMAGE, request.url).href);
+    await tg(env, 'sendPhoto', photo);
+  } catch (_) {}
 
   for (const f of files) {
     const doc = new FormData();
