@@ -1086,14 +1086,15 @@ background: linear-gradient(#333, #333) 0 0 / calc(10px + (100% - 20px) * var(--
   .bottom-nav .menu-item:nth-child(4) { order: 4; }
   .menu-panel .menu-divider:nth-of-type(1) { order: 5; }
   .menu-panel [data-action="editfont"]       { order: 6; }
-  .menu-panel [data-action="finder"]       { order: 7; }
-  .menu-panel [data-action="folder"]       { order: 8; }
-  .menu-panel .menu-divider:nth-of-type(2) { order: 9; }
-  .menu-panel a[href*="facebook.com"] { order: 10; }
-  .menu-panel a[href*="m.me"]         { order: 11; }
-  .menu-panel a[href*="zalo.me"]      { order: 12; }
-  .menu-panel .menu-divider:nth-of-type(3) { order: 13; }
-  .menu-panel #auth-btn               { order: 14; }
+  .menu-panel [data-action="getfont"]       { order: 7; }
+  .menu-panel [data-action="finder"]       { order: 8; }
+  .menu-panel [data-action="folder"]       { order: 9; }
+  .menu-panel .menu-divider:nth-of-type(2) { order: 10; }
+  .menu-panel a[href*="facebook.com"] { order: 11; }
+  .menu-panel a[href*="m.me"]         { order: 12; }
+  .menu-panel a[href*="zalo.me"]      { order: 13; }
+  .menu-panel .menu-divider:nth-of-type(3) { order: 14; }
+  .menu-panel #auth-btn               { order: 15; }
 
   .dock-footer {
     order: 15;

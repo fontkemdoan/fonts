@@ -34,18 +34,19 @@
       <div class="popup-card">
         <div class="login-title">VIỆT HÓA FONT</div>
 
+        <div class="order-label">Link hoặc file</div>
         <div class="popup-field">
           <i class="ri-links-line popup-field-icon"></i>
-          <span class="req" aria-hidden="true">*</span>
-          <input class="popup-input reg-input order-link-input" type="text" id="order-link" placeholder="Link font hoặc tải lên file" aria-required="true" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-          <button type="button" class="btn-icon order-upload-btn" id="order-upload-btn" aria-label="Tải lên file font" title="Tải lên file font"><i class="ri-attachment-line"></i></button>
-          <input type="file" id="order-files" multiple accept=".ttf,.otf,.ttc,.woff,.woff2,.zip,.rar,.7z" hidden>
+          <input class="popup-input" type="text" id="order-link" placeholder="Link font" aria-required="true" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
         </div>
+        <button type="button" class="order-upload" id="order-upload-btn"><i class="ri-attachment-line"></i><span>Upload</span></button>
+        <input type="file" id="order-files" multiple accept=".ttf,.otf,.ttc,.woff,.woff2,.zip,.rar,.7z" hidden>
         <ul class="order-files" id="order-file-list"></ul>
 
+        <div class="order-label">Thời gian</div>
         <div class="popup-field kd-select" id="order-time">
           <i class="ri-time-line popup-field-icon"></i>
-          <button type="button" class="kd-select-btn" id="order-time-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Thời gian">
+          <button type="button" class="kd-select-btn" id="order-time-btn" aria-haspopup="listbox" aria-expanded="false">
             <span class="kd-select-label">Tiêu chuẩn</span>
             <span class="kd-select-price">100.000đ</span>
             <i class="ri-arrow-down-s-line kd-select-caret"></i>
@@ -56,12 +57,13 @@
           </ul>
         </div>
 
+        <div class="order-label">Liên hệ</div>
         <div class="popup-field">
           <i class="ri-user-line popup-field-icon"></i>
-          <span class="req" aria-hidden="true">*</span>
-          <input class="popup-input reg-input" type="text" id="order-contact" placeholder="Thông tin liên hệ" aria-required="true" autocomplete="off" maxlength="200">
+          <input class="popup-input" type="text" id="order-contact" placeholder="Zalo, facebook..." aria-required="true" autocomplete="off" maxlength="200">
         </div>
 
+        <div class="order-label">Ghi chú</div>
         <div class="popup-field order-note-field">
           <i class="ri-edit-line popup-field-icon"></i>
           <textarea class="popup-input order-note" id="order-note" rows="4" placeholder="Cho chúng tôi biết nếu bạn có thêm yêu cầu nhé..." maxlength="500"></textarea>
@@ -82,7 +84,7 @@
       <button type="button" class="btn-icon popup-close" id="success-close" aria-label="Đóng" title="Đóng"><i class="ri-close-line"></i></button>
       <div class="btn-icon success-icon"><i class="ri-check-line"></i></div>
       <div class="success-title">Thành công.</div>
-      <div class="success-msg">Chúng tôi sẽ liên hệ lại bạn sau khi nhận được yêu cầu.</div>
+      <div class="success-msg">Chúng tôi sẽ liên hệ lại sau khi nhận được yêu cầu.</div>
     </div>
   </div>
 
