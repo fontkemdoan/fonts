@@ -1,4 +1,5 @@
 const ORDER_IMAGE = '/imgdemo/demoviethoa.jpg';
+const MAX_CAPTION = 1024;
 
 const TIMES = {
   normal: { label: 'Tiêu chuẩn', price: '100.000đ' },
@@ -34,28 +35,43 @@ export async function handleOrder(request, env) {
 
   if (!time || !contact || (!link && !files.length)) return json({ ok: false }, 400);
 
-  const lines = [
+  const plain = [
+    'ĐẶT VIỆT HÓA',
+    'Thời gian: ' + time.label + ' (' + time.price + ')'
+  ];
+  const html = [
     '🆕 <b>ĐẶT VIỆT HÓA</b>',
     '⏱ Thời gian: ' + esc(time.label) + ' (' + time.price + ')'
   ];
-  if (link) lines.push('🔗 Link font: ' + esc(link));
-  if (note) lines.push('📝 Yêu cầu: ' + esc(note));
-  lines.push('📞 Liên hệ: ' + esc(contact));
-  if (files.length) lines.push('📎 File font: ' + files.length);
+  const add = (icon, label, value) => {
+    plain.push(label + ': ' + value);
+    html.push(icon + ' ' + label + ': ' + esc(value));
+  };
+  if (link) add('🔗', 'Link font', link);
+  if (note) add('📝', 'Yêu cầu', note);
+  add('📞', 'Liên hệ', contact);
+  if (files.length) add('📎', 'File font', String(files.length));
 
-  const msg = new FormData();
-  msg.append('chat_id', chatId(env));
-  msg.append('text', lines.join('\n'));
-  msg.append('parse_mode', 'HTML');
-  msg.append('disable_web_page_preview', 'true');
-  if (!(await tg(env, 'sendMessage', msg))) return json({ ok: false }, 502);
+  const fits = plain.join('\n').length <= MAX_CAPTION;
+  const shortCaption = [html[0], html[1], html[html.length - (files.length ? 2 : 1)]].join('\n');
 
-  try {
-    const photo = new FormData();
-    photo.append('chat_id', chatId(env));
-    photo.append('photo', new URL(ORDER_IMAGE, request.url).href);
-    await tg(env, 'sendPhoto', photo);
-  } catch (_) {}
+  const photo = new FormData();
+  photo.append('chat_id', chatId(env));
+  photo.append('photo', new URL(ORDER_IMAGE, request.url).href);
+  photo.append('caption', fits ? html.join('\n') : shortCaption);
+  photo.append('parse_mode', 'HTML');
+
+  let sentPhoto = false;
+  try { sentPhoto = await tg(env, 'sendPhoto', photo); } catch (_) {}
+
+  if (!sentPhoto || !fits) {
+    const msg = new FormData();
+    msg.append('chat_id', chatId(env));
+    msg.append('text', html.join('\n'));
+    msg.append('parse_mode', 'HTML');
+    msg.append('disable_web_page_preview', 'true');
+    if (!(await tg(env, 'sendMessage', msg))) return json({ ok: false }, 502);
+  }
 
   for (const f of files) {
     const doc = new FormData();
