@@ -438,7 +438,7 @@ function initOrderPage() {
     const contact = contactInput.value.trim();
     const note = noteInput.value.trim();
 
-    if (!link && !files.length) { showHint('Vui lòng dán link hoặc tải lên file font'); return; }
+    if (!link && !files.length) { showHint('Vui lòng nhập link hoặc tải lên file'); return; }
     if (link && !link.split(/[\s,]+/).every((u) => /^https?:\/\/\S+\.\S+/i.test(u))) {
       showHint('Link font không hợp lệ');
       return;
